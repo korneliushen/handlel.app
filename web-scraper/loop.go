@@ -9,9 +9,11 @@ import (
 	"github.com/gocolly/colly"
 )
 
-func getCategories() {
+func getProducts() {
 	c := colly.NewCollector()
 
+	// besøker oda og henter alle kategorier
+	// for hver kategori, kjører getUnderCategories med kategori linken man får
 	c.OnHTML(".k-p-4", func(e *colly.HTMLElement) {
 		categoryLink := e.ChildAttr("div > a", "href")
 		getUnderCategories(categoryLink)
@@ -23,8 +25,9 @@ func getCategories() {
 func getUnderCategories(categoryLink string) {
 	c := colly.NewCollector()
 
-	fmt.Println("going to: ", categoryLink)
-
+	// finner hver under kategori
+	// Eksempel: oda.com/no/categories/20-frukt-og-gront og så Frukt, Bær, osv.
+	// for hver underkategori, henter mengden sider den underkategorien har (cursor)
 	c.OnHTML("section", func(e *colly.HTMLElement) {
 		underCategoryLink := e.ChildAttr("section > a", "href")
 		getPageCount(underCategoryLink)
@@ -39,6 +42,7 @@ func getPageCount(underCategoryLink string) {
 	c := colly.NewCollector()
 
 	c.OnHTML("main", func(e *colly.HTMLElement) {
+		// finner mengden sider
 		tall := strings.Split(e.ChildText("main > div > div > div > span > div > div > a.k-choice-chip--selected.k-choice-chip--primary > span.k-pill--extra-small"), "")
 		tallLengde := len(tall) / 2
 		var s []string
@@ -52,9 +56,9 @@ func getPageCount(underCategoryLink string) {
 		}
 		antallVarerDelt := antallVarer / 24
 		antallSider := int(math.Ceil(float64(antallVarerDelt)))
-		fmt.Println(antallSider)
-		underCategoryLink := "/no/categories/1135-bakeri-og-konditori/1136-handverksbakeri/?filters="
+		// lager en link for underkategorien
 		link := fmt.Sprintf("https://oda.com%s", underCategoryLink)
+		// for hver side, hent produktinfo for alle produktene på siden
 		for i := range antallSider {
 			getProductInfo(link, i+1)
 		}
@@ -66,6 +70,7 @@ func getPageCount(underCategoryLink string) {
 func getProductInfo(link string, cursor int) {
 	c := colly.NewCollector()
 
+	// henter data for hvert element (printer bare for nå)
 	c.OnHTML("article", func(e *colly.HTMLElement) {
 		fmt.Println("Title: ", e.ChildText("div > div h2"))
 		fmt.Println("Price: ", e.ChildText("div > div > div > span"))
@@ -74,6 +79,5 @@ func getProductInfo(link string, cursor int) {
 	})
 
 	visitLink := fmt.Sprintf("%s&cursor=%v", link, cursor)
-	fmt.Println("Link", visitLink)
 	c.Visit(visitLink)
 }
