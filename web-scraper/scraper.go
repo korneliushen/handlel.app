@@ -4,74 +4,87 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gocolly/colly"
 )
 
-type Produkter struct {
-	Produkter []Produkt
-}
-
-// TODO: gjøre alt som kan bli int/float til det
-type Produkt struct {
-	Tittel    string
-	Pris      string
-	KiloPris  string
-	BildeLink string
-	Innhold   Innhold
-}
-
-type Innhold struct {
-	Salgsinformasjon   string
-	Beskrivelse        string
-	Holdbarhetsgaranti string
-	Utleveringsdager   string
-	Størrelse          string
-	Leverandør         string
-	Ingredienser       []string
-	Oppbevaring        string
-	// næringsinnhold (gjør til egen struct kanskje senere)
-	Energi                      string
-	Fett                        string
-	HvoravMettedeFettsyrer      string
-	HvoravEnumettedeFettsyrer   string
-	HvoravFlerumettedeFettsyrer string
-	Karbohydrater               string
-	HvoravSukkerarter           string
-	HvoravPolyoler              string
-	HvoravStivelse              string
-	Kostfiber                   string
-	Protein                     string
-	Salt                        string
-}
-
-// type Næringsinnhold struct {}
-
 func getProducts() {
 	c := colly.NewCollector()
 
+	categories := Kategorier{}
+
 	// besøker oda og henter alle kategorier
 	// for hver kategori, kjører getUnderCategories med kategori linken man får
-	c.OnHTML(".k-p-4", func(e *colly.HTMLElement) {
+	c.OnHTML("article.k-p-4", func(e *colly.HTMLElement) {
+		start := time.Now()
+		category := Kategori{}
+
+		categoryName := e.ChildText("div > a > h1")
+		category.Navn = categoryName
+
+		fmt.Println("Getting data for: ", categoryName)
+
 		categoryLink := e.ChildAttr("div > a", "href")
-		getUnderCategories(categoryLink)
+		getUnderCategories(categoryName, categoryLink, category)
+
+		categories.Kategorier = append(categories.Kategorier, category)
+
+		// temp code just for testing
+		jsonData, err := json.MarshalIndent(categories, "", "    ")
+		if err != nil {
+			fmt.Printf("Error marshalling to JSON: %v\n", err)
+			return
+		}
+
+		fmt.Println("Data: ", string(jsonData))
+
+		end := time.Now()
+		elapsed := end.Sub(start)
+		fmt.Println("Found data for category: ", categoryName, "in: ", elapsed, "seconds")
 	})
 
 	c.Visit("https://oda.com/no/products/")
+
+	jsonData, err := json.MarshalIndent(categories, "", "    ")
+	if err != nil {
+		fmt.Printf("Error marshalling to JSON: %v\n", err)
+		return
+	}
+
+	err = os.WriteFile("./data.json", jsonData, 0666)
+	if err != nil {
+		fmt.Printf("Error writing json data to file %v\n", err)
+		return
+	}
+
+	fmt.Println("Data: ", string(jsonData))
 }
 
-func getUnderCategories(categoryLink string) {
+func getUnderCategories(categoryName string, categoryLink string, category Kategori) {
 	c := colly.NewCollector()
 
 	// finner hver under kategori
 	// Eksempel: oda.com/no/categories/20-frukt-og-gront og så Frukt, Bær, osv.
 	// for hver underkategori, henter mengden sider den underkategorien har (cursor)
 	c.OnHTML("section", func(e *colly.HTMLElement) {
+		// lager instans av under kategori
+		underCategory := Underkategori{}
+
+		// gir instansen et navn
+		underCategoryName := e.ChildText("section > a > h2")
+		underCategory.Navn = underCategoryName
+
+		fmt.Println("Getting data for undercategory: ", underCategoryName, "in category", categoryName)
+
 		underCategoryLink := e.ChildAttr("section > a", "href")
-		getPageCount(underCategoryLink)
+		getPageCount(underCategoryName, underCategoryLink, underCategory)
+
+		category.Underkategorier = append(category.Underkategorier, underCategory)
 	})
 
 	link := fmt.Sprintf("https://oda.com%s", categoryLink)
@@ -79,7 +92,7 @@ func getUnderCategories(categoryLink string) {
 	c.Visit(link)
 }
 
-func getPageCount(underCategoryLink string) {
+func getPageCount(underCategoryName string, underCategoryLink string, underCategory Underkategori) {
 	c := colly.NewCollector()
 
 	c.OnHTML("main", func(e *colly.HTMLElement) {
@@ -101,7 +114,7 @@ func getPageCount(underCategoryLink string) {
 		link := fmt.Sprintf("https://oda.com%s", underCategoryLink)
 		// for hver side, hent produktinfo for alle produktene på siden
 		for i := range antallSider {
-			getProductInfo(link, i+1)
+			getProductInfo(link, i+1, underCategory)
 		}
 	})
 	link := fmt.Sprintf("https://oda.com%s", underCategoryLink)
@@ -117,6 +130,7 @@ func setFieldValue(in *Innhold, key string, value string) {
 	key = strings.Title(key)
 	key = strings.ReplaceAll(key, " ", "")
 
+	// finner fieldet som matcher key
 	field := v.FieldByName(key)
 
 	if !field.IsValid() || !field.CanSet() {
@@ -134,10 +148,8 @@ func setFieldValue(in *Innhold, key string, value string) {
 	}
 }
 
-func getProductInfo(link string, cursor int) {
+func getProductInfo(link string, cursor int, underCategory Underkategori) {
 	// lager en instans av Produkter
-	products := Produkter{}
-
 	c := colly.NewCollector()
 
 	// henter data for hvert element (printer bare for nå)
@@ -187,20 +199,11 @@ func getProductInfo(link string, cursor int) {
 		// legger innhold til i produktinfo
 		productInfo.Innhold = *contents
 		// setter produktet inn i produkter arrayet
-		products.Produkter = append(products.Produkter, productInfo)
+		underCategory.Produkter = append(underCategory.Produkter, productInfo)
 	})
 
 	// besøker linken med underkategori og cursor (side nr)
 	// visitLink := fmt.Sprintf("%s&cursor=%v", link, cursor)
 	visitLink := fmt.Sprintf("https://oda.com/no/categories/20-frukt-og-gront/21-frukt/?filters=&cursor=3")
 	c.Visit(visitLink)
-
-	// gjør dataen til jsondata
-	jsonData, err := json.Marshal(products)
-	if err != nil {
-		fmt.Println("Error marshalling to JSON:", err)
-		return
-	}
-
-	fmt.Println(string(jsonData))
 }
