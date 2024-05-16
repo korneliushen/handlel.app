@@ -22,7 +22,7 @@ func getProducts() {
 	// for hver kategori, kjører getUnderCategories med kategori linken man får
 	c.OnHTML("article.k-p-4", func(e *colly.HTMLElement) {
 		start := time.Now()
-		category := Kategori{}
+		category := &Kategori{}
 
 		categoryName := e.ChildText("div > a > h1")
 		category.Navn = categoryName
@@ -32,12 +32,18 @@ func getProducts() {
 		categoryLink := e.ChildAttr("div > a", "href")
 		getUnderCategories(categoryName, categoryLink, category)
 
-		categories.Kategorier = append(categories.Kategorier, category)
+		categories.Kategorier = append(categories.Kategorier, *category)
 
 		// temp code just for testing
 		jsonData, err := json.MarshalIndent(categories, "", "    ")
 		if err != nil {
 			fmt.Printf("Error marshalling to JSON: %v\n", err)
+			return
+		}
+
+		err = os.WriteFile("./data.json", jsonData, 0666)
+		if err != nil {
+			fmt.Printf("Error writing json data to file %v\n", err)
 			return
 		}
 
@@ -65,7 +71,7 @@ func getProducts() {
 	fmt.Println("Data: ", string(jsonData))
 }
 
-func getUnderCategories(categoryName string, categoryLink string, category Kategori) {
+func getUnderCategories(categoryName string, categoryLink string, category *Kategori) {
 	c := colly.NewCollector()
 
 	// finner hver under kategori
@@ -73,7 +79,7 @@ func getUnderCategories(categoryName string, categoryLink string, category Kateg
 	// for hver underkategori, henter mengden sider den underkategorien har (cursor)
 	c.OnHTML("section", func(e *colly.HTMLElement) {
 		// lager instans av under kategori
-		underCategory := Underkategori{}
+		underCategory := &Underkategori{} // Use a pointer to Underkategori
 
 		// gir instansen et navn
 		underCategoryName := e.ChildText("section > a > h2")
@@ -82,9 +88,9 @@ func getUnderCategories(categoryName string, categoryLink string, category Kateg
 		fmt.Println("Getting data for undercategory: ", underCategoryName, "in category", categoryName)
 
 		underCategoryLink := e.ChildAttr("section > a", "href")
-		getPageCount(underCategoryName, underCategoryLink, underCategory)
+		getPageCount(underCategoryLink, underCategory)
 
-		category.Underkategorier = append(category.Underkategorier, underCategory)
+		category.Underkategorier = append(category.Underkategorier, *underCategory)
 	})
 
 	link := fmt.Sprintf("https://oda.com%s", categoryLink)
@@ -92,7 +98,7 @@ func getUnderCategories(categoryName string, categoryLink string, category Kateg
 	c.Visit(link)
 }
 
-func getPageCount(underCategoryName string, underCategoryLink string, underCategory Underkategori) {
+func getPageCount(underCategoryLink string, underCategory *Underkategori) {
 	c := colly.NewCollector()
 
 	c.OnHTML("main", func(e *colly.HTMLElement) {
@@ -113,7 +119,7 @@ func getPageCount(underCategoryName string, underCategoryLink string, underCateg
 		// lager en link for underkategorien
 		link := fmt.Sprintf("https://oda.com%s", underCategoryLink)
 		// for hver side, hent produktinfo for alle produktene på siden
-		for i := range antallSider {
+		for i := 0; i < antallSider; i++ {
 			getProductInfo(link, i+1, underCategory)
 		}
 	})
@@ -148,7 +154,7 @@ func setFieldValue(in *Innhold, key string, value string) {
 	}
 }
 
-func getProductInfo(link string, cursor int, underCategory Underkategori) {
+func getProductInfo(link string, cursor int, underCategory *Underkategori) {
 	// lager en instans av Produkter
 	c := colly.NewCollector()
 
@@ -164,6 +170,8 @@ func getProductInfo(link string, cursor int, underCategory Underkategori) {
 		if title == "" {
 			return
 		}
+
+		fmt.Println("Getting data for", title)
 
 		productInfo.Tittel = title
 		productInfo.Pris = e.ChildText("div > div > div > span")
@@ -202,8 +210,6 @@ func getProductInfo(link string, cursor int, underCategory Underkategori) {
 		underCategory.Produkter = append(underCategory.Produkter, productInfo)
 	})
 
-	// besøker linken med underkategori og cursor (side nr)
-	// visitLink := fmt.Sprintf("%s&cursor=%v", link, cursor)
-	visitLink := fmt.Sprintf("https://oda.com/no/categories/20-frukt-og-gront/21-frukt/?filters=&cursor=3")
+	visitLink := fmt.Sprintf("%s&cursor=%v", link, cursor)
 	c.Visit(visitLink)
 }

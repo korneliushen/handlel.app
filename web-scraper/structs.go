@@ -36,8 +36,13 @@ type Innhold struct {
 	Opphavssted        string
 	Egenskaper         string
 	Inneholder         string
+	Allergener         string
+	KanInneholdeSporAv string
+	Vekt               string
+	Bruksområde        string
 	// næringsinnhold (gjør til egen struct kanskje senere)
 	Energi                      string
+	Natrium                     string
 	Fett                        string
 	HvoravMettedeFettsyrer      string
 	HvoravEnumettedeFettsyrer   string
