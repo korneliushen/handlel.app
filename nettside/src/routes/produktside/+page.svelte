@@ -1,12 +1,23 @@
 <script>
     import {ChevronDown} from 'lucide-svelte'
+    import autoAnimate from '@formkit/auto-animate';
     let antallProdukter = 0
     let dropdown = false;
-    let lesmer = '40';
+    let lesmer = '10rem';
+    let lesmerBool = false;
+
+    function lesmerFunc() {
+        lesmerBool = true
+        if (lesmerBool) {
+            lesmer = 'fit-content'
+        } else {
+            lesmer = '10rem'
+        };
+    };
 </script>
 
 <main class=" relative w-screen max-w-[400px] rounded-lg flex flex-col px-5 overflow-auto">
-    <div class=" relative min-h-80 flex justify-center py-1 border-b-2 border-borderColor/50">
+    <div class=" relative min-h-80 flex justify-center items-center py-1 border-b-2 border-borderColor/50">
         <img class=" h-full" src="/favicon.png" alt="Produktbilde">
         <img class=" absolute bottom-1 left-1 w-10" src="/favicon.png" alt="nettside">
     </div>
@@ -43,8 +54,10 @@
             </div>
         </div>
     </div>
-    <div class=" my-3 relative max-h-{lesmer} overflow-hidden">
-        <div class=" w-full h-full bg-gradient-to-b from-transparent to-85% to-white absolute z-10"></div>
+    <div use:autoAnimate class=" my-3 relative overflow-hidden" style="max-height: {lesmer};">
+        {#if !lesmerBool}
+            <div class=" w-full h-full bg-gradient-to-b from-transparent to-85% to-white absolute z-10"/>
+        {/if}
         <div>
             <p class=" font-bold text-xl py-1">Om produktet</p>
         </div>
@@ -65,15 +78,14 @@
                 <p class=" w-2/3 text-end">lettmelk 4%, sukker, stivelse, aroma</p>
             </div>
         </div>
-        <button on:click={() => lesmer = "fit"} class=" text-purple-500 font-bold bottom-1 left-1 absolute z-20">+ Les mer...</button>
+        {#if !lesmerBool}
+            <button on:click={() => lesmerFunc()} class=" text-purple-500 font-bold bottom-1 left-1 absolute z-20">+ Les mer...</button>
+        {/if}
     </div>
-
-
-
-    <div class=" mb-24 mt-3 border-y border-borderColor transition duration-1000">
-        <button on:click={() => dropdown = true} class=" flex items-center justify-between w-full py-3 h-20">
+    <div use:autoAnimate class=" mb-24 mt-3 border-y border-borderColor">
+        <button on:click={() => dropdown = !dropdown} class=" flex items-center justify-between w-full py-3 h-20">
             <p class=" font-bold text-xl py-1">Næringsinnhold per 100g</p>
-            <ChevronDown strokeWidth={3} />
+            <ChevronDown class=" {dropdown ? "rotate-180" : "rotate-0"}" strokeWidth={3}/>
         </button>
         {#if dropdown}
             <div class=" flex w-full justify-between border-t border-borderColor py-2">
