@@ -34,18 +34,18 @@ type Innhold struct {
 	Ingredienser       []string
 	Oppbevaring        string
 	// næringsinnhold (gjør til egen struct kanskje senere)
-	Energi                string
-	Fett                  string
-	MettedeFettsyrer      string
-	EnumettedeFettsyter   string
-	FlerumettedeFettsyrer string
-	Karbohydrater         string
-	Sukkerarter           string
-	Polyoler              string
-	Stivelse              string
-	Kostfiber             string
-	Protein               string
-	Salt                  string
+	Energi                      string
+	Fett                        string
+	HvoravMettedeFettsyrer      string
+	HvoravEnumettedeFettsyrer   string
+	HvoravFlerumettedeFettsyrer string
+	Karbohydrater               string
+	HvoravSukkerarter           string
+	HvoravPolyoler              string
+	HvoravStivelse              string
+	Kostfiber                   string
+	Protein                     string
+	Salt                        string
 }
 
 // type Næringsinnhold struct {}
@@ -108,8 +108,18 @@ func getPageCount(underCategoryLink string) {
 	c.Visit(link)
 }
 
-func setFieldValue(in *Innhold, key, value string) {
+// TODO: rewrite
+// convert ord som ikke matcher i struct
+// legg til cases for float og int (for gram osv??)
+func setFieldValue(in *Innhold, key string, value string) {
 	v := reflect.ValueOf(in).Elem()
+
+	key = strings.Title(key)
+
+	key = strings.ReplaceAll(key, " ", "")
+
+	fmt.Println(key)
+
 	field := v.FieldByName(key)
 
 	if !field.IsValid() || !field.CanSet() {
@@ -120,22 +130,7 @@ func setFieldValue(in *Innhold, key, value string) {
 	switch field.Kind() {
 	case reflect.String:
 		field.SetString(value)
-	case reflect.Int:
-		intValue, err := strconv.Atoi(value)
-		if err != nil {
-			fmt.Printf("Error converting %s to int: %v\n", value, err)
-			return
-		}
-		field.SetInt(int64(intValue))
-	case reflect.Float32, reflect.Float64:
-		floatValue, err := strconv.ParseFloat(value, 32)
-		if err != nil {
-			fmt.Printf("Error converting %s to float: %v\n", value, err)
-			return
-		}
-		field.SetFloat(floatValue)
 	case reflect.Slice:
-		// Assuming Ingredienser field is a slice of strings
 		field.Set(reflect.ValueOf([]string{value}))
 	default:
 		fmt.Printf("Unsupported kind %s\n", field.Kind())
@@ -170,7 +165,7 @@ func getProductInfo(link string, cursor int) {
 		// henter data fra produkt siden
 		n := colly.NewCollector()
 
-		n.OnHTML(".styles_ReadMore__JFqrt", func(h *colly.HTMLElement) {
+		n.OnHTML("#read-more-product-description-nb", func(h *colly.HTMLElement) {
 			// henter beskrivelsen
 			description := h.ChildText("p")
 			contents.Beskrivelse = description
@@ -180,6 +175,10 @@ func getProductInfo(link string, cursor int) {
 		n.OnHTML("div.k-grid.k-pt-3.k-pb-6", func(h *colly.HTMLElement) {
 			key := h.ChildText("div > span")
 			value := h.ChildText("div > p")
+			if strings.Contains(key, "Oppbevaring") {
+				key = "Oppbevaring"
+				value = h.ChildText("div > div span")
+			}
 			setFieldValue(contents, key, value)
 		})
 
