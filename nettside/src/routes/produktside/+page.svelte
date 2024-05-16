@@ -1,8 +1,11 @@
 <script>
+    import {ChevronDown} from 'lucide-svelte'
     let antallProdukter = 0
+    let dropdown = false;
+    let lesmer = '40';
 </script>
 
-<main class=" relative w-screen max-w-[1200px] rounded-lg flex min-h-fit flex-col px-5">
+<main class=" relative w-screen max-w-[400px] rounded-lg flex flex-col px-5 overflow-auto">
     <div class=" relative min-h-80 flex justify-center py-1 border-b-2 border-borderColor/50">
         <img class=" h-full" src="/favicon.png" alt="Produktbilde">
         <img class=" absolute bottom-1 left-1 w-10" src="/favicon.png" alt="nettside">
@@ -40,9 +43,10 @@
             </div>
         </div>
     </div>
-    <div class=" mt-3 h-40">
+    <div class=" my-3 relative max-h-{lesmer} overflow-hidden">
+        <div class=" w-full h-full bg-gradient-to-b from-transparent to-85% to-white absolute z-10"></div>
         <div>
-            <p class=" font-bold">Om produktet</p>
+            <p class=" font-bold text-xl py-1">Om produktet</p>
         </div>
         <div>
             <p>
@@ -51,22 +55,66 @@
                 Tempora, provident laudantium? 
                 Ex minima rerum omnis nam a, quos dignissimos itaque! 
                 Omnis.
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Amet id deleniti sed hic dicta magni rem, doloremque molestias? Unde voluptate officia repudiandae enim! Voluptatibus consequatur iure sapiente eius molestias totam.
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos voluptas exercitationem tenetur ipsum asperiores cupiditate minus at, adipisci pariatur impedit molestiae nulla veritatis suscipit ad cum consectetur vero odit perferendis!
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum, eos excepturi assumenda maiores nam accusantium voluptates! Quas consectetur, consequatur maxime ipsam qui cumque amet quod quis sit blanditiis accusamus similique.
             </p>
+            <div class=" flex justify-between my-4">
+                <p class=" font-bold text-lg">Mengde</p>
+                <p>1 Liter</p>
+            </div>
+            <div class=" flex my-4 w-full justify-between">
+                <p class=" font-bold text-lg">Ingredienser</p>
+                <p class=" w-2/3 text-end">lettmelk 4%, sukker, stivelse, aroma</p>
+            </div>
         </div>
+        <button on:click={() => lesmer = "fit"} class=" text-purple-500 font-bold bottom-1 left-1 absolute z-20">+ Les mer...</button>
     </div>
-    <div class=" mb-24 h-20">
-        <div>
-            <p>Næringsinnhold per 100g</p>
-            <img src="" alt="">
-        </div>
-        <div>
 
-        </div>
+
+
+    <div class=" mb-24 mt-3 border-y border-borderColor transition duration-1000">
+        <button on:click={() => dropdown = true} class=" flex items-center justify-between w-full py-3 h-20">
+            <p class=" font-bold text-xl py-1">Næringsinnhold per 100g</p>
+            <ChevronDown strokeWidth={3} />
+        </button>
+        {#if dropdown}
+            <div class=" flex w-full justify-between border-t border-borderColor py-2">
+                <p class=" font-bold">Kalorier</p>
+                <p class=" w-2/3 text-end">40kcal</p>
+            </div>
+            <div class=" flex w-full justify-between border-t border-borderColor py-2">
+                <p class=" font-bold">Kalorier</p>
+                <p class=" w-2/3 text-end">40kcal</p>
+            </div>
+            <div class=" flex w-full justify-between border-t border-borderColor py-2">
+                <p class=" font-bold">Kalorier</p>
+                <p class=" w-2/3 text-end">40kcal</p>
+            </div>
+            <div class=" flex w-full justify-between border-t border-borderColor py-2">
+                <p class=" font-bold">Kalorier</p>
+                <p class=" w-2/3 text-end">40kcal</p>
+            </div>
+            <div class=" flex w-full justify-between border-t border-borderColor py-2">
+                <p class=" font-bold">Kalorier</p>
+                <p class=" w-2/3 text-end">40kcal</p>
+            </div>
+            <div class=" flex w-full justify-between border-t border-borderColor py-2">
+                <p class=" font-bold">Kalorier</p>
+                <p class=" w-2/3 text-end">40kcal</p>
+            </div>
+            <div class=" flex w-full justify-between border-t border-borderColor py-2">
+                <p class=" font-bold">Kalorier</p>
+                <p class=" w-2/3 text-end">40kcal</p>
+            </div>
+            <div class=" flex w-full justify-between border-t border-borderColor py-2">
+                <p class=" font-bold">Kalorier</p>
+                <p class=" w-2/3 text-end">40kcal</p>
+            </div>
+            <div class=" flex w-full justify-between border-t border-borderColor py-2">
+                <p class=" font-bold">Kalorier</p>
+                <p class=" w-2/3 text-end">40kcal</p>
+            </div>
+        {/if}
     </div>
-    <footer class=" bg-white fixed bottom-0 left-0 h-20 w-full border-t border-borderColor flex justify-center items-center">
+    <footer class=" bg-white fixed bottom-0 left-0 h-20 w-full border-t border-borderColor flex justify-center items-center z-50">
         <div class=" w-4/5 h-12 rounded-lg">
             {#if antallProdukter !== 0}
                 <div class=" flex justify-between items-center h-full w-full border border-purple-500 rounded-lg">
@@ -75,7 +123,7 @@
                     <button on:click={() => antallProdukter++} class=" w-14 font-extrabold text-xl">+</button>
                 </div>
             {:else}
-                <button on:click={() => antallProdukter++} class=" w-full h-full rounded-lg flex items-center justify-center bg-purple-500 border border-purple-500 active:scale-95 transition">
+                <button on:click={() => antallProdukter++} class=" w-full h-full rounded-lg flex items-center justify-center bg-purple-500 border border-purple-500">
                     <p class=" text-white font-bold">Legg til i handlelisten</p>
                     <img src="" alt="">
                 </button>
