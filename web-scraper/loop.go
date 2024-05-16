@@ -108,17 +108,14 @@ func getPageCount(underCategoryLink string) {
 	c.Visit(link)
 }
 
-// TODO: rewrite
-// convert ord som ikke matcher i struct
-// legg til cases for float og int (for gram osv??)
+// Sammenligner key til innholdet (navnet), med et field i Innhold structen
+// om den finner en key som matcher en field, legges det til i instansen av Innhold
 func setFieldValue(in *Innhold, key string, value string) {
 	v := reflect.ValueOf(in).Elem()
 
+	// denne koden gjør at alt med hvorav funker som det skal
 	key = strings.Title(key)
-
 	key = strings.ReplaceAll(key, " ", "")
-
-	fmt.Println(key)
 
 	field := v.FieldByName(key)
 
@@ -138,13 +135,16 @@ func setFieldValue(in *Innhold, key string, value string) {
 }
 
 func getProductInfo(link string, cursor int) {
+	// lager en instans av Produkter
 	products := Produkter{}
 
 	c := colly.NewCollector()
 
 	// henter data for hvert element (printer bare for nå)
 	c.OnHTML("article", func(e *colly.HTMLElement) {
+		// lager en instans av Produkt, som har all infoen om produktet
 		productInfo := Produkt{}
+		// bruker en referanse verdi her for at det skal funke med reflect
 		contents := &Innhold{}
 
 		title := e.ChildText("div > div h2")
@@ -184,7 +184,9 @@ func getProductInfo(link string, cursor int) {
 
 		n.Visit(dataLink)
 
+		// legger innhold til i produktinfo
 		productInfo.Innhold = *contents
+		// setter produktet inn i produkter arrayet
 		products.Produkter = append(products.Produkter, productInfo)
 	})
 
@@ -193,6 +195,7 @@ func getProductInfo(link string, cursor int) {
 	visitLink := fmt.Sprintf("https://oda.com/no/categories/20-frukt-og-gront/21-frukt/?filters=&cursor=3")
 	c.Visit(visitLink)
 
+	// gjør dataen til jsondata
 	jsonData, err := json.Marshal(products)
 	if err != nil {
 		fmt.Println("Error marshalling to JSON:", err)
