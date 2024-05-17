@@ -25,6 +25,11 @@ func getProducts() {
 		category := &Kategori{}
 
 		categoryName := e.ChildText("div > a > h1")
+
+		if categoryName == "" {
+			return
+		}
+
 		category.Navn = categoryName
 
 		fmt.Println("Getting data for: ", categoryName)
@@ -83,6 +88,11 @@ func getUnderCategories(categoryName string, categoryLink string, category *Kate
 
 		// gir instansen et navn
 		underCategoryName := e.ChildText("section > a > h2")
+
+		if underCategoryName == "" {
+			return
+		}
+
 		underCategory.Navn = underCategoryName
 
 		fmt.Println("Getting data for undercategory: ", underCategoryName, "in category", categoryName)
@@ -102,22 +112,32 @@ func getPageCount(underCategoryLink string, underCategory *Underkategori) {
 	c := colly.NewCollector()
 
 	c.OnHTML("main", func(e *colly.HTMLElement) {
+		var antallSider int
 		// finner mengden sider
 		tall := strings.Split(e.ChildText("main > div > div > div > span > div > div > a.k-choice-chip--selected.k-choice-chip--primary > span.k-pill--extra-small"), "")
-		tallLengde := len(tall) / 2
-		var s []string
-		for i := 0; i < tallLengde; i++ {
-			s = append(s, tall[i])
+
+		// om det bare er en side så vil tall være 1 siffer, så antallsider blir bare satt til 1
+		// hvis det er flere sider, kjør en scuffed alg for å få tallet
+		if len(tall) <= 2 {
+			antallSider = 1
+		} else {
+			tallLengde := len(tall) / 2
+			var s []string
+			for i := 0; i < tallLengde; i++ {
+				s = append(s, tall[i])
+			}
+			str := strings.Join(s, "")
+			antallVarer, err := strconv.ParseFloat(str, 64)
+			if err != nil {
+				return
+			}
+			antallVarerDelt := antallVarer / 24
+			antallSider = int(math.Ceil(float64(antallVarerDelt)))
 		}
-		str := strings.Join(s, "")
-		antallVarer, err := strconv.ParseFloat(str, 64)
-		if err != nil {
-			return
-		}
-		antallVarerDelt := antallVarer / 24
-		antallSider := int(math.Ceil(float64(antallVarerDelt)))
+
 		// lager en link for underkategorien
 		link := fmt.Sprintf("https://oda.com%s", underCategoryLink)
+
 		// for hver side, hent produktinfo for alle produktene på siden
 		for i := 0; i < antallSider; i++ {
 			getProductInfo(link, i+1, underCategory)
@@ -129,7 +149,7 @@ func getPageCount(underCategoryLink string, underCategory *Underkategori) {
 
 // Sammenligner key til innholdet (navnet), med et field i Innhold structen
 // om den finner en key som matcher en field, legges det til i instansen av Innhold
-func setFieldValue(in *Innhold, key string, value string) {
+func setFieldValue(in *Innhold, key string, value string, title string) {
 	v := reflect.ValueOf(in).Elem()
 
 	// denne koden gjør at alt med hvorav funker som det skal
@@ -140,6 +160,7 @@ func setFieldValue(in *Innhold, key string, value string) {
 	field := v.FieldByName(key)
 
 	if !field.IsValid() || !field.CanSet() {
+		fmt.Println("title: ", title, "key:", key, "value:", value)
 		fmt.Printf("Cannot set field %s\n", key)
 		return
 	}
@@ -199,7 +220,7 @@ func getProductInfo(link string, cursor int, underCategory *Underkategori) {
 				key = "Oppbevaring"
 				value = h.ChildText("div > div span")
 			}
-			setFieldValue(contents, key, value)
+			setFieldValue(contents, key, value, title)
 		})
 
 		n.Visit(dataLink)
