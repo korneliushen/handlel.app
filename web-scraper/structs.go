@@ -30,7 +30,7 @@ type Innhold struct {
 	Utleveringsdager   string
 	Størrelse          string
 	Leverandør         string
-	Ingredienser       []string
+	Ingredienser       string
 	Oppbevaring        string
 	Opprinnelsesland   string
 	Opphavssted        string

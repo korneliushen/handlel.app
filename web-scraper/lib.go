@@ -11,6 +11,8 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/gocolly/colly"
 )
 
 // om det bare er en side så vil tall være 1 siffer, så antallsider blir bare satt til 1
@@ -33,6 +35,17 @@ func getPageCount(pageCountSlice []string) int {
 	return int(math.Ceil(float64(amountOfProducts / 24)))
 }
 
+// ingredienser er satt opp annerledes avhengig av hvor mange ingredienser det her, så det accountes for her
+func getIngredients(e *colly.HTMLElement, value string) string {
+	if value != "" {
+		// om det er få ingredienser
+		return e.ChildText("div > div p")
+	}
+
+	// om det er flere ingredienser (da havner også Ingredienser i value, så det fjernes)
+	return strings.Split(e.ChildText("div > div span"), "Ingredienser")[1]
+}
+
 // Sammenligner key til innholdet (navnet), med et field i Innhold structen
 // om den finner en key som matcher en field, legges det til i instansen av Innhold
 func setFieldValue(in *Innhold, key string, value string, title string) {
@@ -51,14 +64,7 @@ func setFieldValue(in *Innhold, key string, value string, title string) {
 		return
 	}
 
-	switch field.Kind() {
-	case reflect.String:
-		field.SetString(value)
-	case reflect.Slice:
-		field.Set(reflect.ValueOf([]string{value}))
-	default:
-		fmt.Printf("Unsupported kind %s\n", field.Kind())
-	}
+	field.SetString(value)
 }
 
 func writeData(data Kategorier) {

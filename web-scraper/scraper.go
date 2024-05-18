@@ -149,10 +149,19 @@ func getProductInfo(link string, cursor int, underCategory *Underkategori) {
 		n.OnHTML("div.k-grid.k-pt-3.k-pb-6", func(h *colly.HTMLElement) {
 			key := h.ChildText("div > span")
 			value := h.ChildText("div > p")
+
+			// oppbevaring har annerledes oppsett enn annet innhold, basically bare en extra div og så en span
 			if strings.Contains(key, "Oppbevaring") {
 				key = "Oppbevaring"
 				value = h.ChildText("div > div span")
 			}
+
+			// ingredienser er satt opp annerledes avhengig av hvor mange ingredienser det er, så det accountes for her
+			if strings.Contains(key, "Ingredienser") {
+				key = "Ingredienser"
+				value = getIngredients(h, value)
+			}
+
 			setFieldValue(contents, key, value, title)
 		})
 
