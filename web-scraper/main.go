@@ -7,7 +7,7 @@ import (
 
 func main() {
 	start := time.Now()
-	getProducts()
+	scrape()
 	end := time.Now()
 	elapsed := end.Sub(start)
 	fmt.Println("Elapsed: ", elapsed)

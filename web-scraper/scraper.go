@@ -3,17 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"math"
-	"os"
-	"reflect"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gocolly/colly"
 )
 
-func getProducts() {
+func scrape() {
 	c := colly.NewCollector()
 
 	categories := Kategorier{}
@@ -46,12 +42,6 @@ func getProducts() {
 			return
 		}
 
-		err = os.WriteFile("./data.json", jsonData, 0666)
-		if err != nil {
-			fmt.Printf("Error writing json data to file %v\n", err)
-			return
-		}
-
 		fmt.Println("Data: ", string(jsonData))
 
 		end := time.Now()
@@ -61,19 +51,7 @@ func getProducts() {
 
 	c.Visit("https://oda.com/no/products/")
 
-	jsonData, err := json.MarshalIndent(categories, "", "    ")
-	if err != nil {
-		fmt.Printf("Error marshalling to JSON: %v\n", err)
-		return
-	}
-
-	err = os.WriteFile("./data.json", jsonData, 0666)
-	if err != nil {
-		fmt.Printf("Error writing json data to file %v\n", err)
-		return
-	}
-
-	fmt.Println("Data: ", string(jsonData))
+	writeData(categories)
 }
 
 func getUnderCategories(categoryName string, categoryLink string, category *Kategori) {
@@ -98,7 +76,7 @@ func getUnderCategories(categoryName string, categoryLink string, category *Kate
 		fmt.Println("Getting data for undercategory: ", underCategoryName, "in category", categoryName)
 
 		underCategoryLink := e.ChildAttr("section > a", "href")
-		getPageCount(underCategoryLink, underCategory)
+		getProducts(underCategoryLink, underCategory)
 
 		category.Underkategorier = append(category.Underkategorier, *underCategory)
 	})
@@ -108,71 +86,26 @@ func getUnderCategories(categoryName string, categoryLink string, category *Kate
 	c.Visit(link)
 }
 
-func getPageCount(underCategoryLink string, underCategory *Underkategori) {
+// får mengden sider for å vite hvor mange sider som må besøkes
+// kjører så getProductInfo() på mengden sider -> får alle produkter på alle sider
+func getProducts(underCategoryLink string, underCategory *Underkategori) {
 	c := colly.NewCollector()
 
 	c.OnHTML("main", func(e *colly.HTMLElement) {
-		var antallSider int
 		// finner mengden sider
-		tall := strings.Split(e.ChildText("main > div > div > div > span > div > div > a.k-choice-chip--selected.k-choice-chip--primary > span.k-pill--extra-small"), "")
-
-		// om det bare er en side så vil tall være 1 siffer, så antallsider blir bare satt til 1
-		// hvis det er flere sider, kjør en scuffed alg for å få tallet
-		if len(tall) <= 2 {
-			antallSider = 1
-		} else {
-			tallLengde := len(tall) / 2
-			var s []string
-			for i := 0; i < tallLengde; i++ {
-				s = append(s, tall[i])
-			}
-			str := strings.Join(s, "")
-			antallVarer, err := strconv.ParseFloat(str, 64)
-			if err != nil {
-				return
-			}
-			antallVarerDelt := antallVarer / 24
-			antallSider = int(math.Ceil(float64(antallVarerDelt)))
-		}
+		pageCountSlice := strings.Split(e.ChildText("main > div > div > div > span > div > div > a.k-choice-chip--selected.k-choice-chip--primary > span.k-pill--extra-small"), "")
+		pageCount := getPageCount(pageCountSlice)
 
 		// lager en link for underkategorien
 		link := fmt.Sprintf("https://oda.com%s", underCategoryLink)
 
 		// for hver side, hent produktinfo for alle produktene på siden
-		for i := 0; i < antallSider; i++ {
+		for i := 0; i < pageCount; i++ {
 			getProductInfo(link, i+1, underCategory)
 		}
 	})
 	link := fmt.Sprintf("https://oda.com%s", underCategoryLink)
 	c.Visit(link)
-}
-
-// Sammenligner key til innholdet (navnet), med et field i Innhold structen
-// om den finner en key som matcher en field, legges det til i instansen av Innhold
-func setFieldValue(in *Innhold, key string, value string, title string) {
-	v := reflect.ValueOf(in).Elem()
-
-	// denne koden gjør at alt med hvorav funker som det skal
-	key = strings.Title(key)
-	key = strings.ReplaceAll(key, " ", "")
-
-	// finner fieldet som matcher key
-	field := v.FieldByName(key)
-
-	if !field.IsValid() || !field.CanSet() {
-		fmt.Println("title: ", title, "key:", key, "value:", value)
-		fmt.Printf("Cannot set field %s\n", key)
-		return
-	}
-
-	switch field.Kind() {
-	case reflect.String:
-		field.SetString(value)
-	case reflect.Slice:
-		field.Set(reflect.ValueOf([]string{value}))
-	default:
-		fmt.Printf("Unsupported kind %s\n", field.Kind())
-	}
 }
 
 func getProductInfo(link string, cursor int, underCategory *Underkategori) {
