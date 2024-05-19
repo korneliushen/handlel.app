@@ -40,7 +40,10 @@ type Innhold struct {
 	KanInneholdeSporAv string
 	Vekt               string
 	Bruksområde        string
-	// næringsinnhold (gjør til egen struct kanskje senere)
+	Næringsinnhold     Næringsinnhold
+}
+
+type Næringsinnhold struct {
 	Energi                      string
 	Natrium                     string
 	Fett                        string

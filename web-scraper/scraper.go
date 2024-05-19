@@ -118,6 +118,7 @@ func getProductInfo(link string, cursor int, underCategory *Underkategori) {
 		productInfo := Produkt{}
 		// bruker en referanse verdi her for at det skal funke med reflect
 		contents := &Innhold{}
+		nutritionalContents := &Næringsinnhold{}
 
 		title := e.ChildText("div > div h2")
 
@@ -162,11 +163,13 @@ func getProductInfo(link string, cursor int, underCategory *Underkategori) {
 				value = getIngredients(h, value)
 			}
 
-			setFieldValue(contents, key, value, title)
+			setFieldValue(contents, nutritionalContents, key, value)
 		})
 
 		n.Visit(dataLink)
 
+		// legger næringsinnhold til i innhold
+		contents.Næringsinnhold = *nutritionalContents
 		// legger innhold til i produktinfo
 		productInfo.Innhold = *contents
 		// setter produktet inn i produkter arrayet

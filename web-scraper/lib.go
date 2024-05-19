@@ -48,8 +48,9 @@ func getIngredients(e *colly.HTMLElement, value string) string {
 
 // Sammenligner key til innholdet (navnet), med et field i Innhold structen
 // om den finner en key som matcher en field, legges det til i instansen av Innhold
-func setFieldValue(in *Innhold, key string, value string, title string) {
-	v := reflect.ValueOf(in).Elem()
+// alt med "n" foran seg, er for næringsinnhold
+func setFieldValue(contents *Innhold, nContents *Næringsinnhold, key string, value string) {
+	v := reflect.ValueOf(contents).Elem()
 
 	// denne koden gjør at alt med hvorav funker som det skal
 	key = strings.Title(key)
@@ -59,8 +60,15 @@ func setFieldValue(in *Innhold, key string, value string, title string) {
 	field := v.FieldByName(key)
 
 	if !field.IsValid() || !field.CanSet() {
-		fmt.Println("title: ", title, "key:", key, "value:", value)
-		fmt.Printf("Cannot set field %s\n", key)
+		nV := reflect.ValueOf(nContents).Elem()
+		nField := nV.FieldByName(key)
+
+		if !nField.IsValid() || !nField.CanSet() {
+			fmt.Printf("Cannot set field %s\n", key)
+			return
+		}
+
+		nField.SetString(value)
 		return
 	}
 
