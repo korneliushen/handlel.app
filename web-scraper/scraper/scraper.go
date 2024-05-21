@@ -1,7 +1,8 @@
-package main
+package scraper
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -9,7 +10,7 @@ import (
 	"github.com/gocolly/colly"
 )
 
-func scrape() {
+func Scrape() {
 	c := colly.NewCollector()
 
 	categories := Kategorier{}
@@ -51,7 +52,10 @@ func scrape() {
 
 	c.Visit("https://oda.com/no/products/")
 
-	writeData(categories)
+	err := WriteData(categories, "../data.json")
+	if err != nil {
+		fmt.Printf("Error writing data to json: %v\n", err)
+	}
 }
 
 func getUnderCategories(categoryName string, categoryLink string, category *Kategori) {
@@ -88,27 +92,36 @@ func getUnderCategories(categoryName string, categoryLink string, category *Kate
 
 // får mengden sider for å vite hvor mange sider som må besøkes
 // kjører så getProductInfo() på mengden sider -> får alle produkter på alle sider
-func getProducts(underCategoryLink string, underCategory *Underkategori) {
+func getProducts(underCategoryLink string, underCategory *Underkategori) error {
 	c := colly.NewCollector()
 
 	c.OnHTML("main", func(e *colly.HTMLElement) {
 		// finner mengden sider
 		pageCountSlice := strings.Split(e.ChildText("main > div > div > div > span > div > div > a.k-choice-chip--selected.k-choice-chip--primary > span.k-pill--extra-small"), "")
-		pageCount := getPageCount(pageCountSlice)
+		pageCount := GetPageCount(pageCountSlice)
 
 		// lager en link for underkategorien
 		link := fmt.Sprintf("https://oda.com%s", underCategoryLink)
 
 		// for hver side, hent produktinfo for alle produktene på siden
 		for i := 0; i < pageCount; i++ {
-			getProductInfo(link, i+1, underCategory)
+			// crazy error handling syntax
+			if err := GetProductInfo(link, i+1, underCategory); err != nil {
+				fmt.Printf("Error getting product info: %v\n", err)
+			}
 		}
 	})
 	link := fmt.Sprintf("https://oda.com%s", underCategoryLink)
 	c.Visit(link)
+
+	return nil
 }
 
-func getProductInfo(link string, cursor int, underCategory *Underkategori) {
+func GetProductInfo(link string, cursor int, underCategory *Underkategori) error {
+	// lager en err variabel, som kan få en value i onHTML
+	// om den får en value, blir den returnert, om den forblir nil, blir det returnert
+	var err error
+
 	// lager en instans av Produkter
 	c := colly.NewCollector()
 
@@ -123,6 +136,7 @@ func getProductInfo(link string, cursor int, underCategory *Underkategori) {
 		title := e.ChildText("div > div h2")
 
 		if title == "" {
+			err = errors.New("No title, skipping")
 			return
 		}
 
@@ -176,6 +190,12 @@ func getProductInfo(link string, cursor int, underCategory *Underkategori) {
 		underCategory.Produkter = append(underCategory.Produkter, productInfo)
 	})
 
+	if err != nil {
+		return err
+	}
+
 	visitLink := fmt.Sprintf("%s&cursor=%v", link, cursor)
 	c.Visit(visitLink)
+
+	return nil
 }

@@ -1,7 +1,7 @@
 // funksjoner flyttet hit for å gjøre scraper mere readable
 // ikke så viktig å forstå disse for å forstå scraper
 
-package main
+package scraper
 
 import (
 	"encoding/json"
@@ -15,9 +15,11 @@ import (
 	"github.com/gocolly/colly"
 )
 
+// får et slice med antall sider to ganger (om antall sider er 24, vil slicen være: [2, 4, 2, 4])
+// det er 24 elementer per side, så antall produkter blir delt på 24 for å få produkter
 // om det bare er en side så vil tall være 1 siffer, så antallsider blir bare satt til 1
 // hvis det er flere sider, kjør en scuffed alg for å få tallet
-func getPageCount(pageCountSlice []string) int {
+func GetPageCount(pageCountSlice []string) int {
 	if len(pageCountSlice) <= 2 {
 		return 1
 	}
@@ -75,18 +77,18 @@ func setFieldValue(contents *Innhold, nContents *Næringsinnhold, key string, va
 	field.SetString(value)
 }
 
-func writeData(data Kategorier) {
+func WriteData(data Kategorier, path string) error {
 	jsonData, err := json.MarshalIndent(data, "", "    ")
 	if err != nil {
-		fmt.Printf("Error marshalling to JSON: %v\n", err)
-		return
+		return err
 	}
 
-	err = os.WriteFile("./data.json", jsonData, 0666)
+	err = os.WriteFile(path, jsonData, 0666)
 	if err != nil {
-		fmt.Printf("Error writing json data to file %v\n", err)
-		return
+		return err
 	}
 
 	fmt.Println("Data written: ", string(jsonData))
+
+	return nil
 }
