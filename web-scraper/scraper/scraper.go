@@ -117,6 +117,7 @@ func getProducts(underCategoryLink string, underCategory *Underkategori) error {
 	return nil
 }
 
+// henter data til hvert produkt på siden og legger data inn i underCategory struct instansen
 func GetProductInfo(link string, cursor int, underCategory *Underkategori) error {
 	// lager en err variabel, som kan få en value i onHTML
 	// om den får en value, blir den returnert, om den forblir nil, blir det returnert
@@ -125,7 +126,6 @@ func GetProductInfo(link string, cursor int, underCategory *Underkategori) error
 	// lager en instans av Produkter
 	c := colly.NewCollector()
 
-	// henter data for hvert element (printer bare for nå)
 	c.OnHTML("article", func(e *colly.HTMLElement) {
 		// lager en instans av Produkt, som har all infoen om produktet
 		productInfo := Produkt{}
