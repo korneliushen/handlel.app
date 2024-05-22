@@ -1,0 +1,970 @@
+{
+    "Kategorier": [
+        {
+            "Navn": "Frukt \u0026 grønt",
+            "Link": "https://meny.no/varer/kategori/frukt-gront/?c=frukt-gront",
+            "Underkategorier": [
+                {
+                    "Navn": "Bær",
+                    "Link": "htts://meny.no/varer/frukt-gront/baer"
+                },
+                {
+                    "Navn": "Frosne bær og grønnsaker",
+                    "Link": "htts://meny.no/varer/frukt-gront/frosne-baer-og-gronnsaker"
+                },
+                {
+                    "Navn": "Frukt",
+                    "Link": "htts://meny.no/varer/frukt-gront/frukt"
+                },
+                {
+                    "Navn": "Fruktkurv",
+                    "Link": "htts://meny.no/varer/frukt-gront/fruktkurv"
+                },
+                {
+                    "Navn": "Grønnsaker",
+                    "Link": "htts://meny.no/varer/frukt-gront/gronnsaker"
+                },
+                {
+                    "Navn": "Krydderurter",
+                    "Link": "htts://meny.no/varer/frukt-gront/krydderurter"
+                },
+                {
+                    "Navn": "Poteter",
+                    "Link": "htts://meny.no/varer/frukt-gront/poteter"
+                },
+                {
+                    "Navn": "Sopp",
+                    "Link": "htts://meny.no/varer/frukt-gront/sopp"
+                }
+            ]
+        },
+        {
+            "Navn": "Fisk \u0026 skalldyr",
+            "Link": "https://meny.no/varer/kategori/fisk-skalldyr/?c=fisk-skalldyr",
+            "Underkategorier": [
+                {
+                    "Navn": "Fisk",
+                    "Link": "htts://meny.no/varer/fisk-skalldyr/fisk"
+                },
+                {
+                    "Navn": "Hvalkjøtt",
+                    "Link": "htts://meny.no/varer/fisk-skalldyr/hvalkjott"
+                },
+                {
+                    "Navn": "Rakfisk",
+                    "Link": "htts://meny.no/varer/fisk-skalldyr/rakfisk"
+                },
+                {
+                    "Navn": "Skalldyr",
+                    "Link": "htts://meny.no/varer/fisk-skalldyr/skalldyr"
+                },
+                {
+                    "Navn": "Skjell",
+                    "Link": "htts://meny.no/varer/fisk-skalldyr/skjell"
+                },
+                {
+                    "Navn": "Sushi",
+                    "Link": "htts://meny.no/varer/fisk-skalldyr/sushi"
+                },
+                {
+                    "Navn": "Tørket fisk",
+                    "Link": "htts://meny.no/varer/fisk-skalldyr/torket-fisk"
+                }
+            ]
+        },
+        {
+            "Navn": "Bakeri",
+            "Link": "https://meny.no/varer/kategori/bakeri/?c=bakeri",
+            "Underkategorier": [
+                {
+                    "Navn": "Boller og småkaker",
+                    "Link": "htts://meny.no/varer/bakeri/boller-og-smakaker"
+                },
+                {
+                    "Navn": "Brød",
+                    "Link": "htts://meny.no/varer/bakeri/brod"
+                },
+                {
+                    "Navn": "Hamburgerbrød",
+                    "Link": "htts://meny.no/varer/bakeri/hamburgerbrod"
+                },
+                {
+                    "Navn": "Kaker",
+                    "Link": "htts://meny.no/varer/bakeri/kaker"
+                },
+                {
+                    "Navn": "Knekkebrød",
+                    "Link": "htts://meny.no/varer/bakeri/knekkebrod"
+                },
+                {
+                    "Navn": "Lefser",
+                    "Link": "htts://meny.no/varer/bakeri/lefser"
+                },
+                {
+                    "Navn": "Lomper",
+                    "Link": "htts://meny.no/varer/bakeri/lomper"
+                },
+                {
+                    "Navn": "Myke runde porsjonsbrød",
+                    "Link": "htts://meny.no/varer/bakeri/myke-runde-porsjonsbrod"
+                },
+                {
+                    "Navn": "Nanbrød",
+                    "Link": "htts://meny.no/varer/bakeri/nanbrod"
+                },
+                {
+                    "Navn": "Pitabrød",
+                    "Link": "htts://meny.no/varer/bakeri/pitabrod"
+                },
+                {
+                    "Navn": "Pølsebrød",
+                    "Link": "htts://meny.no/varer/bakeri/polsebrod"
+                },
+                {
+                    "Navn": "Påsmurte baguetter",
+                    "Link": "htts://meny.no/varer/bakeri/pasmurte-baguetter"
+                },
+                {
+                    "Navn": "Påsmurte lefser",
+                    "Link": "htts://meny.no/varer/bakeri/pasmurte-lefser"
+                },
+                {
+                    "Navn": "Riskaker",
+                    "Link": "htts://meny.no/varer/bakeri/riskaker"
+                },
+                {
+                    "Navn": "Rundstykker og småbrød",
+                    "Link": "htts://meny.no/varer/bakeri/rundstykker-og-smabrod"
+                },
+                {
+                    "Navn": "Tørt brød",
+                    "Link": "htts://meny.no/varer/bakeri/tort-brod"
+                }
+            ]
+        },
+        {
+            "Navn": "Middag",
+            "Link": "https://meny.no/varer/kategori/middag/?c=middag",
+            "Underkategorier": [
+                {
+                    "Navn": "Ferdigmåltider",
+                    "Link": "htts://meny.no/varer/middag/ferdigmaltider"
+                },
+                {
+                    "Navn": "Fiskeretter",
+                    "Link": "htts://meny.no/varer/middag/fiskeretter"
+                },
+                {
+                    "Navn": "Grøt",
+                    "Link": "htts://meny.no/varer/middag/grot"
+                },
+                {
+                    "Navn": "Middag kit",
+                    "Link": "htts://meny.no/varer/middag/middag-kit"
+                },
+                {
+                    "Navn": "Middagshermetikk",
+                    "Link": "htts://meny.no/varer/middag/middagshermetikk"
+                },
+                {
+                    "Navn": "Nudler",
+                    "Link": "htts://meny.no/varer/middag/nudler"
+                },
+                {
+                    "Navn": "Pasta",
+                    "Link": "htts://meny.no/varer/middag/pasta"
+                },
+                {
+                    "Navn": "Pizza",
+                    "Link": "htts://meny.no/varer/middag/pizza"
+                },
+                {
+                    "Navn": "Potetretter",
+                    "Link": "htts://meny.no/varer/middag/potetretter"
+                },
+                {
+                    "Navn": "Ris",
+                    "Link": "htts://meny.no/varer/middag/ris"
+                },
+                {
+                    "Navn": "Supper",
+                    "Link": "htts://meny.no/varer/middag/supper"
+                },
+                {
+                    "Navn": "Taco",
+                    "Link": "htts://meny.no/varer/middag/taco"
+                },
+                {
+                    "Navn": "Vegetarretter",
+                    "Link": "htts://meny.no/varer/middag/vegetarretter"
+                }
+            ]
+        },
+        {
+            "Navn": "Kylling og fjærkre",
+            "Link": "https://meny.no/varer/kategori/kylling-og-fjaerkre/?c=kylling-og-fjaerkre",
+            "Underkategorier": [
+                {
+                    "Navn": "And",
+                    "Link": "htts://meny.no/varer/kylling-og-fjaerkre/and"
+                },
+                {
+                    "Navn": "Gås",
+                    "Link": "htts://meny.no/varer/kylling-og-fjaerkre/gas"
+                },
+                {
+                    "Navn": "Høns",
+                    "Link": "htts://meny.no/varer/kylling-og-fjaerkre/hons"
+                },
+                {
+                    "Navn": "Kalkun",
+                    "Link": "htts://meny.no/varer/kylling-og-fjaerkre/kalkun"
+                },
+                {
+                    "Navn": "Kylling",
+                    "Link": "htts://meny.no/varer/kylling-og-fjaerkre/kylling"
+                },
+                {
+                    "Navn": "Rype",
+                    "Link": "htts://meny.no/varer/kylling-og-fjaerkre/rype"
+                }
+            ]
+        },
+        {
+            "Navn": "Meieri \u0026 egg",
+            "Link": "https://meny.no/varer/kategori/meieri-egg/?c=meieri-egg",
+            "Underkategorier": [
+                {
+                    "Navn": "Cottage Cheese",
+                    "Link": "htts://meny.no/varer/meieri-egg/cottage-cheese"
+                },
+                {
+                    "Navn": "Creme Fraiche",
+                    "Link": "htts://meny.no/varer/meieri-egg/creme-fraiche"
+                },
+                {
+                    "Navn": "Egg",
+                    "Link": "htts://meny.no/varer/meieri-egg/egg"
+                },
+                {
+                    "Navn": "Eggehvite",
+                    "Link": "htts://meny.no/varer/meieri-egg/eggehvite"
+                },
+                {
+                    "Navn": "Fløte",
+                    "Link": "htts://meny.no/varer/meieri-egg/flote"
+                },
+                {
+                    "Navn": "Kesam",
+                    "Link": "htts://meny.no/varer/meieri-egg/kesam"
+                },
+                {
+                    "Navn": "Melk",
+                    "Link": "htts://meny.no/varer/meieri-egg/melk"
+                },
+                {
+                    "Navn": "Plantebasert drikke",
+                    "Link": "htts://meny.no/varer/meieri-egg/plantebasert-drikke"
+                },
+                {
+                    "Navn": "Rømme",
+                    "Link": "htts://meny.no/varer/meieri-egg/romme"
+                },
+                {
+                    "Navn": "Smør og margarin",
+                    "Link": "htts://meny.no/varer/meieri-egg/smor-og-margarin"
+                },
+                {
+                    "Navn": "Yoghurt",
+                    "Link": "htts://meny.no/varer/meieri-egg/yoghurt"
+                }
+            ]
+        },
+        {
+            "Navn": "Pålegg \u0026 frokost",
+            "Link": "https://meny.no/varer/kategori/palegg-frokost/?c=palegg-frokost",
+            "Underkategorier": [
+                {
+                    "Navn": "Bacon",
+                    "Link": "htts://meny.no/varer/palegg-frokost/bacon"
+                },
+                {
+                    "Navn": "Fiskepålegg",
+                    "Link": "htts://meny.no/varer/palegg-frokost/fiskepalegg"
+                },
+                {
+                    "Navn": "Frokostblandinger og musli",
+                    "Link": "htts://meny.no/varer/palegg-frokost/frokostblandinger-og-musli"
+                },
+                {
+                    "Navn": "Kjøttpålegg",
+                    "Link": "htts://meny.no/varer/palegg-frokost/kjottpalegg"
+                },
+                {
+                    "Navn": "Majones",
+                    "Link": "htts://meny.no/varer/palegg-frokost/majones"
+                },
+                {
+                    "Navn": "Mellommåltidsbarer",
+                    "Link": "htts://meny.no/varer/palegg-frokost/mellommaltidsbarer"
+                },
+                {
+                    "Navn": "Postei og pate",
+                    "Link": "htts://meny.no/varer/palegg-frokost/postei-og-pate"
+                },
+                {
+                    "Navn": "Påleggsalat",
+                    "Link": "htts://meny.no/varer/palegg-frokost/paleggsalat"
+                },
+                {
+                    "Navn": "Remulade",
+                    "Link": "htts://meny.no/varer/palegg-frokost/remulade"
+                },
+                {
+                    "Navn": "Spekemat",
+                    "Link": "htts://meny.no/varer/palegg-frokost/spekemat"
+                },
+                {
+                    "Navn": "Syltetøy",
+                    "Link": "htts://meny.no/varer/palegg-frokost/syltetoy"
+                },
+                {
+                    "Navn": "Søtpålegg",
+                    "Link": "htts://meny.no/varer/palegg-frokost/sotpalegg"
+                },
+                {
+                    "Navn": "Vegansk pålegg",
+                    "Link": "htts://meny.no/varer/palegg-frokost/vegansk-palegg"
+                }
+            ]
+        },
+        {
+            "Navn": "Kjøtt",
+            "Link": "https://meny.no/varer/kategori/kjott/?c=kjott",
+            "Underkategorier": [
+                {
+                    "Navn": "Hamburger",
+                    "Link": "htts://meny.no/varer/kjott/hamburger"
+                },
+                {
+                    "Navn": "Kjøttdeig og farse",
+                    "Link": "htts://meny.no/varer/kjott/kjottdeig-og-farse"
+                },
+                {
+                    "Navn": "Kjøttretter",
+                    "Link": "htts://meny.no/varer/kjott/kjottretter"
+                },
+                {
+                    "Navn": "Lammekjøtt",
+                    "Link": "htts://meny.no/varer/kjott/lammekjott"
+                },
+                {
+                    "Navn": "Pølser",
+                    "Link": "htts://meny.no/varer/kjott/polser"
+                },
+                {
+                    "Navn": "Ribbe",
+                    "Link": "htts://meny.no/varer/kjott/ribbe"
+                },
+                {
+                    "Navn": "Storfekjøtt",
+                    "Link": "htts://meny.no/varer/kjott/storfekjott"
+                },
+                {
+                    "Navn": "Svinekjøtt",
+                    "Link": "htts://meny.no/varer/kjott/svinekjott"
+                },
+                {
+                    "Navn": "Viltkjøtt",
+                    "Link": "htts://meny.no/varer/kjott/viltkjott"
+                }
+            ]
+        },
+        {
+            "Navn": "Middagstilbehør",
+            "Link": "https://meny.no/varer/kategori/middagstilbehor/?c=middagstilbehor",
+            "Underkategorier": [
+                {
+                    "Navn": "Deiger og rører",
+                    "Link": "htts://meny.no/varer/middagstilbehor/deiger-og-rorer"
+                },
+                {
+                    "Navn": "Dressinger",
+                    "Link": "htts://meny.no/varer/middagstilbehor/dressinger"
+                },
+                {
+                    "Navn": "Eddiker",
+                    "Link": "htts://meny.no/varer/middagstilbehor/eddiker"
+                },
+                {
+                    "Navn": "Hermetisk grønt",
+                    "Link": "htts://meny.no/varer/middagstilbehor/hermetisk-gront"
+                },
+                {
+                    "Navn": "Ketchup og sennep",
+                    "Link": "htts://meny.no/varer/middagstilbehor/ketchup-og-sennep"
+                },
+                {
+                    "Navn": "Kokosmelk",
+                    "Link": "htts://meny.no/varer/middagstilbehor/kokosmelk"
+                },
+                {
+                    "Navn": "Kraft og buljong",
+                    "Link": "htts://meny.no/varer/middagstilbehor/kraft-og-buljong"
+                },
+                {
+                    "Navn": "Krydder",
+                    "Link": "htts://meny.no/varer/middagstilbehor/krydder"
+                },
+                {
+                    "Navn": "Linser og frø",
+                    "Link": "htts://meny.no/varer/middagstilbehor/linser-og-fro"
+                },
+                {
+                    "Navn": "Marinader og BBQ-saus",
+                    "Link": "htts://meny.no/varer/middagstilbehor/marinader-og-bbq-saus"
+                },
+                {
+                    "Navn": "Matoljer",
+                    "Link": "htts://meny.no/varer/middagstilbehor/matoljer"
+                },
+                {
+                    "Navn": "Middagssalat",
+                    "Link": "htts://meny.no/varer/middagstilbehor/middagssalat"
+                },
+                {
+                    "Navn": "Potetsalat",
+                    "Link": "htts://meny.no/varer/middagstilbehor/potetsalat"
+                },
+                {
+                    "Navn": "Salt og pepper",
+                    "Link": "htts://meny.no/varer/middagstilbehor/salt-og-pepper"
+                },
+                {
+                    "Navn": "Sauser",
+                    "Link": "htts://meny.no/varer/middagstilbehor/sauser"
+                },
+                {
+                    "Navn": "Stuinger",
+                    "Link": "htts://meny.no/varer/middagstilbehor/stuinger"
+                },
+                {
+                    "Navn": "Sushitilbehør",
+                    "Link": "htts://meny.no/varer/middagstilbehor/sushitilbehor"
+                }
+            ]
+        },
+        {
+            "Navn": "Drikke",
+            "Link": "https://meny.no/varer/kategori/drikke/?c=drikke",
+            "Underkategorier": [
+                {
+                    "Navn": "Brus",
+                    "Link": "htts://meny.no/varer/drikke/brus"
+                },
+                {
+                    "Navn": "Cider",
+                    "Link": "htts://meny.no/varer/drikke/cider"
+                },
+                {
+                    "Navn": "Drinkmix",
+                    "Link": "htts://meny.no/varer/drikke/drinkmix"
+                },
+                {
+                    "Navn": "Energidrikk",
+                    "Link": "htts://meny.no/varer/drikke/energidrikk"
+                },
+                {
+                    "Navn": "Ferdigdrink",
+                    "Link": "htts://meny.no/varer/drikke/ferdigdrink"
+                },
+                {
+                    "Navn": "Iskaffe",
+                    "Link": "htts://meny.no/varer/drikke/iskaffe"
+                },
+                {
+                    "Navn": "Iste",
+                    "Link": "htts://meny.no/varer/drikke/iste"
+                },
+                {
+                    "Navn": "Juice",
+                    "Link": "htts://meny.no/varer/drikke/juice"
+                },
+                {
+                    "Navn": "Kaffe",
+                    "Link": "htts://meny.no/varer/drikke/kaffe"
+                },
+                {
+                    "Navn": "Kaffekapsler",
+                    "Link": "htts://meny.no/varer/drikke/kaffekapsler"
+                },
+                {
+                    "Navn": "Kombucha",
+                    "Link": "htts://meny.no/varer/drikke/kombucha"
+                },
+                {
+                    "Navn": "Leskedrikk",
+                    "Link": "htts://meny.no/varer/drikke/leskedrikk"
+                },
+                {
+                    "Navn": "Saft",
+                    "Link": "htts://meny.no/varer/drikke/saft"
+                },
+                {
+                    "Navn": "Sjokoladedrikk",
+                    "Link": "htts://meny.no/varer/drikke/sjokoladedrikk"
+                },
+                {
+                    "Navn": "Smoothie",
+                    "Link": "htts://meny.no/varer/drikke/smoothie"
+                },
+                {
+                    "Navn": "Te",
+                    "Link": "htts://meny.no/varer/drikke/te"
+                },
+                {
+                    "Navn": "Toddy",
+                    "Link": "htts://meny.no/varer/drikke/toddy"
+                },
+                {
+                    "Navn": "Vann",
+                    "Link": "htts://meny.no/varer/drikke/vann"
+                },
+                {
+                    "Navn": "Vin",
+                    "Link": "htts://meny.no/varer/drikke/vin"
+                },
+                {
+                    "Navn": "Øl",
+                    "Link": "htts://meny.no/varer/drikke/ol"
+                }
+            ]
+        },
+        {
+            "Navn": "Ost",
+            "Link": "https://meny.no/varer/kategori/oster/?c=ost",
+            "Underkategorier": [
+                {
+                    "Navn": "Blåmuggost",
+                    "Link": "htts://meny.no/varer/ost/blamuggost"
+                },
+                {
+                    "Navn": "Brunost",
+                    "Link": "htts://meny.no/varer/ost/brunost"
+                },
+                {
+                    "Navn": "Cheddar",
+                    "Link": "htts://meny.no/varer/ost/cheddar"
+                },
+                {
+                    "Navn": "Chevre",
+                    "Link": "htts://meny.no/varer/ost/chevre"
+                },
+                {
+                    "Navn": "Fetaost",
+                    "Link": "htts://meny.no/varer/ost/fetaost"
+                },
+                {
+                    "Navn": "Gamalost",
+                    "Link": "htts://meny.no/varer/ost/gamalost"
+                },
+                {
+                    "Navn": "Guloster",
+                    "Link": "htts://meny.no/varer/ost/guloster"
+                },
+                {
+                    "Navn": "Halloumi",
+                    "Link": "htts://meny.no/varer/ost/halloumi"
+                },
+                {
+                    "Navn": "Hvitmuggost",
+                    "Link": "htts://meny.no/varer/ost/hvitmuggost"
+                },
+                {
+                    "Navn": "Kittmodnetost",
+                    "Link": "htts://meny.no/varer/ost/kittmodnetost"
+                },
+                {
+                    "Navn": "Manchego",
+                    "Link": "htts://meny.no/varer/ost/manchego"
+                },
+                {
+                    "Navn": "Mozzarella",
+                    "Link": "htts://meny.no/varer/ost/mozzarella"
+                },
+                {
+                    "Navn": "Ostefat",
+                    "Link": "htts://meny.no/varer/ost/ostefat"
+                },
+                {
+                    "Navn": "Parmesan og smaksrike fastoster",
+                    "Link": "htts://meny.no/varer/ost/parmesan-og-smaksrike-fastoster"
+                },
+                {
+                    "Navn": "Plantebasert erstatning for ost",
+                    "Link": "htts://meny.no/varer/ost/plantebasert-erstatning-for-ost"
+                },
+                {
+                    "Navn": "Pultost",
+                    "Link": "htts://meny.no/varer/ost/pultost"
+                },
+                {
+                    "Navn": "Revet ost",
+                    "Link": "htts://meny.no/varer/ost/revet-ost"
+                },
+                {
+                    "Navn": "Ricotta",
+                    "Link": "htts://meny.no/varer/ost/ricotta"
+                },
+                {
+                    "Navn": "Smøreoster",
+                    "Link": "htts://meny.no/varer/ost/smoreoster"
+                },
+                {
+                    "Navn": "Øvrig ost",
+                    "Link": "htts://meny.no/varer/ost/ovrig-ost"
+                }
+            ]
+        },
+        {
+            "Navn": "Dessert og iskrem",
+            "Link": "https://meny.no/varer/kategori/dessert/?c=dessert-og-iskrem",
+            "Underkategorier": [
+                {
+                    "Navn": "Dessertpuddinger",
+                    "Link": "htts://meny.no/varer/dessert-og-iskrem/dessertpuddinger"
+                },
+                {
+                    "Navn": "Dessertsauser",
+                    "Link": "htts://meny.no/varer/dessert-og-iskrem/dessertsauser"
+                },
+                {
+                    "Navn": "Dessertsuppe",
+                    "Link": "htts://meny.no/varer/dessert-og-iskrem/dessertsuppe"
+                },
+                {
+                    "Navn": "Desserttopping",
+                    "Link": "htts://meny.no/varer/dessert-og-iskrem/desserttopping"
+                },
+                {
+                    "Navn": "Fruktkompott",
+                    "Link": "htts://meny.no/varer/dessert-og-iskrem/fruktkompott"
+                },
+                {
+                    "Navn": "Gele",
+                    "Link": "htts://meny.no/varer/dessert-og-iskrem/gele"
+                },
+                {
+                    "Navn": "Hermetisk frukt og bær",
+                    "Link": "htts://meny.no/varer/dessert-og-iskrem/hermetisk-frukt-og-baer"
+                },
+                {
+                    "Navn": "Is",
+                    "Link": "htts://meny.no/varer/dessert-og-iskrem/is"
+                },
+                {
+                    "Navn": "Isbiter",
+                    "Link": "htts://meny.no/varer/dessert-og-iskrem/isbiter"
+                },
+                {
+                    "Navn": "Mousse",
+                    "Link": "htts://meny.no/varer/dessert-og-iskrem/mousse"
+                },
+                {
+                    "Navn": "Proteinpudding",
+                    "Link": "htts://meny.no/varer/dessert-og-iskrem/proteinpudding"
+                },
+                {
+                    "Navn": "Riskrem",
+                    "Link": "htts://meny.no/varer/dessert-og-iskrem/riskrem"
+                },
+                {
+                    "Navn": "Smådesserter",
+                    "Link": "htts://meny.no/varer/dessert-og-iskrem/smadesserter"
+                },
+                {
+                    "Navn": "Soyadessert",
+                    "Link": "htts://meny.no/varer/dessert-og-iskrem/soyadessert"
+                },
+                {
+                    "Navn": "Tiramisu",
+                    "Link": "htts://meny.no/varer/dessert-og-iskrem/tiramisu"
+                }
+            ]
+        },
+        {
+            "Navn": "Bakevarer og kjeks",
+            "Link": "https://meny.no/varer/kategori/bakevarer-og-kjeks/?c=bakevarer-og-kjeks",
+            "Underkategorier": [
+                {
+                    "Navn": "Bakemixer",
+                    "Link": "htts://meny.no/varer/bakevarer-og-kjeks/bakemixer"
+                },
+                {
+                    "Navn": "Baking",
+                    "Link": "htts://meny.no/varer/bakevarer-og-kjeks/baking"
+                },
+                {
+                    "Navn": "Gjær",
+                    "Link": "htts://meny.no/varer/bakevarer-og-kjeks/gjaer"
+                },
+                {
+                    "Navn": "Kjeks",
+                    "Link": "htts://meny.no/varer/bakevarer-og-kjeks/kjeks"
+                },
+                {
+                    "Navn": "Mel og gryn",
+                    "Link": "htts://meny.no/varer/bakevarer-og-kjeks/mel-og-gryn"
+                },
+                {
+                    "Navn": "Sukker",
+                    "Link": "htts://meny.no/varer/bakevarer-og-kjeks/sukker"
+                },
+                {
+                    "Navn": "Tørket frukt og nøtter",
+                    "Link": "htts://meny.no/varer/bakevarer-og-kjeks/torket-frukt-og-notter"
+                }
+            ]
+        },
+        {
+            "Navn": "Snacks \u0026 godteri",
+            "Link": "https://meny.no/varer/kategori/snacks-godteri/?c=snacks-godteri",
+            "Underkategorier": [
+                {
+                    "Navn": "Dip",
+                    "Link": "htts://meny.no/varer/snacks-godteri/dip"
+                },
+                {
+                    "Navn": "Godteri",
+                    "Link": "htts://meny.no/varer/snacks-godteri/godteri"
+                },
+                {
+                    "Navn": "Konfekt",
+                    "Link": "htts://meny.no/varer/snacks-godteri/konfekt"
+                },
+                {
+                    "Navn": "Nøtter",
+                    "Link": "htts://meny.no/varer/snacks-godteri/notter"
+                },
+                {
+                    "Navn": "Pastiller",
+                    "Link": "htts://meny.no/varer/snacks-godteri/pastiller"
+                },
+                {
+                    "Navn": "Popcorn",
+                    "Link": "htts://meny.no/varer/snacks-godteri/popcorn"
+                },
+                {
+                    "Navn": "Popcornkrydder",
+                    "Link": "htts://meny.no/varer/snacks-godteri/popcornkrydder"
+                },
+                {
+                    "Navn": "Sjokolade",
+                    "Link": "htts://meny.no/varer/snacks-godteri/sjokolade"
+                },
+                {
+                    "Navn": "Snacks",
+                    "Link": "htts://meny.no/varer/snacks-godteri/snacks"
+                },
+                {
+                    "Navn": "Tyggegummi",
+                    "Link": "htts://meny.no/varer/snacks-godteri/tyggegummi"
+                }
+            ]
+        },
+        {
+            "Navn": "Kioskvarer",
+            "Link": "https://meny.no/varer/kategori/kioskvarer/?c=kioskvarer",
+            "Underkategorier": [
+                {
+                    "Navn": "Lesestoff",
+                    "Link": "htts://meny.no/varer/kioskvarer/lesestoff"
+                },
+                {
+                    "Navn": "Sigar",
+                    "Link": "htts://meny.no/varer/kioskvarer/sigar"
+                },
+                {
+                    "Navn": "Sigaretter",
+                    "Link": "htts://meny.no/varer/kioskvarer/sigaretter"
+                },
+                {
+                    "Navn": "Snus",
+                    "Link": "htts://meny.no/varer/kioskvarer/snus"
+                },
+                {
+                    "Navn": "Tobakk",
+                    "Link": "htts://meny.no/varer/kioskvarer/tobakk"
+                }
+            ]
+        },
+        {
+            "Navn": "Barneprodukter",
+            "Link": "https://meny.no/varer/kategori/barneprodukter/?c=barneprodukter",
+            "Underkategorier": [
+                {
+                    "Navn": "Babyartikler",
+                    "Link": "htts://meny.no/varer/barneprodukter/babyartikler"
+                },
+                {
+                    "Navn": "Babypleie",
+                    "Link": "htts://meny.no/varer/barneprodukter/babypleie"
+                },
+                {
+                    "Navn": "Badebleier",
+                    "Link": "htts://meny.no/varer/barneprodukter/badebleier"
+                },
+                {
+                    "Navn": "Barnedessert",
+                    "Link": "htts://meny.no/varer/barneprodukter/barnedessert"
+                },
+                {
+                    "Navn": "Barnegrøt",
+                    "Link": "htts://meny.no/varer/barneprodukter/barnegrot"
+                },
+                {
+                    "Navn": "Barnekjeks",
+                    "Link": "htts://meny.no/varer/barneprodukter/barnekjeks"
+                },
+                {
+                    "Navn": "Barnemat",
+                    "Link": "htts://meny.no/varer/barneprodukter/barnemat"
+                },
+                {
+                    "Navn": "Bleier",
+                    "Link": "htts://meny.no/varer/barneprodukter/bleier"
+                },
+                {
+                    "Navn": "Morsmelkerstatning",
+                    "Link": "htts://meny.no/varer/barneprodukter/morsmelkerstatning"
+                }
+            ]
+        },
+        {
+            "Navn": "Personlige artikler",
+            "Link": "https://meny.no/varer/kategori/personlige-artikler/?c=personlige-artikler",
+            "Underkategorier": [
+                {
+                    "Navn": "Apotekvarer",
+                    "Link": "htts://meny.no/varer/personlige-artikler/apotekvarer"
+                },
+                {
+                    "Navn": "Barbering",
+                    "Link": "htts://meny.no/varer/personlige-artikler/barbering"
+                },
+                {
+                    "Navn": "Bind og tamponger",
+                    "Link": "htts://meny.no/varer/personlige-artikler/bind-og-tamponger"
+                },
+                {
+                    "Navn": "Helsekost",
+                    "Link": "htts://meny.no/varer/personlige-artikler/helsekost"
+                },
+                {
+                    "Navn": "Hudpleie",
+                    "Link": "htts://meny.no/varer/personlige-artikler/hudpleie"
+                },
+                {
+                    "Navn": "Hårpleie",
+                    "Link": "htts://meny.no/varer/personlige-artikler/harpleie"
+                },
+                {
+                    "Navn": "Neglepleie",
+                    "Link": "htts://meny.no/varer/personlige-artikler/neglepleie"
+                },
+                {
+                    "Navn": "Personlig hygiene",
+                    "Link": "htts://meny.no/varer/personlige-artikler/personlig-hygiene"
+                },
+                {
+                    "Navn": "Sminke",
+                    "Link": "htts://meny.no/varer/personlige-artikler/sminke"
+                },
+                {
+                    "Navn": "Tannpleie",
+                    "Link": "htts://meny.no/varer/personlige-artikler/tannpleie"
+                }
+            ]
+        },
+        {
+            "Navn": "Hus \u0026 hjem",
+            "Link": "https://meny.no/varer/kategori/hus-hjem/?c=hus-hjem",
+            "Underkategorier": [
+                {
+                    "Navn": "Bilpleie",
+                    "Link": "htts://meny.no/varer/hus-hjem/bilpleie"
+                },
+                {
+                    "Navn": "Borddekning",
+                    "Link": "htts://meny.no/varer/hus-hjem/borddekning"
+                },
+                {
+                    "Navn": "Grill og ild",
+                    "Link": "htts://meny.no/varer/hus-hjem/grill-og-ild"
+                },
+                {
+                    "Navn": "Hobby",
+                    "Link": "htts://meny.no/varer/hus-hjem/hobby"
+                },
+                {
+                    "Navn": "Hus",
+                    "Link": "htts://meny.no/varer/hus-hjem/hus"
+                },
+                {
+                    "Navn": "Kjøkken",
+                    "Link": "htts://meny.no/varer/hus-hjem/kjokken"
+                },
+                {
+                    "Navn": "Klesvask",
+                    "Link": "htts://meny.no/varer/hus-hjem/klesvask"
+                },
+                {
+                    "Navn": "Klær",
+                    "Link": "htts://meny.no/varer/hus-hjem/klaer"
+                },
+                {
+                    "Navn": "Kontorrekvisita",
+                    "Link": "htts://meny.no/varer/hus-hjem/kontorrekvisita"
+                },
+                {
+                    "Navn": "Poser, papir og folie",
+                    "Link": "htts://meny.no/varer/hus-hjem/poser-papir-og-folie"
+                },
+                {
+                    "Navn": "Renhold",
+                    "Link": "htts://meny.no/varer/hus-hjem/renhold"
+                },
+                {
+                    "Navn": "Sesong og fest",
+                    "Link": "htts://meny.no/varer/hus-hjem/sesong-og-fest"
+                },
+                {
+                    "Navn": "Stearinlys",
+                    "Link": "htts://meny.no/varer/hus-hjem/stearinlys"
+                }
+            ]
+        },
+        {
+            "Navn": "Dyr",
+            "Link": "https://meny.no/varer/kategori/dyr/?c=dyr",
+            "Underkategorier": [
+                {
+                    "Navn": "Dyreartikler",
+                    "Link": "htts://meny.no/varer/dyr/dyreartikler"
+                },
+                {
+                    "Navn": "Fuglemat",
+                    "Link": "htts://meny.no/varer/dyr/fuglemat"
+                },
+                {
+                    "Navn": "Hundemat",
+                    "Link": "htts://meny.no/varer/dyr/hundemat"
+                },
+                {
+                    "Navn": "Kattemat",
+                    "Link": "htts://meny.no/varer/dyr/kattemat"
+                }
+            ]
+        }
+    ]
+}
