@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/korneliushen/handlel.app/meny/menyapi"
+	"github.com/korneliushen/handlel.app/meny/fetch"
 	"github.com/korneliushen/handlel.app/meny/scraper"
 )
 
@@ -17,8 +17,10 @@ func main() {
 		category := categories.Kategorier[i]
 		for j := range category.Underkategorier {
 			subCategory := category.Underkategorier[j]
-			menyapi.GetProducts(category.QueryFormatNavn, subCategory.QueryFormatNavn)
+			fetch.GetProducts(category.Navn, subCategory.Navn)
+			break
 		}
+		break
 	}
 
 	end := time.Now()

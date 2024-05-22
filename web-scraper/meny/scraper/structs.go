@@ -7,12 +7,10 @@ type Kategorier struct {
 type Kategori struct {
 	Navn            string
 	Link            string
-	QueryFormatNavn string
 	Underkategorier []Underkategori
 }
 
 type Underkategori struct {
-	Navn            string
-	Link            string
-	QueryFormatNavn string
+	Navn string
+	Link string
 }
