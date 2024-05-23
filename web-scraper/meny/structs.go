@@ -27,17 +27,24 @@ type Produkt struct {
 	AndreNavn     string
 	Kategori      string
 	Underkategori string
-	Pris          string
-	KiloPris      string
+	Priser        Priser
 	BildeLink     string
 	Innhold       Innhold
 }
 
+type Priser struct {
+	Joker     float32
+	Meny      float32
+	Spar      float32
+	JokerKilo float32
+	MenyKilo  float32
+	SparKilo  float32
+}
+
 type Innhold struct {
-	Salgsinformasjon   string
 	Beskrivelse        string
 	Holdbarhetsgaranti string
-	Utleveringsdager   string
+	Enhet              string
 	Størrelse          string
 	Leverandør         string
 	Ingredienser       string
@@ -45,8 +52,7 @@ type Innhold struct {
 	Opprinnelsesland   string
 	Opphavssted        string
 	Egenskaper         string
-	Inneholder         string
-	Allergener         string
+	Allergener         []string
 	KanInneholdeSporAv string
 	Vekt               string
 	Bruksområde        string
@@ -67,4 +73,19 @@ type Næringsinnhold struct {
 	Kostfiber                   string
 	Protein                     string
 	Salt                        string
+}
+
+type ApiResponse struct {
+	TidsAvbrudd bool     `json:"timed_out"`
+	Resultat    Resultat `json:"hits"`
+}
+
+type Resultat struct {
+	Antall    int          `json:"total"`
+	Produkter []ApiProdukt `json:"hits"`
+}
+
+type ApiProdukt struct {
+	Type  string `json:"_type"`
+	ApiId string `json:"_id"`
 }

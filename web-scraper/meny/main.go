@@ -3,12 +3,7 @@ package main
 import (
 	"fmt"
 	"time"
-
-	"github.com/korneliushen/handlel.app/meny/fetch"
 )
-
-// TODO: ting å snakke med henrik om imrgn: næringsinnhold meny og så priser fra andre?
-// legge til priser for alle butikker i database skisse
 
 func main() {
 	start := time.Now()
@@ -19,7 +14,10 @@ func main() {
 		category := categories.Kategorier[i]
 		for j := range category.Underkategorier {
 			subCategory := category.Underkategorier[j]
-			fetch.GetProducts("meny", category.Navn, subCategory.Navn)
+			err := getProducts("meny", category.Navn, subCategory.Navn)
+			if err != nil {
+				fmt.Printf("Error getting products: %v\n", err)
+			}
 			break
 		}
 		break

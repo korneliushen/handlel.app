@@ -1,15 +1,18 @@
-package fetch
+package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"net/url"
 	"strings"
 )
 
 // separerer kategori og sub-kategori
-const SEPERATOR = "%3BShoppingListGroups%3A"
 const BASE_URL = "https://platform-rest-prod.ngdata.no/api/products"
 const OPTIONS = "?page=1&page_size=1000&full_response=true&fieldset=maximal&facets=Category%2CAllergen&facet=Categories%3A"
+const SEPERATOR = "%3BShoppingListGroups%3A"
 
 const (
 	MENY_ID  = "/1300/7080001150488"
@@ -54,8 +57,35 @@ func getUrl(shop string, category string, subCategory string) string {
 	return url
 }
 
-func GetProducts(shop string, category string, subCategory string) {
+func fetchProducts(url string) {}
+
+func getProducts(shop string, category string, subCategory string) error {
 	// bare meny funker helt for nå
 	url := getUrl(shop, category, subCategory)
-	fmt.Println(url)
+
+	// gjør request til url-en
+	res, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+
+	var produkter ApiResponse
+	err = json.Unmarshal(body, &produkter)
+	if err != nil {
+		return err
+	}
+
+	data, err := json.MarshalIndent(produkter, "", "    ")
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(string(data))
+
+	return nil
 }
