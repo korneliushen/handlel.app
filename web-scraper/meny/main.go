@@ -5,19 +5,21 @@ import (
 	"time"
 
 	"github.com/korneliushen/handlel.app/meny/fetch"
-	"github.com/korneliushen/handlel.app/meny/scraper"
 )
+
+// TODO: ting å snakke med henrik om imrgn: næringsinnhold meny og så priser fra andre?
+// legge til priser for alle butikker i database skisse
 
 func main() {
 	start := time.Now()
 
-	categories := scraper.GetCategories()
+	categories := getCategories()
 
 	for i := range categories.Kategorier {
 		category := categories.Kategorier[i]
 		for j := range category.Underkategorier {
 			subCategory := category.Underkategorier[j]
-			fetch.GetProducts(category.Navn, subCategory.Navn)
+			fetch.GetProducts("meny", category.Navn, subCategory.Navn)
 			break
 		}
 		break

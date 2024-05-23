@@ -1,4 +1,4 @@
-package scraper
+package main
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/gocolly/colly"
 )
 
-func GetCategories() Kategorier {
+func getCategories() Kategorier {
 	// kategorier instans
 	categories := Kategorier{}
 
