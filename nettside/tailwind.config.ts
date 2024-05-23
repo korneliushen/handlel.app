@@ -5,7 +5,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        'borderColor': '#ABABAB'
+        'borderColor': '#ABABAB',
+        "mainPurple": "#9516F9"
       }
     }
   },
