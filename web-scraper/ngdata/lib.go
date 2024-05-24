@@ -1,11 +1,15 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
+	"log"
 	"os"
+
+	_ "github.com/lib/pq"
 )
 
-func WriteData(data any, path string) error {
+func writeData(data any, path string) error {
 	jsonData, err := json.MarshalIndent(data, "", "    ")
 	if err != nil {
 		return err
@@ -17,4 +21,14 @@ func WriteData(data any, path string) error {
 	}
 
 	return nil
+}
+
+func db() *sql.DB {
+	connStr := os.Getenv("NEON_SECRET")
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return db
 }

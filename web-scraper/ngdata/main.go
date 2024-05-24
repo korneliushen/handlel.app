@@ -2,7 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 func run() {
@@ -11,8 +14,10 @@ func run() {
 	categories := getCategories()
 
 	for i := range categories.Kategorier {
+		// får kategori
 		category := categories.Kategorier[i]
 		for j := range category.Underkategorier {
+			// får underkategori
 			subCategory := category.Underkategorier[j]
 
 			menyData, err := getProducts("meny", category.Navn, subCategory.Navn)
@@ -37,20 +42,28 @@ func run() {
 				menyProduct := menyData.Hits.Products[k]
 				jokerProduct, sparProduct := getPrices(gtin, jokerData, sparData)
 
-				insertData(menyProduct, jokerProduct, sparProduct, products)
+				formatData(menyProduct, jokerProduct, sparProduct, products)
 			}
+			break
 		}
+		break
 	}
 
-	err := WriteData(products, "./data.json")
-	if err != nil {
-		fmt.Printf("Error writing to json: %v\n", err)
-		return
+	for i := range products.Produkter {
+		err := insertData(products.Produkter[i])
+		if err != nil {
+			fmt.Printf("Error inserting data into db: %v\n", err)
+			return
+		}
 	}
 }
 
 func main() {
 	start := time.Now()
+
+	if err := godotenv.Load(); err != nil {
+		log.Fatalf("Couldn't load env variables: %v\n", err)
+	}
 
 	fmt.Println("Running")
 	run()
@@ -59,4 +72,5 @@ func main() {
 	elapsed := end.Sub(start)
 	fmt.Println("Elapsed: ", elapsed)
 
+	fmt.Println("Everything ran successfully :O")
 }

@@ -1,5 +1,7 @@
 package main
 
+// TODO: rewrite hele denne dritten (ta alt på engelsk med bedre naming)
+
 // NOTE
 // alt som er data fra api-en er på engelsk, alt som er laget selv og skal sendes til databasen, er på norsk
 // NOTE
@@ -44,9 +46,9 @@ type Priser struct {
 	JokerOriginal float32
 	MenyOriginal  float32
 	SparOriginal  float32
-	JokerKilo     float32
-	MenyKilo      float32
-	SparKilo      float32
+	JokerEnhet    float32
+	MenyEnhet     float32
+	SparEnhet     float32
 }
 
 type Innhold struct {
@@ -60,11 +62,11 @@ type Innhold struct {
 	Opprinnelsesland   string
 	Opphavssted        string
 	Egenskaper         string
-	Allergener         []Allergens
+	Allergener         string
 	KanInneholdeSporAv string
 	Vekt               string
 	Bruksområde        string
-	Næringsinnhold     []NutritionalContent
+	Næringsinnhold     Næringsinnhold
 }
 
 // currently ikke i bruk
@@ -111,6 +113,7 @@ type ProductData struct {
 	SubCategory           string               `json:"shoppingListGroupName"`
 	Price                 float32              `json:"pricePerUnit"`
 	OriginalPrice         float32              `json:"pricePerUnitOriginal"`
+	KgPrice               float32              `json:"calcPricePerUnit"`
 	ImageLink             string               `json:"imagePath"` // https://bilder.ngdata.no/BildeLink/medium.jpg (eller small)
 	WeightMeasurementType string               `json:"measurementType"`
 	Weight                float32              `json:"weight"`
@@ -127,7 +130,6 @@ type ProductData struct {
 }
 
 type Allergens struct {
-	Code string `json:"code"`
 	Name string `json:"displayName"`
 }
 

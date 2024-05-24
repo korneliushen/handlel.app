@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+	"strings"
+)
 
 func getPrices(gtin string, jokerData ApiResponse, sparData ApiResponse) (Product, Product) {
 	jokerProduct := Product{}
@@ -24,7 +28,7 @@ func getPrices(gtin string, jokerData ApiResponse, sparData ApiResponse) (Produc
 }
 
 // lager instanser av egne structs med dataen fra fetchProducts
-func insertData(menyData Product, jokerData Product, sparData Product, products *Produkter) {
+func formatData(menyData Product, jokerData Product, sparData Product, products *Produkter) {
 	product := Produkt{}
 
 	// TODO: remake dette for å gjøre at man bare kan compare når requesten sendes og slipper dette, det funker tho
@@ -35,13 +39,17 @@ func insertData(menyData Product, jokerData Product, sparData Product, products 
 	product.Underkategori = menyData.Data.SubCategory
 	product.BildeLink = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/medium.jpg")
 
-	// TODO: priser (må endre på dette systemet senere for å få med alle priser)
 	product.Priser.Meny = menyData.Data.Price
 	product.Priser.MenyOriginal = menyData.Data.OriginalPrice
+	product.Priser.MenyEnhet = menyData.Data.KgPrice
+
 	product.Priser.Joker = jokerData.Data.Price
 	product.Priser.JokerOriginal = jokerData.Data.OriginalPrice
+	product.Priser.JokerEnhet = jokerData.Data.KgPrice
+
 	product.Priser.Spar = sparData.Data.Price
 	product.Priser.SparOriginal = sparData.Data.OriginalPrice
+	product.Priser.SparEnhet = jokerData.Data.KgPrice
 
 	// innhold
 	product.Innhold.Vekt = fmt.Sprintf("%v%s", menyData.Data.Weight, menyData.Data.WeightMeasurementType)
@@ -50,13 +58,45 @@ func insertData(menyData Product, jokerData Product, sparData Product, products 
 	product.Innhold.Størrelse = menyData.Data.Size
 	product.Innhold.Leverandør = menyData.Data.Vendor
 	product.Innhold.Opprinnelsesland = menyData.Data.OriginCountry
-	product.Innhold.Allergener = menyData.Data.Allergens
+
+	var allergens []string
+	for i := range menyData.Data.Allergens {
+		allergens = append(allergens, menyData.Data.Allergens[i].Name)
+	}
+
+	product.Innhold.Allergener = strings.Join(allergens, ", ")
 	product.Innhold.Ingredienser = menyData.Data.Ingredients
 	product.Innhold.KanInneholdeSporAv = menyData.Data.AllergyDeclaration
 
+	// TODO FOR MEG IMRGN: fikse næringsinnhold, må gjøre det om til et json object av typen til Næringsinnhold structen +
+	// fikse prices field (tror jeg først må inserte i prices og så referere til den)
+
 	// næringsinnhold
-	product.Innhold.Næringsinnhold = menyData.Data.NutritionalContent
+	nutritionalContent := Næringsinnhold{}
+	product.Innhold.Næringsinnhold = nutritionalContent
 
 	// bytt ut med faktiske data
 	products.Produkter = append(products.Produkter, product)
+}
+
+func insertData(product Produkt) error {
+	client := db()
+	defer client.Close()
+
+	// gjør om næringsinnhold (type Næringsinnhold struct) til json
+	json, err := json.Marshal(product.Innhold.Næringsinnhold)
+
+	rows, err := client.Query(`
+		INSERT INTO 
+		products (id, title, subtitle, imagelink, category, subcategory, description, weight, origincountry, ingredients, vendor, size, unit, allergens, allergydeclaration, nutritionalcontent) 
+		VALUES 
+		($1, $2, $3, $4, $5, $6 , $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
+		product.Gtin, product.Tittel, product.Undertittel, product.BildeLink, product.Kategori, product.Underkategori, product.Innhold.Beskrivelse, product.Innhold.Vekt, product.Innhold.Opprinnelsesland, product.Innhold.Ingredienser, product.Innhold.Leverandør, product.Innhold.Størrelse, product.Innhold.Enhet, product.Innhold.Allergener, product.Innhold.KanInneholdeSporAv, json,
+	)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	return nil
 }
