@@ -28,9 +28,8 @@ type Produkter struct {
 type Produkt struct {
 	Id            int
 	Gtin          string
-	FullNavn      string
-	FørsteNavn    string
-	AndreNavn     string
+	Tittel        string
+	Undertittel   string
 	Kategori      string
 	Underkategori string
 	Priser        Priser

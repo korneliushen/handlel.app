@@ -29,9 +29,8 @@ func insertData(menyData Product, jokerData Product, sparData Product, products 
 
 	// TODO: remake dette for å gjøre at man bare kan compare når requesten sendes og slipper dette, det funker tho
 	product.Gtin = menyData.Data.Ean
-	product.FullNavn = fmt.Sprintf("%s - %s", menyData.Data.Title, menyData.Data.Subtitle)
-	product.FørsteNavn = menyData.Data.Title
-	product.AndreNavn = menyData.Data.Subtitle
+	product.Tittel = menyData.Data.Title
+	product.Undertittel = menyData.Data.Subtitle
 	product.Kategori = menyData.Data.Category
 	product.Underkategori = menyData.Data.SubCategory
 	product.BildeLink = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/medium.jpg")
