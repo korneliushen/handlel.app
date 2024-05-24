@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -14,6 +13,7 @@ const BASE_URL = "https://platform-rest-prod.ngdata.no/api/products"
 const OPTIONS = "?page=1&page_size=1000&full_response=true&fieldset=maximal&facets=Category%2CAllergen&facet=Categories%3A"
 const SEPERATOR = "%3BShoppingListGroups%3A"
 
+// id til butikkene
 const (
 	MENY_ID  = "/1300/7080001150488"
 	JOKER_ID = "/1220/7080001395933"
@@ -27,6 +27,20 @@ var ids = map[string]string{
 	"spar":  SPAR_ID,
 }
 
+func getProducts(shop string, category string, subCategory string) (ApiResponse, error) {
+	// bare meny funker helt for nå
+	url := getUrl(shop, category, subCategory)
+
+	// får data om produkter fra api-en
+	data, err := fetchProducts(url)
+	if err != nil {
+		return ApiResponse{}, err
+	}
+
+	return data, nil
+}
+
+// genererer en url for norgesgruppen api med butikk, kategori og underkategori
 func getUrl(shop string, category string, subCategory string) string {
 	// joker trenger stor bokstav på starten av alle ord i kategori eller underkategori
 	if shop == "joker" {
@@ -57,35 +71,24 @@ func getUrl(shop string, category string, subCategory string) string {
 	return url
 }
 
-func fetchProducts(url string) {}
-
-func getProducts(shop string, category string, subCategory string) error {
-	// bare meny funker helt for nå
-	url := getUrl(shop, category, subCategory)
-
+// henter data for produkter med url-en som blir generert over
+func fetchProducts(url string) (ApiResponse, error) {
 	// gjør request til url-en
 	res, err := http.Get(url)
 	if err != nil {
-		return err
+		return ApiResponse{}, err
 	}
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return err
+		return ApiResponse{}, err
 	}
 
 	var produkter ApiResponse
 	err = json.Unmarshal(body, &produkter)
 	if err != nil {
-		return err
+		return ApiResponse{}, err
 	}
 
-	data, err := json.MarshalIndent(produkter, "", "    ")
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(string(data))
-
-	return nil
+	return produkter, nil
 }

@@ -1,5 +1,10 @@
 package main
 
+// NOTE
+// alt som er data fra api-en er på engelsk, alt som er laget selv og skal sendes til databasen, er på norsk
+// NOTE
+
+// brukt for å få alle kategorier som skal hentes produkter fra
 type Kategorier struct {
 	Kategorier []Kategori
 }
@@ -15,13 +20,14 @@ type Underkategori struct {
 	Link string
 }
 
+// produkter som skal bli til json data/lagt inn i database
 type Produkter struct {
 	Produkter []Produkt
 }
 
 type Produkt struct {
 	Id            int
-	Gtin          int
+	Gtin          string
 	FullNavn      string
 	FørsteNavn    string
 	AndreNavn     string
@@ -33,12 +39,15 @@ type Produkt struct {
 }
 
 type Priser struct {
-	Joker     float32
-	Meny      float32
-	Spar      float32
-	JokerKilo float32
-	MenyKilo  float32
-	SparKilo  float32
+	Joker         float32
+	Meny          float32
+	Spar          float32
+	JokerOriginal float32
+	MenyOriginal  float32
+	SparOriginal  float32
+	JokerKilo     float32
+	MenyKilo      float32
+	SparKilo      float32
 }
 
 type Innhold struct {
@@ -52,13 +61,14 @@ type Innhold struct {
 	Opprinnelsesland   string
 	Opphavssted        string
 	Egenskaper         string
-	Allergener         []string
+	Allergener         []Allergens
 	KanInneholdeSporAv string
 	Vekt               string
 	Bruksområde        string
-	Næringsinnhold     Næringsinnhold
+	Næringsinnhold     []NutritionalContent
 }
 
+// currently ikke i bruk
 type Næringsinnhold struct {
 	Energi                      string
 	Natrium                     string
@@ -75,17 +85,58 @@ type Næringsinnhold struct {
 	Salt                        string
 }
 
+// setter data fra api inn i eget struct, gjør det lettere å assigne data senere
 type ApiResponse struct {
-	TidsAvbrudd bool     `json:"timed_out"`
-	Resultat    Resultat `json:"hits"`
+	TimedOut bool `json:"timed_out"`
+	Hits     Hits `json:"hits"`
 }
 
-type Resultat struct {
-	Antall    int          `json:"total"`
-	Produkter []ApiProdukt `json:"hits"`
+type Hits struct {
+	AmountOfProducts int       `json:"total"`
+	Products         []Product `json:"hits"`
 }
 
-type ApiProdukt struct {
-	Type  string `json:"_type"`
-	ApiId string `json:"_id"`
+type Product struct {
+	Type  string      `json:"_type"`
+	ApiId string      `json:"_id"`
+	Data  ProductData `json:"_source"`
+}
+
+type ProductData struct {
+	Ean                   string               `json:"ean"`
+	Title                 string               `json:"title"`
+	Subtitle              string               `json:"subtitle"`
+	Slug                  string               `json:"slugifiedUrl"`
+	Description           string               `json:"description"`
+	Category              string               `json:"categoryName"`
+	SubCategory           string               `json:"shoppingListGroupName"`
+	Price                 float32              `json:"pricePerUnit"`
+	OriginalPrice         float32              `json:"pricePerUnitOriginal"`
+	ImageLink             string               `json:"imagePath"` // https://bilder.ngdata.no/BildeLink/medium.jpg (eller small)
+	WeightMeasurementType string               `json:"measurementType"`
+	Weight                float32              `json:"weight"`
+	Unit                  string               `json:"unit"`
+	Size                  string               `json:"packageSize"`
+	Vendor                string               `json:"vendor"`
+	OnSale                bool                 `json:"isOffer"`
+	OriginCountry         string               `json:"countryOfOrigin"`
+	Allergens             []Allergens          `json:"allergens"`
+	NutritionalContent    []NutritionalContent `json:"nutritionalContent"`
+	Associated            Associated           `json:"associated"`
+}
+
+type Allergens struct {
+	Code string `json:"code"`
+	Name string `json:"displayName"`
+}
+
+type NutritionalContent struct {
+	Id     string  `json:"name"`
+	Name   string  `json:"displayName"`
+	Amount float32 `json:"amount"`
+	Unit   string  `json:"unit"`
+}
+
+type Associated struct {
+	Products []string `json:"slg"`
 }

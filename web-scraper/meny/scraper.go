@@ -7,6 +7,9 @@ import (
 	"github.com/gocolly/colly"
 )
 
+// TODO: legg til en timeout på scraper
+const TIMEOUT = 10
+
 func getCategories() Kategorier {
 	// kategorier instans
 	categories := Kategorier{}
