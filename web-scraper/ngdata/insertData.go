@@ -2,6 +2,27 @@ package main
 
 import "fmt"
 
+func getPrices(gtin string, jokerData ApiResponse, sparData ApiResponse) (Product, Product) {
+	jokerProduct := Product{}
+	sparProduct := Product{}
+
+	// finner produkt fra joker med samme gtin
+	for l := range jokerData.Hits.Products {
+		if jokerData.Hits.Products[l].Data.Ean == gtin {
+			jokerProduct = jokerData.Hits.Products[l]
+		}
+	}
+
+	// finner produkt fra spar med samme gtin
+	for l := range sparData.Hits.Products {
+		if sparData.Hits.Products[l].Data.Ean == gtin {
+			sparProduct = sparData.Hits.Products[l]
+		}
+	}
+
+	return jokerProduct, sparProduct
+}
+
 // lager instanser av egne structs med dataen fra fetchProducts
 func insertData(menyData Product, jokerData Product, sparData Product, products *Produkter) {
 	product := Produkt{}

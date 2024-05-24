@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -69,8 +68,6 @@ func getUrl(shop string, category string, subCategory string) string {
 	if shop == "spar" {
 		url = strings.ReplaceAll(url, "+%26+", "%20og%20")
 	}
-
-	fmt.Println(url)
 
 	return url
 }

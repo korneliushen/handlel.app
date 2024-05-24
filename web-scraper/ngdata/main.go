@@ -34,24 +34,10 @@ func run() {
 			for k := range menyData.Hits.Products {
 				gtin := menyData.Hits.Products[k].Data.Ean
 
-				jokerProduct := Product{}
-				sparProduct := Product{}
+				menyProduct := menyData.Hits.Products[k]
+				jokerProduct, sparProduct := getPrices(gtin, jokerData, sparData)
 
-				// finner produkt fra joker med samme gtin
-				for l := range jokerData.Hits.Products {
-					if jokerData.Hits.Products[l].Data.Ean == gtin {
-						jokerProduct = jokerData.Hits.Products[l]
-					}
-				}
-
-				// finner produkt fra spar med samme gtin
-				for l := range sparData.Hits.Products {
-					if sparData.Hits.Products[l].Data.Ean == gtin {
-						sparProduct = sparData.Hits.Products[l]
-					}
-				}
-
-				insertData(menyData.Hits.Products[k], jokerProduct, sparProduct, products)
+				insertData(menyProduct, jokerProduct, sparProduct, products)
 			}
 		}
 	}
@@ -66,6 +52,7 @@ func run() {
 func main() {
 	start := time.Now()
 
+	fmt.Println("Running")
 	run()
 
 	end := time.Now()
