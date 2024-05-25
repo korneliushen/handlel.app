@@ -28,7 +28,6 @@ type Produkter struct {
 }
 
 type Produkt struct {
-	Id            int
 	Gtin          string
 	Tittel        string
 	Undertittel   string
@@ -40,15 +39,15 @@ type Produkt struct {
 }
 
 type Priser struct {
-	Joker         float32
-	Meny          float32
-	Spar          float32
-	JokerOriginal float32
-	MenyOriginal  float32
-	SparOriginal  float32
-	JokerEnhet    float32
-	MenyEnhet     float32
-	SparEnhet     float32
+	Priser []Pris
+}
+
+type Pris struct {
+	Gtin         string
+	Butikk       string
+	Pris         float32
+	OriginalPris float32
+	EnhetsPris   float32
 }
 
 type Innhold struct {
@@ -113,7 +112,7 @@ type ProductData struct {
 	SubCategory           string               `json:"shoppingListGroupName"`
 	Price                 float32              `json:"pricePerUnit"`
 	OriginalPrice         float32              `json:"pricePerUnitOriginal"`
-	KgPrice               float32              `json:"calcPricePerUnit"`
+	CalcPricePerUnit      float32              `json:"calcPricePerUnit"`
 	ImageLink             string               `json:"imagePath"` // https://bilder.ngdata.no/BildeLink/medium.jpg (eller small)
 	WeightMeasurementType string               `json:"measurementType"`
 	Weight                float32              `json:"weight"`

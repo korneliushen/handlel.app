@@ -39,17 +39,12 @@ func formatData(menyData Product, jokerData Product, sparData Product, products 
 	product.Underkategori = menyData.Data.SubCategory
 	product.BildeLink = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/medium.jpg")
 
-	product.Priser.Meny = menyData.Data.Price
-	product.Priser.MenyOriginal = menyData.Data.OriginalPrice
-	product.Priser.MenyEnhet = menyData.Data.KgPrice
-
-	product.Priser.Joker = jokerData.Data.Price
-	product.Priser.JokerOriginal = jokerData.Data.OriginalPrice
-	product.Priser.JokerEnhet = jokerData.Data.KgPrice
-
-	product.Priser.Spar = sparData.Data.Price
-	product.Priser.SparOriginal = sparData.Data.OriginalPrice
-	product.Priser.SparEnhet = jokerData.Data.KgPrice
+	// lager et array av priser, å gjøre det på denne måten gjør det lettere når dataen skal sendes til database
+	prices := Priser{}
+	prices.Priser = append(prices.Priser, Pris{Gtin: menyData.Data.Ean, Butikk: "meny", Pris: menyData.Data.Price, OriginalPris: menyData.Data.OriginalPrice, EnhetsPris: menyData.Data.CalcPricePerUnit})
+	prices.Priser = append(prices.Priser, Pris{Gtin: jokerData.Data.Ean, Butikk: "joker", Pris: jokerData.Data.Price, OriginalPris: jokerData.Data.OriginalPrice, EnhetsPris: jokerData.Data.CalcPricePerUnit})
+	prices.Priser = append(prices.Priser, Pris{Gtin: sparData.Data.Ean, Butikk: "spar", Pris: sparData.Data.Price, OriginalPris: sparData.Data.OriginalPrice, EnhetsPris: sparData.Data.CalcPricePerUnit})
+	product.Priser = prices
 
 	// innhold
 	product.Innhold.Vekt = fmt.Sprintf("%v%s", menyData.Data.Weight, menyData.Data.WeightMeasurementType)
@@ -68,9 +63,6 @@ func formatData(menyData Product, jokerData Product, sparData Product, products 
 	product.Innhold.Ingredienser = menyData.Data.Ingredients
 	product.Innhold.KanInneholdeSporAv = menyData.Data.AllergyDeclaration
 
-	// TODO FOR MEG IMRGN: fikse næringsinnhold, må gjøre det om til et json object av typen til Næringsinnhold structen +
-	// fikse prices field (tror jeg først må inserte i prices og så referere til den)
-
 	// næringsinnhold
 	nutritionalContent := Næringsinnhold{}
 	product.Innhold.Næringsinnhold = nutritionalContent
@@ -87,16 +79,53 @@ func insertData(product Produkt) error {
 	json, err := json.Marshal(product.Innhold.Næringsinnhold)
 
 	rows, err := client.Query(`
-		INSERT INTO 
-		products (id, title, subtitle, imagelink, category, subcategory, description, weight, origincountry, ingredients, vendor, size, unit, allergens, allergydeclaration, nutritionalcontent) 
-		VALUES 
-		($1, $2, $3, $4, $5, $6 , $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
+		INSERT INTO products (id, title, subtitle, imagelink, category, subcategory, description, weight, origincountry, ingredients, vendor, size, unit, allergens, allergydeclaration, nutritionalcontent) 
+		VALUES ($1, $2, $3, $4, $5, $6 , $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+		ON CONFLICT (id)
+		DO UPDATE SET
+			title = EXCLUDED.title,
+			subtitle = EXCLUDED.subtitle,
+			imagelink = EXCLUDED.imagelink,
+			category = EXCLUDED.category,
+			subcategory = EXCLUDED.subcategory,
+			description = EXCLUDED.description,
+			weight = EXCLUDED.weight,
+			origincountry = EXCLUDED.origincountry,
+			ingredients = EXCLUDED.ingredients,
+			vendor = EXCLUDED.vendor,
+			size = EXCLUDED.size,
+			unit = EXCLUDED.unit,
+			allergens = EXCLUDED.allergens,
+			allergydeclaration = EXCLUDED.allergydeclaration,
+			nutritionalcontent = EXCLUDED.nutritionalcontent
+		`,
 		product.Gtin, product.Tittel, product.Undertittel, product.BildeLink, product.Kategori, product.Underkategori, product.Innhold.Beskrivelse, product.Innhold.Vekt, product.Innhold.Opprinnelsesland, product.Innhold.Ingredienser, product.Innhold.Leverandør, product.Innhold.Størrelse, product.Innhold.Enhet, product.Innhold.Allergener, product.Innhold.KanInneholdeSporAv, json,
 	)
 	if err != nil {
 		return err
 	}
 	defer rows.Close()
+
+	for i := range product.Priser.Priser {
+		price := product.Priser.Priser[i]
+
+		if price.Pris == 0 {
+			continue
+		}
+
+		id := fmt.Sprintf("%s/%s", product.Gtin, price.Butikk)
+
+		rows, err = client.Query(`
+		INSERT INTO
+		price (id, gtin, store, price, priceoriginal, priceunit, product_id)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+			id, product.Gtin, price.Butikk, price.Pris, price.OriginalPris, price.EnhetsPris, product.Gtin,
+		)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+	}
 
 	return nil
 }
