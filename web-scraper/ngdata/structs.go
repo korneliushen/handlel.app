@@ -48,6 +48,7 @@ type Pris struct {
 	Pris         float32
 	OriginalPris float32
 	EnhetsPris   float32
+	EnhetsType   string
 }
 
 type Innhold struct {
@@ -70,19 +71,19 @@ type Innhold struct {
 
 // currently ikke i bruk
 type Næringsinnhold struct {
-	Energi                      string
-	Natrium                     string
-	Fett                        string
-	HvoravMettedeFettsyrer      string
-	HvoravEnumettedeFettsyrer   string
-	HvoravFlerumettedeFettsyrer string
-	Karbohydrater               string
-	HvoravSukkerarter           string
-	HvoravPolyoler              string
-	HvoravStivelse              string
-	Kostfiber                   string
-	Protein                     string
-	Salt                        string
+	Energi          string
+	Kalorier        string
+	Natrium         string
+	Fett            string
+	MettetFett      string
+	EnumettetFett   string
+	FlerumettetFett string
+	Karbohydrater   string
+	Sukkerarter     string
+	Stivelse        string
+	Kostfiber       string
+	Protein         string
+	Salt            string
 }
 
 // setter data fra api inn i eget struct, gjør det lettere å assigne data senere
@@ -113,6 +114,7 @@ type ProductData struct {
 	Price                 float32              `json:"pricePerUnit"`
 	OriginalPrice         float32              `json:"pricePerUnitOriginal"`
 	CalcPricePerUnit      float32              `json:"calcPricePerUnit"`
+	CalcUnit              string               `json:"calcUnit"`
 	ImageLink             string               `json:"imagePath"` // https://bilder.ngdata.no/BildeLink/medium.jpg (eller small)
 	WeightMeasurementType string               `json:"measurementType"`
 	Weight                float32              `json:"weight"`
