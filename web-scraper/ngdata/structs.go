@@ -49,6 +49,7 @@ type Pris struct {
 	OriginalPris float32
 	EnhetsPris   float32
 	EnhetsType   string
+	Url          string
 }
 
 type Innhold struct {
@@ -69,7 +70,6 @@ type Innhold struct {
 	Næringsinnhold     Næringsinnhold
 }
 
-// currently ikke i bruk
 type Næringsinnhold struct {
 	Energi          string
 	Kalorier        string
@@ -117,7 +117,7 @@ type ProductData struct {
 	CalcUnit              string               `json:"calcUnit"`
 	ImageLink             string               `json:"imagePath"` // https://bilder.ngdata.no/BildeLink/medium.jpg (eller small)
 	WeightMeasurementType string               `json:"measurementType"`
-	Weight                float32              `json:"weight"`
+	Weight                float32              `json:"measurementValue"`
 	Unit                  string               `json:"unit"`
 	Size                  string               `json:"packageSize"`
 	Ingredients           string               `json:"ingredients"`

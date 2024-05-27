@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -16,9 +17,12 @@ func run() {
 	for i := range categories.Kategorier {
 		// får kategori
 		category := categories.Kategorier[i]
+		fmt.Println("Henter data for kategori:", category)
 		for j := range category.Underkategorier {
 			// får underkategori
 			subCategory := category.Underkategorier[j]
+
+			fmt.Println("Henter data for underkategori:", subCategory)
 
 			menyData, err := getProducts("meny", category.Navn, subCategory.Navn)
 			if err != nil {
@@ -42,20 +46,35 @@ func run() {
 				menyProduct := menyData.Hits.Products[k]
 				jokerProduct, sparProduct := getPrices(gtin, jokerData, sparData)
 
+				fmt.Println("Formaterer data for:", gtin, menyProduct.Data.Title)
+
 				formatData(menyProduct, jokerProduct, sparProduct, products)
 			}
-			break
 		}
-		break
 	}
 
+	db := db()
+	defer db.Close()
+
+	var wg sync.WaitGroup
+	// limiter hvor mange go routines som kan kjøre om om gangen
+	sem := make(chan struct{}, 4)
+
 	for i := range products.Produkter {
-		err := insertData(products.Produkter[i])
-		if err != nil {
-			fmt.Printf("Error inserting data into db: %v\n", err)
-			return
-		}
+		wg.Add(1)
+		sem <- struct{}{}
+
+		go func(product Produkt) {
+			defer wg.Done()
+			defer func() { <-sem }()
+
+			if err := insertData(product, db); err != nil {
+				fmt.Printf("Error inserting data for %s: %v", products.Produkter[i].Tittel, err)
+			}
+		}(products.Produkter[i])
 	}
+
+	wg.Wait()
 }
 
 func main() {

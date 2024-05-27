@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"reflect"
@@ -43,9 +44,9 @@ func formatData(menyData Product, jokerData Product, sparData Product, products 
 
 	// lager et array av priser, å gjøre det på denne måten gjør det lettere når dataen skal sendes til database
 	prices := Priser{}
-	prices.Priser = append(prices.Priser, Pris{Gtin: menyData.Data.Ean, Butikk: "meny", Pris: menyData.Data.Price, OriginalPris: menyData.Data.OriginalPrice, EnhetsPris: menyData.Data.CalcPricePerUnit, EnhetsType: menyData.Data.CalcUnit})
-	prices.Priser = append(prices.Priser, Pris{Gtin: jokerData.Data.Ean, Butikk: "joker", Pris: jokerData.Data.Price, OriginalPris: jokerData.Data.OriginalPrice, EnhetsPris: jokerData.Data.CalcPricePerUnit, EnhetsType: jokerData.Data.CalcUnit})
-	prices.Priser = append(prices.Priser, Pris{Gtin: sparData.Data.Ean, Butikk: "spar", Pris: sparData.Data.Price, OriginalPris: sparData.Data.OriginalPrice, EnhetsPris: sparData.Data.CalcPricePerUnit, EnhetsType: sparData.Data.CalcUnit})
+	prices.Priser = append(prices.Priser, Pris{Gtin: menyData.Data.Ean, Butikk: "meny", Pris: menyData.Data.Price, OriginalPris: menyData.Data.OriginalPrice, EnhetsPris: menyData.Data.CalcPricePerUnit, EnhetsType: menyData.Data.CalcUnit, Url: fmt.Sprintf("%s%s", "https://meny.no/varer", menyData.Data.Slug)})
+	prices.Priser = append(prices.Priser, Pris{Gtin: jokerData.Data.Ean, Butikk: "joker", Pris: jokerData.Data.Price, OriginalPris: jokerData.Data.OriginalPrice, EnhetsPris: jokerData.Data.CalcPricePerUnit, EnhetsType: jokerData.Data.CalcUnit, Url: fmt.Sprintf("%s%s", "https://joker.no/nettbutikk/varer", jokerData.Data.Slug)})
+	prices.Priser = append(prices.Priser, Pris{Gtin: sparData.Data.Ean, Butikk: "spar", Pris: sparData.Data.Price, OriginalPris: sparData.Data.OriginalPrice, EnhetsPris: sparData.Data.CalcPricePerUnit, EnhetsType: sparData.Data.CalcUnit, Url: fmt.Sprintf("%s%s", "https://spar.no/nettbutikk/varer", sparData.Data.Slug)})
 	product.Priser = prices
 
 	// innhold
@@ -85,15 +86,14 @@ func formatData(menyData Product, jokerData Product, sparData Product, products 
 	products.Produkter = append(products.Produkter, product)
 }
 
-func insertData(product Produkt) error {
-	client := db()
-	defer client.Close()
+func insertData(product Produkt, db *sql.DB) error {
+	fmt.Println("Legger inn data for:", product.Tittel)
 
 	// gjør om næringsinnhold (type Næringsinnhold struct) til json
 	json, err := json.Marshal(product.Innhold.Næringsinnhold)
 
 	// legger til en rad i Products table i databasen. om en rad med samme id (gtin) allerede eksisterer, blir den replaced
-	rows, err := client.Query(`
+	productsStmt, err := db.Prepare(`
 		INSERT INTO products (id, title, subtitle, imagelink, category, subcategory, description, weight, origincountry, ingredients, vendor, size, unit, allergens, allergydeclaration, nutritionalcontent) 
 		VALUES ($1, $2, $3, $4, $5, $6 , $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
 		ON CONFLICT (id)
@@ -113,13 +113,36 @@ func insertData(product Produkt) error {
 			allergens = EXCLUDED.allergens,
 			allergydeclaration = EXCLUDED.allergydeclaration,
 			nutritionalcontent = EXCLUDED.nutritionalcontent
+		`)
+	if err != nil {
+		return err
+	}
+	defer productsStmt.Close()
+
+	_, err = productsStmt.Exec(product.Gtin, product.Tittel, product.Undertittel, product.BildeLink, product.Kategori, product.Underkategori, product.Innhold.Beskrivelse, product.Innhold.Vekt, product.Innhold.Opprinnelsesland, product.Innhold.Ingredienser, product.Innhold.Leverandør, product.Innhold.Størrelse, product.Innhold.Enhet, product.Innhold.Allergener, product.Innhold.KanInneholdeSporAv, json)
+	if err != nil {
+		return err
+	}
+
+	pricesStmt, err := db.Prepare(`
+		INSERT INTO prices (id, gtin, store, price, priceoriginal, priceunit, unittype, url, product_id)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+		ON CONFLICT (id)
+		DO UPDATE SET
+			gtin = EXCLUDED.gtin,
+			store = EXCLUDED.store,
+			price = EXCLUDED.price,
+			priceoriginal = EXCLUDED.priceoriginal,
+			priceunit = EXCLUDED.priceunit,
+			unittype = EXCLUDED.unittype,
+			url = EXCLUDED.url,
+			product_id = EXCLUDED.product_id
 		`,
-		product.Gtin, product.Tittel, product.Undertittel, product.BildeLink, product.Kategori, product.Underkategori, product.Innhold.Beskrivelse, product.Innhold.Vekt, product.Innhold.Opprinnelsesland, product.Innhold.Ingredienser, product.Innhold.Leverandør, product.Innhold.Størrelse, product.Innhold.Enhet, product.Innhold.Allergener, product.Innhold.KanInneholdeSporAv, json,
 	)
 	if err != nil {
 		return err
 	}
-	defer rows.Close()
+	defer pricesStmt.Close()
 
 	// om prisen ikke er 0 (da er det ikke noe vits å putte inn en row), legger til eller replacer pris basert på id
 	// id er bygd opp av gtin og butikk, noe som vil være unikt
@@ -132,25 +155,7 @@ func insertData(product Produkt) error {
 
 		id := fmt.Sprintf("%s/%s", product.Gtin, price.Butikk)
 
-		rows, err = client.Query(`
-		INSERT INTO prices (id, gtin, store, price, priceoriginal, priceunit, unittype, product_id)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-		ON CONFLICT (id)
-		DO UPDATE SET
-			gtin = EXCLUDED.gtin,
-			store = EXCLUDED.store,
-			price = EXCLUDED.price,
-			priceoriginal = EXCLUDED.priceoriginal,
-			priceunit = EXCLUDED.priceunit,
-			unittype = EXCLUDED.unittype,
-			product_id = EXCLUDED.product_id
-		`,
-			id, product.Gtin, price.Butikk, price.Pris, price.OriginalPris, price.EnhetsPris, price.EnhetsType, product.Gtin,
-		)
-		if err != nil {
-			return err
-		}
-		defer rows.Close()
+		pricesStmt.Exec(id, product.Gtin, price.Butikk, price.Pris, price.OriginalPris, price.EnhetsPris, price.EnhetsType, price.Url, product.Gtin)
 	}
 
 	return nil
