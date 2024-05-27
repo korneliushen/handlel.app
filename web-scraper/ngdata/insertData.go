@@ -33,7 +33,6 @@ func getPrices(gtin string, jokerData ApiResponse, sparData ApiResponse) (Produc
 func formatData(menyData Product, jokerData Product, sparData Product, products *Produkter) {
 	product := Produkt{}
 
-	// TODO: remake dette for å gjøre at man bare kan compare når requesten sendes og slipper dette, det funker tho
 	product.Gtin = menyData.Data.Ean
 	product.Tittel = menyData.Data.Title
 	product.Undertittel = menyData.Data.Subtitle
@@ -74,6 +73,7 @@ func formatData(menyData Product, jokerData Product, sparData Product, products 
 	nutritionalContentType := reflect.TypeOf(nutritionalContent)
 	nutritionalContentValue := reflect.ValueOf(&nutritionalContent).Elem()
 
+	// legger til næringsinnhold data i fields med navn som matcher dataen fra api-en (reflect)
 	for i := 0; i < len(nutritionalContentData) && i < nutritionalContentType.NumField(); i++ {
 		field := nutritionalContentValue.Field(i)
 		if field.CanSet() {
@@ -93,6 +93,7 @@ func insertData(product Produkt, db *sql.DB) error {
 	json, err := json.Marshal(product.Innhold.Næringsinnhold)
 
 	// legger til en rad i Products table i databasen. om en rad med samme id (gtin) allerede eksisterer, blir den replaced
+	// her gjører bare queryen klart, uten dette blir goroutinene helt fked up og overlapper
 	productsStmt, err := db.Prepare(`
 		INSERT INTO products (id, title, subtitle, imagelink, category, subcategory, description, weight, origincountry, ingredients, vendor, size, unit, allergens, allergydeclaration, nutritionalcontent) 
 		VALUES ($1, $2, $3, $4, $5, $6 , $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
@@ -119,11 +120,13 @@ func insertData(product Produkt, db *sql.DB) error {
 	}
 	defer productsStmt.Close()
 
+	// queryen executes
 	_, err = productsStmt.Exec(product.Gtin, product.Tittel, product.Undertittel, product.BildeLink, product.Kategori, product.Underkategori, product.Innhold.Beskrivelse, product.Innhold.Vekt, product.Innhold.Opprinnelsesland, product.Innhold.Ingredienser, product.Innhold.Leverandør, product.Innhold.Størrelse, product.Innhold.Enhet, product.Innhold.Allergener, product.Innhold.KanInneholdeSporAv, json)
 	if err != nil {
 		return err
 	}
 
+	// queryen for pris gjøres klar
 	pricesStmt, err := db.Prepare(`
 		INSERT INTO prices (id, gtin, store, price, priceoriginal, priceunit, unittype, url, product_id)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
@@ -149,12 +152,14 @@ func insertData(product Produkt, db *sql.DB) error {
 	for i := range product.Priser.Priser {
 		price := product.Priser.Priser[i]
 
+		// om butikken ikke har en pris, skip den og gå videre
 		if price.Pris == 0 {
 			continue
 		}
 
 		id := fmt.Sprintf("%s/%s", product.Gtin, price.Butikk)
 
+		// kjører queryen for å legge in pris. bruker produktet sin gtin for å linke til en raden i product tablet som ble laget over
 		pricesStmt.Exec(id, product.Gtin, price.Butikk, price.Pris, price.OriginalPris, price.EnhetsPris, price.EnhetsType, price.Url, product.Gtin)
 	}
 

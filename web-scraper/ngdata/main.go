@@ -56,18 +56,22 @@ func run() {
 	db := db()
 	defer db.Close()
 
+	// lager en waitgroup, som venter på goroutines for å bli ferdig før den starter en ny
 	var wg sync.WaitGroup
 	// limiter hvor mange go routines som kan kjøre om om gangen
 	sem := make(chan struct{}, 4)
 
 	for i := range products.Produkter {
+		// legger til et item i wait groupen
 		wg.Add(1)
 		sem <- struct{}{}
 
 		go func(product Produkt) {
+			// når funksjonen er ferdig, blir waitgroup instansen ferdig + sem (det som keeper track av hvor mange ting som kan kjøre om gangen) blir oppdatert
 			defer wg.Done()
 			defer func() { <-sem }()
 
+			// legger til data i databasen
 			if err := insertData(product, db); err != nil {
 				fmt.Printf("Error inserting data for %s: %v", products.Produkter[i].Tittel, err)
 			}

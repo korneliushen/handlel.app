@@ -15,6 +15,7 @@ func db() *sql.DB {
 		log.Fatal(err)
 	}
 
+	// limiter open og idle connections for å ikke med et uhell overloade databasen
 	db.SetMaxOpenConns(20)
 	db.SetMaxIdleConns(20)
 
