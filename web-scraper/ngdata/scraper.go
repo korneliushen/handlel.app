@@ -11,6 +11,8 @@ import (
 const TIMEOUT = 10
 
 func getCategories() Kategorier {
+	fmt.Println("Getting categories")
+
 	// kategorier instans
 	categories := Kategorier{}
 

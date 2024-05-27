@@ -59,7 +59,7 @@ func getUrl(shop string, category string, subCategory string) string {
 	// constructer url
 	url := BASE_URL + id + OPTIONS + category + SEPERATOR + subCategory
 
-	// joker aksepterer bare denne versjonen av "&" av en eller annen grunn
+	// joker bruker "/" i stedet for "&"
 	if shop == "joker" {
 		url = strings.ReplaceAll(url, "+%26+", "%2F")
 	}

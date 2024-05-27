@@ -1,5 +1,7 @@
 package main
 
+// TODO: rewrite hele denne dritten (ta alt på engelsk med bedre naming)
+
 // NOTE
 // alt som er data fra api-en er på engelsk, alt som er laget selv og skal sendes til databasen, er på norsk
 // NOTE
@@ -26,7 +28,6 @@ type Produkter struct {
 }
 
 type Produkt struct {
-	Id            int
 	Gtin          string
 	Tittel        string
 	Undertittel   string
@@ -38,15 +39,17 @@ type Produkt struct {
 }
 
 type Priser struct {
-	Joker         float32
-	Meny          float32
-	Spar          float32
-	JokerOriginal float32
-	MenyOriginal  float32
-	SparOriginal  float32
-	JokerKilo     float32
-	MenyKilo      float32
-	SparKilo      float32
+	Priser []Pris
+}
+
+type Pris struct {
+	Gtin         string
+	Butikk       string
+	Pris         float32
+	OriginalPris float32
+	EnhetsPris   float32
+	EnhetsType   string
+	Url          string
 }
 
 type Innhold struct {
@@ -60,28 +63,27 @@ type Innhold struct {
 	Opprinnelsesland   string
 	Opphavssted        string
 	Egenskaper         string
-	Allergener         []Allergens
+	Allergener         string
 	KanInneholdeSporAv string
 	Vekt               string
 	Bruksområde        string
-	Næringsinnhold     []NutritionalContent
+	Næringsinnhold     Næringsinnhold
 }
 
-// currently ikke i bruk
 type Næringsinnhold struct {
-	Energi                      string
-	Natrium                     string
-	Fett                        string
-	HvoravMettedeFettsyrer      string
-	HvoravEnumettedeFettsyrer   string
-	HvoravFlerumettedeFettsyrer string
-	Karbohydrater               string
-	HvoravSukkerarter           string
-	HvoravPolyoler              string
-	HvoravStivelse              string
-	Kostfiber                   string
-	Protein                     string
-	Salt                        string
+	Energi          string
+	Kalorier        string
+	Natrium         string
+	Fett            string
+	MettetFett      string
+	EnumettetFett   string
+	FlerumettetFett string
+	Karbohydrater   string
+	Sukkerarter     string
+	Stivelse        string
+	Kostfiber       string
+	Protein         string
+	Salt            string
 }
 
 // setter data fra api inn i eget struct, gjør det lettere å assigne data senere
@@ -111,9 +113,11 @@ type ProductData struct {
 	SubCategory           string               `json:"shoppingListGroupName"`
 	Price                 float32              `json:"pricePerUnit"`
 	OriginalPrice         float32              `json:"pricePerUnitOriginal"`
+	CalcPricePerUnit      float32              `json:"calcPricePerUnit"`
+	CalcUnit              string               `json:"calcUnit"`
 	ImageLink             string               `json:"imagePath"` // https://bilder.ngdata.no/BildeLink/medium.jpg (eller small)
 	WeightMeasurementType string               `json:"measurementType"`
-	Weight                float32              `json:"weight"`
+	Weight                float32              `json:"measurementValue"`
 	Unit                  string               `json:"unit"`
 	Size                  string               `json:"packageSize"`
 	Ingredients           string               `json:"ingredients"`
@@ -127,7 +131,6 @@ type ProductData struct {
 }
 
 type Allergens struct {
-	Code string `json:"code"`
 	Name string `json:"displayName"`
 }
 
