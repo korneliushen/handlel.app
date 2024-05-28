@@ -43,18 +43,18 @@ type Priser struct {
 }
 
 type Pris struct {
-	Butikk       string
-	Pris         float32
-	OriginalPris float32
-	EnhetsPris   float32
-	EnhetsType   string
-	Url          string
+	Store         string
+	Price         float32
+	OriginalPrice float32
+	UnitPrice     float32
+	Url           string
 }
 
 type Innhold struct {
 	Beskrivelse        string
 	Holdbarhetsgaranti string
 	Enhet              string
+	EnhetsType         string
 	Størrelse          string
 	Leverandør         string
 	Ingredienser       string
@@ -112,8 +112,8 @@ type ProductData struct {
 	SubCategory           string               `json:"shoppingListGroupName"`
 	Price                 float32              `json:"pricePerUnit"`
 	OriginalPrice         float32              `json:"pricePerUnitOriginal"`
-	CalcPricePerUnit      float32              `json:"calcPricePerUnit"`
-	CalcUnit              string               `json:"calcUnit"`
+	ComparePricePerUnit   float32              `json:"comparePricePerUnit"`
+	CompareUnit           string               `json:"compareUnit"`
 	ImageLink             string               `json:"imagePath"` // https://bilder.ngdata.no/BildeLink/medium.jpg (eller small)
 	WeightMeasurementType string               `json:"measurementType"`
 	Weight                float32              `json:"measurementValue"`
