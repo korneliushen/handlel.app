@@ -43,7 +43,6 @@ type Priser struct {
 }
 
 type Pris struct {
-	Gtin         string
 	Butikk       string
 	Pris         float32
 	OriginalPris float32
