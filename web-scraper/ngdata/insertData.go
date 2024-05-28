@@ -1,10 +1,12 @@
 package main
 
 import (
+	"cmp"
 	"database/sql"
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"slices"
 	"strings"
 )
 
@@ -43,9 +45,22 @@ func formatData(menyData Product, jokerData Product, sparData Product, products 
 
 	// lager et array av priser, å gjøre det på denne måten gjør det lettere når dataen skal sendes til database
 	prices := Priser{}
-	prices.Priser = append(prices.Priser, Pris{Gtin: menyData.Data.Ean, Butikk: "meny", Pris: menyData.Data.Price, OriginalPris: menyData.Data.OriginalPrice, EnhetsPris: menyData.Data.CalcPricePerUnit, EnhetsType: menyData.Data.CalcUnit, Url: fmt.Sprintf("%s%s", "https://meny.no/varer", menyData.Data.Slug)})
-	prices.Priser = append(prices.Priser, Pris{Gtin: jokerData.Data.Ean, Butikk: "joker", Pris: jokerData.Data.Price, OriginalPris: jokerData.Data.OriginalPrice, EnhetsPris: jokerData.Data.CalcPricePerUnit, EnhetsType: jokerData.Data.CalcUnit, Url: fmt.Sprintf("%s%s", "https://joker.no/nettbutikk/varer", jokerData.Data.Slug)})
-	prices.Priser = append(prices.Priser, Pris{Gtin: sparData.Data.Ean, Butikk: "spar", Pris: sparData.Data.Price, OriginalPris: sparData.Data.OriginalPrice, EnhetsPris: sparData.Data.CalcPricePerUnit, EnhetsType: sparData.Data.CalcUnit, Url: fmt.Sprintf("%s%s", "https://spar.no/nettbutikk/varer", sparData.Data.Slug)})
+	// sjekker at prisen ikke er 0, om den er det er det ikke vits å sende til databasen
+	if menyData.Data.Price != 0 {
+		prices.Priser = append(prices.Priser, Pris{Store: "meny", Price: menyData.Data.Price, OriginalPrice: menyData.Data.OriginalPrice, UnitPrice: menyData.Data.ComparePricePerUnit, Url: fmt.Sprintf("%s%s", "https://meny.no/varer", menyData.Data.Slug)})
+	}
+	if jokerData.Data.Price != 0 {
+		prices.Priser = append(prices.Priser, Pris{Store: "joker", Price: jokerData.Data.Price, OriginalPrice: jokerData.Data.OriginalPrice, UnitPrice: jokerData.Data.ComparePricePerUnit, Url: fmt.Sprintf("%s%s", "https://joker.no/nettbutikk/varer", jokerData.Data.Slug)})
+	}
+	if sparData.Data.Price != 0 {
+		prices.Priser = append(prices.Priser, Pris{Store: "spar", Price: sparData.Data.Price, OriginalPrice: sparData.Data.OriginalPrice, UnitPrice: sparData.Data.ComparePricePerUnit, Url: fmt.Sprintf("%s%s", "https://spar.no/nettbutikk/varer", sparData.Data.Slug)})
+	}
+
+	// sorterer basert på pris, så det første elementet i arrayet vil være det billigste
+	priceCmp := func(a, b Pris) int {
+		return cmp.Compare(a.Price, b.Price)
+	}
+	slices.SortFunc(prices.Priser, priceCmp)
 	product.Priser = prices
 
 	// innhold
@@ -53,6 +68,7 @@ func formatData(menyData Product, jokerData Product, sparData Product, products 
 	product.Innhold.Vekt = fmt.Sprintf("%v%s", menyData.Data.Weight, menyData.Data.WeightMeasurementType)
 	product.Innhold.Beskrivelse = menyData.Data.Description
 	product.Innhold.Enhet = menyData.Data.Unit
+	product.Innhold.EnhetsType = menyData.Data.CompareUnit
 	product.Innhold.Størrelse = menyData.Data.Size
 	product.Innhold.Leverandør = menyData.Data.Vendor
 	product.Innhold.Opprinnelsesland = menyData.Data.OriginCountry
@@ -89,14 +105,23 @@ func formatData(menyData Product, jokerData Product, sparData Product, products 
 func insertData(product Produkt, db *sql.DB) error {
 	fmt.Println("Legger inn data for:", product.Tittel)
 
-	// gjør om næringsinnhold (type Næringsinnhold struct) til json
-	json, err := json.Marshal(product.Innhold.Næringsinnhold)
+	// gjør om næringsinnhold (type Næringsinnhold struct) til nutritionalContentJson
+	nutritionalContentJson, err := json.Marshal(product.Innhold.Næringsinnhold)
+	if err != nil {
+		return err
+	}
+
+	// lager json objekt med priser
+	pricesJson, err := json.Marshal(product.Priser.Priser)
+	if err != nil {
+		return err
+	}
 
 	// legger til en rad i Products table i databasen. om en rad med samme id (gtin) allerede eksisterer, blir den replaced
 	// her gjører bare queryen klart, uten dette blir goroutinene helt fked up og overlapper
 	productsStmt, err := db.Prepare(`
-		INSERT INTO products (id, title, subtitle, imagelink, category, subcategory, description, weight, origincountry, ingredients, vendor, size, unit, allergens, allergydeclaration, nutritionalcontent) 
-		VALUES ($1, $2, $3, $4, $5, $6 , $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+		INSERT INTO products (id, title, subtitle, imagelink, category, subcategory, description, weight, origincountry, ingredients, vendor, size, unit, unittype, allergens, allergydeclaration, nutritionalcontent, prices)
+		VALUES ($1, $2, $3, $4, $5, $6 , $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
 		ON CONFLICT (id)
 		DO UPDATE SET
 			title = EXCLUDED.title,
@@ -111,9 +136,11 @@ func insertData(product Produkt, db *sql.DB) error {
 			vendor = EXCLUDED.vendor,
 			size = EXCLUDED.size,
 			unit = EXCLUDED.unit,
+			unittype = EXCLUDED.unittype,
 			allergens = EXCLUDED.allergens,
 			allergydeclaration = EXCLUDED.allergydeclaration,
-			nutritionalcontent = EXCLUDED.nutritionalcontent
+			nutritionalcontent = EXCLUDED.nutritionalcontent,
+			prices = EXCLUDED.prices
 		`)
 	if err != nil {
 		return err
@@ -121,46 +148,9 @@ func insertData(product Produkt, db *sql.DB) error {
 	defer productsStmt.Close()
 
 	// queryen executes
-	_, err = productsStmt.Exec(product.Gtin, product.Tittel, product.Undertittel, product.BildeLink, product.Kategori, product.Underkategori, product.Innhold.Beskrivelse, product.Innhold.Vekt, product.Innhold.Opprinnelsesland, product.Innhold.Ingredienser, product.Innhold.Leverandør, product.Innhold.Størrelse, product.Innhold.Enhet, product.Innhold.Allergener, product.Innhold.KanInneholdeSporAv, json)
+	_, err = productsStmt.Exec(product.Gtin, product.Tittel, product.Undertittel, product.BildeLink, product.Kategori, product.Underkategori, product.Innhold.Beskrivelse, product.Innhold.Vekt, product.Innhold.Opprinnelsesland, product.Innhold.Ingredienser, product.Innhold.Leverandør, product.Innhold.Størrelse, product.Innhold.Enhet, product.Innhold.EnhetsType, product.Innhold.Allergener, product.Innhold.KanInneholdeSporAv, nutritionalContentJson, pricesJson)
 	if err != nil {
 		return err
-	}
-
-	// queryen for pris gjøres klar
-	pricesStmt, err := db.Prepare(`
-		INSERT INTO prices (id, gtin, store, price, priceoriginal, priceunit, unittype, url, product_id)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-		ON CONFLICT (id)
-		DO UPDATE SET
-			gtin = EXCLUDED.gtin,
-			store = EXCLUDED.store,
-			price = EXCLUDED.price,
-			priceoriginal = EXCLUDED.priceoriginal,
-			priceunit = EXCLUDED.priceunit,
-			unittype = EXCLUDED.unittype,
-			url = EXCLUDED.url,
-			product_id = EXCLUDED.product_id
-		`,
-	)
-	if err != nil {
-		return err
-	}
-	defer pricesStmt.Close()
-
-	// om prisen ikke er 0 (da er det ikke noe vits å putte inn en row), legger til eller replacer pris basert på id
-	// id er bygd opp av gtin og butikk, noe som vil være unikt
-	for i := range product.Priser.Priser {
-		price := product.Priser.Priser[i]
-
-		// om butikken ikke har en pris, skip den og gå videre
-		if price.Pris == 0 {
-			continue
-		}
-
-		id := fmt.Sprintf("%s/%s", product.Gtin, price.Butikk)
-
-		// kjører queryen for å legge in pris. bruker produktet sin gtin for å linke til en raden i product tablet som ble laget over
-		pricesStmt.Exec(id, product.Gtin, price.Butikk, price.Pris, price.OriginalPris, price.EnhetsPris, price.EnhetsType, price.Url, product.Gtin)
 	}
 
 	return nil
