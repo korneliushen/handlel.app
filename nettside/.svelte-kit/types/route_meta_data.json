@@ -1,7 +1,5 @@
 {
-	"/": [
-		"src/routes/+page.server.ts"
-	],
+	"/": [],
 	"/handlelapp": [],
 	"/produktside": []
 }
