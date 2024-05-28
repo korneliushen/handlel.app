@@ -3,5 +3,8 @@
 		"src/routes/+page.server.ts"
 	],
 	"/handlelapp": [],
-	"/produktside": []
+	"/produktside": [],
+	"/produkt/[slug]": [
+		"src/routes/produkt/[slug]/+page.server.ts"
+	]
 }
