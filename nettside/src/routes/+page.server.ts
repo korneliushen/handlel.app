@@ -7,7 +7,7 @@ export const load: PageServerLoad = async ({ url }) => {
             products: await prisma.products.findMany({
                 where: {
                   title: {
-                    search: url.searchParams.get("search") as string,
+                    search: url.searchParams.get("search")?.replace(" ", " & ") as string,
                   },
                 },
               })
