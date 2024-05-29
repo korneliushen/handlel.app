@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"math"
 	"reflect"
 	"slices"
 	"strings"
@@ -47,13 +48,13 @@ func formatData(menyData Product, jokerData Product, sparData Product, products 
 	prices := Priser{}
 	// sjekker at prisen ikke er 0, om den er det er det ikke vits å sende til databasen
 	if menyData.Data.Price != 0 {
-		prices.Priser = append(prices.Priser, Pris{Store: "meny", Price: menyData.Data.Price, OriginalPrice: menyData.Data.OriginalPrice, UnitPrice: menyData.Data.ComparePricePerUnit, Url: fmt.Sprintf("%s%s", "https://meny.no/varer", menyData.Data.Slug)})
+		prices.Priser = append(prices.Priser, Pris{Store: "meny", Price: math.Round(menyData.Data.Price), OriginalPrice: math.Round(menyData.Data.OriginalPrice), UnitPrice: math.Round(menyData.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", "https://meny.no/varer", menyData.Data.Slug)})
 	}
 	if jokerData.Data.Price != 0 {
-		prices.Priser = append(prices.Priser, Pris{Store: "joker", Price: jokerData.Data.Price, OriginalPrice: jokerData.Data.OriginalPrice, UnitPrice: jokerData.Data.ComparePricePerUnit, Url: fmt.Sprintf("%s%s", "https://joker.no/nettbutikk/varer", jokerData.Data.Slug)})
+		prices.Priser = append(prices.Priser, Pris{Store: "joker", Price: math.Round(jokerData.Data.Price), OriginalPrice: math.Round(jokerData.Data.OriginalPrice), UnitPrice: math.Round(jokerData.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", "https://joker.no/nettbutikk/varer", jokerData.Data.Slug)})
 	}
 	if sparData.Data.Price != 0 {
-		prices.Priser = append(prices.Priser, Pris{Store: "spar", Price: sparData.Data.Price, OriginalPrice: sparData.Data.OriginalPrice, UnitPrice: sparData.Data.ComparePricePerUnit, Url: fmt.Sprintf("%s%s", "https://spar.no/nettbutikk/varer", sparData.Data.Slug)})
+		prices.Priser = append(prices.Priser, Pris{Store: "spar", Price: math.Round(sparData.Data.Price), OriginalPrice: math.Round(sparData.Data.OriginalPrice), UnitPrice: math.Round(sparData.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", "https://spar.no/nettbutikk/varer", sparData.Data.Slug)})
 	}
 
 	// sorterer basert på pris, så det første elementet i arrayet vil være det billigste
