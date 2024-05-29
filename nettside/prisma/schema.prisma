@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
@@ -23,7 +24,7 @@ model products {
   unit               String? @db.VarChar(255)
   unittype           String? @db.VarChar(255)
   allergens          String?
-  allergydeclaration String?
+  maycontaintracesof String?
   nutritionalcontent Json?
   prices             Json?
 }
