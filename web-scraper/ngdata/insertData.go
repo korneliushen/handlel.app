@@ -72,26 +72,31 @@ func formatData(menyData Product, jokerData Product, sparData Product, products 
 	product.Innhold.Størrelse = menyData.Data.Size
 	product.Innhold.Leverandør = menyData.Data.Vendor
 	product.Innhold.Opprinnelsesland = menyData.Data.OriginCountry
+	product.Innhold.Ingredienser = menyData.Data.Ingredients
 
-	// mapper over allergener array som vi fikk fra databasen, og legger til navnet i struct så det er av typen []string
+	// mapper over allergener array som vi fikk fra databasen
+	// i databasen så bestemmer koden hva itemet i arrayen betyr for produktet
+	// om koden er JA, blir det lagt til i allergens, om det er kan blir det lagt til i mayContainTracesOf
 	var allergens []string
-	for i := range menyData.Data.Allergens {
-		allergens = append(allergens, menyData.Data.Allergens[i].Name)
+	var mayContainTracesOf []string
+	for _, allergen := range menyData.Data.Allergens {
+		if allergen.Code == "JA" {
+			allergens = append(allergens, allergen.Name)
+		} else if allergen.Code == "KAN" {
+			mayContainTracesOf = append(mayContainTracesOf, allergen.Name)
+		}
 	}
 	product.Innhold.Allergener = strings.Join(allergens, ", ")
-
-	product.Innhold.Ingredienser = menyData.Data.Ingredients
-	product.Innhold.KanInneholdeSporAv = menyData.Data.AllergyDeclaration
+	product.Innhold.KanInneholdeSporAv = strings.Join(mayContainTracesOf, ", ")
 
 	// næringsinnhold
 	nutritionalContent := Næringsinnhold{}
 	nutritionalContentData := menyData.Data.NutritionalContent
-	nutritionalContentType := reflect.TypeOf(nutritionalContent)
-	nutritionalContentValue := reflect.ValueOf(&nutritionalContent).Elem()
+	v := reflect.ValueOf(&nutritionalContent).Elem()
 
 	// legger til næringsinnhold data i fields med navn som matcher dataen fra api-en (reflect)
-	for i := 0; i < len(nutritionalContentData) && i < nutritionalContentType.NumField(); i++ {
-		field := nutritionalContentValue.Field(i)
+	for i := range len(nutritionalContentData) {
+		field := v.FieldByName(nutritionalContentData[i].Name)
 		if field.CanSet() {
 			field.SetString(fmt.Sprintf("%v%s", nutritionalContentData[i].Amount, nutritionalContentData[i].Unit))
 		}
@@ -120,7 +125,7 @@ func insertData(product Produkt, db *sql.DB) error {
 	// legger til en rad i Products table i databasen. om en rad med samme id (gtin) allerede eksisterer, blir den replaced
 	// her gjører bare queryen klart, uten dette blir goroutinene helt fked up og overlapper
 	productsStmt, err := db.Prepare(`
-		INSERT INTO products (id, title, subtitle, imagelink, category, subcategory, description, weight, origincountry, ingredients, vendor, size, unit, unittype, allergens, allergydeclaration, nutritionalcontent, prices)
+		INSERT INTO products (id, title, subtitle, imagelink, category, subcategory, description, weight, origincountry, ingredients, vendor, size, unit, unittype, allergens, mayContainTracesOf, nutritionalcontent, prices)
 		VALUES ($1, $2, $3, $4, $5, $6 , $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
 		ON CONFLICT (id)
 		DO UPDATE SET
@@ -138,7 +143,7 @@ func insertData(product Produkt, db *sql.DB) error {
 			unit = EXCLUDED.unit,
 			unittype = EXCLUDED.unittype,
 			allergens = EXCLUDED.allergens,
-			allergydeclaration = EXCLUDED.allergydeclaration,
+			mayContainTracesOf = EXCLUDED.mayContainTracesOf,
 			nutritionalcontent = EXCLUDED.nutritionalcontent,
 			prices = EXCLUDED.prices
 		`)

@@ -1,5 +1,7 @@
 package main
 
+import "sync"
+
 // TODO: rewrite hele denne dritten (ta alt på engelsk med bedre naming)
 
 // NOTE
@@ -24,6 +26,7 @@ type Underkategori struct {
 
 // produkter som skal bli til json data/lagt inn i database
 type Produkter struct {
+	sync.Mutex
 	Produkter []Produkt
 }
 
@@ -131,6 +134,7 @@ type ProductData struct {
 
 type Allergens struct {
 	Name string `json:"displayName"`
+	Code string `json:"code"`
 }
 
 type NutritionalContent struct {
