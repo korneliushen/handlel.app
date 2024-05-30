@@ -41,6 +41,5 @@
 		href="/produkt/{product.id}"
 		class="absolute inset-0 z-0"
 		title="Gå til produkt"
-		target="_blank"
 	></a>
 </div>
