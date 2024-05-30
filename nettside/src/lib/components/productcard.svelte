@@ -1,8 +1,8 @@
 <script lang="ts">
     import {BookPlus} from 'lucide-svelte'
     import type { products } from '@prisma/client';
+    import { addProduct } from '$lib/localstorage'
     export let product: products;
-
 </script>
 
 <div class=" z-20 w-44 md:w-60 h-full border border-borderColor/26 rounded-lg flex flex-col justify-between hover:border-purple-500 shadow-sm hover:shadow-md hover:scale-[1.01] transition p-2">
@@ -24,7 +24,7 @@
                     <p class=" text-gray-500/60 text-sm border-t border-gray-500/60">{product.prices[0].UnitPrice} kr/{product.unittype || "N/A"}</p>
                 </div>
             </a>
-            <button on:click={() => alert("added to handlelapp")} class=" h-10 w-10 aspect-square bg-purple-500 rounded-md flex justify-center items-center hover:brightness-110 transition z-50">
+            <button on:click={() => addProduct(product)} class=" h-10 w-10 aspect-square bg-purple-500 rounded-md flex justify-center items-center hover:brightness-110 transition z-50">
                 <BookPlus color="#fff"/>
             </button>
         </div>

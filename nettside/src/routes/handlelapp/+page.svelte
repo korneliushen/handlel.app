@@ -1,19 +1,23 @@
-<script>
+<script lang="ts">
 	import Filter from "$lib/components/filter.svelte";
 	import HandlelappProdukt from "$lib/components/handlelappProdukt.svelte";
     import { filter } from "$lib/stores/filter";
     import { onMount } from 'svelte';
     import { ChevronDown, SlidersHorizontal, MapPin } from "lucide-svelte";
+	import type { products } from "@prisma/client";
 
     let desktopView = false
     let selected = false;
-
+    let handlelapp: products[] = []
     onMount(() => {
         if (window.innerWidth > 1024) {
             $filter = true
             desktopView = true
         }
+        console.log(JSON.parse(localStorage.getItem("handlelapp") as string))
+        handlelapp = JSON.parse(localStorage.getItem("handlelapp") as string)
     })
+    $: console.log(handlelapp)
 </script>
 
 <main class=" relative flex w-screen px-4 max-w-[400px] lg:max-w-[1200px]">
@@ -63,8 +67,8 @@
                 </div>
             {/if}
         </div>
-        <HandlelappProdukt/>
-        <HandlelappProdukt/>
-        <HandlelappProdukt/>
+        {#each handlelapp as product, id}
+            <HandlelappProdukt product={product} id={id} />
+        {/each}
     </div>
 </main>
