@@ -138,7 +138,7 @@
             </div>
             <div class=" flex w-full justify-between border-t border-borderColor p-2">
                 <p>Kostfiber</p>
-                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.dietaryFiber || "N/A"}</p>
+                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.dietaryfiber || "N/A"}</p>
             </div>
             <div class=" flex w-full justify-between border-t border-borderColor p-2">
                 <p>Mettet fett</p>
