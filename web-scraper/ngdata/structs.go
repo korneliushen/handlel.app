@@ -1,5 +1,7 @@
 package main
 
+import "sync"
+
 // TODO: rewrite hele denne dritten (ta alt på engelsk med bedre naming)
 
 // NOTE
@@ -24,6 +26,7 @@ type Underkategori struct {
 
 // produkter som skal bli til json data/lagt inn i database
 type Produkter struct {
+	sync.Mutex
 	Produkter []Produkt
 }
 
@@ -34,8 +37,17 @@ type Produkt struct {
 	Kategori      string
 	Underkategori string
 	Priser        Priser
-	BildeLink     string
+	PåSalg        bool
 	Innhold       Innhold
+	Bilder        Bilder
+}
+
+type Bilder struct {
+	BildeLinkXSmall string
+	BildeLinkSmall  string
+	BildeLinkMedium string
+	BildeLinkLarge  string
+	BildeLinkXLarge string
 }
 
 type Priser struct {
@@ -44,9 +56,9 @@ type Priser struct {
 
 type Pris struct {
 	Store         string
-	Price         float32
-	OriginalPrice float32
-	UnitPrice     float32
+	Price         float64
+	OriginalPrice float64
+	UnitPrice     float64
 	Url           string
 }
 
@@ -57,6 +69,7 @@ type Innhold struct {
 	EnhetsType         string
 	Størrelse          string
 	Leverandør         string
+	Merke              string
 	Ingredienser       string
 	Oppbevaring        string
 	Opprinnelsesland   string
@@ -70,19 +83,19 @@ type Innhold struct {
 }
 
 type Næringsinnhold struct {
-	Energi          string
-	Kalorier        string
-	Natrium         string
-	Fett            string
-	MettetFett      string
-	EnumettetFett   string
-	FlerumettetFett string
-	Karbohydrater   string
-	Sukkerarter     string
-	Stivelse        string
-	Kostfiber       string
-	Protein         string
-	Salt            string
+	Energi          string `json:"energy"`
+	Kalorier        string `json:"calories"`
+	Natrium         string `json:"sodium"`
+	Fett            string `json:"fat"`
+	MettetFett      string `json:"saturatedfat"`
+	EnumettetFett   string `json:"monounsaturatedfat"`
+	FlerumettetFett string `json:"polyunsaturatedfat"`
+	Karbohydrater   string `json:"carbohydrates"`
+	Sukkerarter     string `json:"sugars"`
+	Stivelse        string `json:"starch"`
+	Kostfiber       string `json:"dietaryfiber"`
+	Protein         string `json:"protein"`
+	Salt            string `json:"salt"`
 }
 
 // setter data fra api inn i eget struct, gjør det lettere å assigne data senere
@@ -110,18 +123,19 @@ type ProductData struct {
 	Description           string               `json:"description"`
 	Category              string               `json:"categoryName"`
 	SubCategory           string               `json:"shoppingListGroupName"`
-	Price                 float32              `json:"pricePerUnit"`
-	OriginalPrice         float32              `json:"pricePerUnitOriginal"`
-	ComparePricePerUnit   float32              `json:"comparePricePerUnit"`
+	Price                 float64              `json:"pricePerUnit"`
+	OriginalPrice         float64              `json:"pricePerUnitOriginal"`
+	ComparePricePerUnit   float64              `json:"comparePricePerUnit"`
 	CompareUnit           string               `json:"compareUnit"`
 	ImageLink             string               `json:"imagePath"` // https://bilder.ngdata.no/BildeLink/medium.jpg (eller small)
 	WeightMeasurementType string               `json:"measurementType"`
-	Weight                float32              `json:"measurementValue"`
+	Weight                float64              `json:"measurementValue"`
 	Unit                  string               `json:"unit"`
 	Size                  string               `json:"packageSize"`
 	Ingredients           string               `json:"ingredients"`
 	AllergyDeclaration    string               `json:"allergyDeclaration"`
 	Vendor                string               `json:"vendor"`
+	Brand                 string               `json:"brand"`
 	OnSale                bool                 `json:"isOffer"`
 	OriginCountry         string               `json:"countryOfOrigin"`
 	Allergens             []Allergens          `json:"allergens"`
@@ -131,6 +145,7 @@ type ProductData struct {
 
 type Allergens struct {
 	Name string `json:"displayName"`
+	Code string `json:"code"`
 }
 
 type NutritionalContent struct {
