@@ -4,6 +4,7 @@
 	export let product: products;
 </script>
 
+
 <div
 	class="border-borderColor/26 relative flex h-full w-44 flex-col justify-between rounded-lg border p-2 shadow-sm transition hover:scale-[1.01] hover:border-mainPurple hover:shadow-md md:w-60"
 >
