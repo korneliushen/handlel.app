@@ -48,7 +48,7 @@
                 <a href={price.url} target="_blank" class=" w-full flex justify-between border border-borderColor rounded-md p-2 my-1">
                     <div class=" flex w-12 items-center">
                         <img class=" w-full mr-3 rounded-md" src="/{price.store}.svg" alt="Butikklogo">
-                        <p class=" font-bold">{price.store[0].toUpperCase() + price.Store.substring(1)}</p>
+                        <p class=" font-bold">{price.store[0].toUpperCase() + price.store.substring(1)}</p>
                     </div>
                     <div class=" text-end">
                         <p class=" font-bold text-lg">{price.price} kr</p>
