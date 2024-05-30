@@ -3,10 +3,9 @@ import type { PageServerLoad } from "./$types";
 import { error } from "@sveltejs/kit";
 import type { products } from "@prisma/client";
 
-
 export const load: PageServerLoad = async ({ url }) => {
   try {
-    // Fetch alle kategorier
+    // Fetch all categories
     const categories: { category: string }[] = await prisma.products.findMany({
       select: {
         category: true,
@@ -14,7 +13,7 @@ export const load: PageServerLoad = async ({ url }) => {
       distinct: ['category']
     });
 
-    // Fetch 4 produkter fra hver kategori og grupper i JSON med array for hver kategori
+    // Fetch 4 products from each category and group them in JSON with an array for each category
     const groupedProducts: { [key: string]: products[] } = {};
     for (const { category } of categories) {
       const products: products[] = await prisma.products.findMany({
@@ -22,13 +21,13 @@ export const load: PageServerLoad = async ({ url }) => {
         take: 4,
       });
       groupedProducts[category] = products;
-
+    }
 
     return { products: groupedProducts };
 
   } catch (e) {
     console.error("Error fetching products:", e);
-    error(500, "Internal Server Error")
+    throw error(500, "Internal Server Error");
   }
 };
 
