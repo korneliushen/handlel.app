@@ -26,7 +26,7 @@
 
 <main class=" grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4 relative w-screen max-w-[600px] rounded-lg px-5 overflow-hidden lg:max-w-[1200px] lg:px-20">
     <div class=" relative min-h-80 lg:w-full flex justify-center items-center py-1 aspect-square">
-        <img src={data.product.imagelink} alt="Produktbilde">
+        <img src={data.product.imagelinkmedium} alt="Produktbilde">
     </div>
     <div class=" flex flex-col lg:relative">
         <div class=" mt-5">
