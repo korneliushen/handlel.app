@@ -57,7 +57,7 @@
                 </a>
             {/each}
         </div>
-        <div class=" bg-white fixed bottom-0 left-0 h-20 w-full border-t border-borderColor lg:border-none flex justify-center items-center z-50 lg:absolute">
+        <div class=" bg-white fixed bottom-16 left-0 h-20 w-full border-t border-borderColor lg:border-none flex justify-center items-center z-50 lg:absolute">
             <div class=" w-4/5 h-12 rounded-lg lg:w-full">
                 {#if antallProdukter !== 0}
                     <div class=" flex justify-between items-center h-full w-full border border-mainPurple rounded-lg">

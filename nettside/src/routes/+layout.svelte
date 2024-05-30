@@ -3,8 +3,10 @@
   import Header from "$lib/components/Header.svelte";
 </script>
 
-<main class="flex font-sans items-center min-h-screen flex-col overflow-y-scroll">
+<main class="flex font-sans items-center min-h-screen flex-col overflow-y-scrol relative">
   <Header/>
-	<slot />
+  <div class=" mt-1 sm:mt-0">
+    <slot />
+  </div>
 </main>
 
