@@ -37,8 +37,17 @@ type Produkt struct {
 	Kategori      string
 	Underkategori string
 	Priser        Priser
-	BildeLink     string
+	PåSalg        bool
 	Innhold       Innhold
+	Bilder        Bilder
+}
+
+type Bilder struct {
+	BildeLinkXSmall string
+	BildeLinkSmall  string
+	BildeLinkMedium string
+	BildeLinkLarge  string
+	BildeLinkXLarge string
 }
 
 type Priser struct {
@@ -60,6 +69,7 @@ type Innhold struct {
 	EnhetsType         string
 	Størrelse          string
 	Leverandør         string
+	Merke              string
 	Ingredienser       string
 	Oppbevaring        string
 	Opprinnelsesland   string
@@ -77,7 +87,7 @@ type Næringsinnhold struct {
 	Kalorier        string `json:"calories"`
 	Natrium         string `json:"sodium"`
 	Fett            string `json:"fat"`
-	MettetFett      string `json:"saturateddat"`
+	MettetFett      string `json:"saturatedfat"`
 	EnumettetFett   string `json:"monounsaturatedfat"`
 	FlerumettetFett string `json:"polyunsaturatedfat"`
 	Karbohydrater   string `json:"carbohydrates"`
@@ -125,6 +135,7 @@ type ProductData struct {
 	Ingredients           string               `json:"ingredients"`
 	AllergyDeclaration    string               `json:"allergyDeclaration"`
 	Vendor                string               `json:"vendor"`
+	Brand                 string               `json:"brand"`
 	OnSale                bool                 `json:"isOffer"`
 	OriginCountry         string               `json:"countryOfOrigin"`
 	Allergens             []Allergens          `json:"allergens"`
