@@ -12,7 +12,7 @@
 		<img
 			loading="lazy"
 			class="absolute bottom-0 left-0 ml-2 w-10 rounded-md"
-			src="/{product.prices[0].Store}.svg"
+			src="/{product.prices[0].store}.svg"
 			alt="nettside"
 		/>
 	</div>
@@ -23,9 +23,9 @@
 		</div>
 		<div class="mt-1 flex justify-between px-2">
 			<div class="w-fit space-y-0">
-				<p class="font-semibold">{product.prices[0].Price} kr</p>
+				<p class="font-semibold">{product.prices[0].price} kr</p>
 				<p class="border-t border-gray-500/60 text-sm text-gray-500/60">
-					{product.prices[0].UnitPrice} kr/{product.unittype || 'N/A'}
+					{product.prices[0].unitprice || product.prices[0].price} kr/{product.unittype || 'stk'}
 				</p>
 			</div>
 			<button

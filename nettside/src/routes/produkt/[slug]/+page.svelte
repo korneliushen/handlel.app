@@ -30,14 +30,14 @@
     </div>
     <div class=" flex flex-col lg:relative">
         <div class=" mt-5">
-            <a target="_blank" href={data.product?.prices[0].Url} class=" font-bold text-2xl">{data.product?.title}</a>
+            <a target="_blank" href={data.product?.prices[0].url} class=" font-bold text-2xl">{data.product?.title}</a>
             <div class=" flex justify-between mt-2">
                 <p class=" text-lg text-gray-500/60">{data.product?.vendor}</p>
                 <div class=" flex items-center ">
-                    <a target="_blank" href={data.product?.prices[0].Url}><img class=" h-12 rounded-md mr-4" src="/{data.product.prices[0].Store}.svg" alt="nettside"></a>
+                    <a target="_blank" href={data.product?.prices[0].url}><img class=" h-12 rounded-md mr-4" src="/{data.product.prices[0].store}.svg" alt="nettside"></a>
                     <div class=" text-end">
-                        <p class=" font-bold text-2xl text-mainPurple">{data.product?.prices[0].Price} kr</p>
-                        <p class=" text-lg text-gray-500/60">{data.product?.prices[0].UnitPrice} kr/{data.product?.unittype}</p>
+                        <p class=" font-bold text-2xl text-mainPurple">{data.product?.prices[0].price} kr</p>
+                        <p class=" text-lg text-gray-500/60">{data.product?.prices[0].unitprice || data.product?.prices[0].price} kr/{data.product?.unittype || "stk"}</p>
                     </div>
                 </div>
             </div>
@@ -45,14 +45,14 @@
         <div class=" flex flex-col items-center mt-3">
             <p class=" font-bold text-xl">Andre butikker</p>
             {#each data.product?.prices.slice(1) as price}
-                <a href={price.Url} target="_blank" class=" w-full flex justify-between border border-borderColor rounded-md p-2 my-1">
+                <a href={price.url} target="_blank" class=" w-full flex justify-between border border-borderColor rounded-md p-2 my-1">
                     <div class=" flex w-12 items-center">
-                        <img class=" w-full mr-3 rounded-md" src="/{price.Store}.svg" alt="Butikklogo">
-                        <p class=" font-bold">{price.Store[0].toUpperCase() + price.Store.substring(1)}</p>
+                        <img class=" w-full mr-3 rounded-md" src="/{price.store}.svg" alt="Butikklogo">
+                        <p class=" font-bold">{price.store[0].toUpperCase() + price.Store.substring(1)}</p>
                     </div>
                     <div class=" text-end">
-                        <p class=" font-bold text-lg">{price.Price} kr</p>
-                        <p class=" text-gray-500/60 text-sm">{price.UnitPrice} kr/{data.product.unittype}</p>
+                        <p class=" font-bold text-lg">{price.price} kr</p>
+                        <p class=" text-gray-500/60 text-sm">{price.unitprice || price.prices[0].price} kr/{data.product.unittype || "stk"}</p>
                     </div>
                 </a>
             {/each}
@@ -142,7 +142,7 @@
             </div>
             <div class=" flex w-full justify-between border-t border-borderColor p-2">
                 <p>Mettet fett</p>
-                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.saturateddat || "N/A"}</p>
+                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.saturatedfat || "N/A"}</p>
             </div>
             <div class=" flex w-full justify-between border-t border-borderColor p-2">
                 <p>Protein</p>
