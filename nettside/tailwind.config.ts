@@ -9,7 +9,7 @@ export default {
       },
       colors: {
         'borderColor': '#ABABAB',
-        "mainPurple": "#9516F9"
+        "mainPurple": "#7A38D0"
       }
     }
   },
