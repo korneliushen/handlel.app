@@ -22,7 +22,7 @@ export const load: PageServerLoad = async ({ url }) => {
         take: 4,
       });
       groupedProducts[category] = products;
-    }
+
 
     return { products: groupedProducts };
 
