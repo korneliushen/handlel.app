@@ -8,8 +8,8 @@
 <div
 	class="border-borderColor/26 relative flex h-full w-44 flex-col justify-between rounded-lg border p-2 shadow-sm transition hover:scale-[1.01] hover:border-mainPurple hover:shadow-md md:w-60"
 >
-	<div title="product" class="relative flex aspect-square max-h-40 justify-center py-1">
-		<img loading="lazy" src={product.imagelinksmall} alt="produktbilde" />
+	<div title="product" class="relative flex aspect-square max-h-40 justify-center py-1 lg:w-full items-center">
+		<img loading="lazy" class="max-h-40" src={product.imagelinksmall} alt="produktbilde" />
 		<img
 			loading="lazy"
 			class="absolute bottom-0 left-0 ml-2 w-10 rounded-md"
