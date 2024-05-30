@@ -122,39 +122,39 @@
         {#if dropdown}
             <div class=" flex w-full justify-between border-t border-borderColor p-2">
                 <p>Kalorier</p>
-                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.Kalorier || "N/A"}</p>
+                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.calories || "N/A"}</p>
             </div>
             <div class=" flex w-full justify-between border-t border-borderColor p-2">
                 <p>Energi</p>
-                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.Energi || "N/A"}</p>
+                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.energy || "N/A"}</p>
             </div>
             <div class=" flex w-full justify-between border-t border-borderColor p-2">
                 <p>Fett</p>
-                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.Fett || "N/A"}</p>
+                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.fat || "N/A"}</p>
             </div>
             <div class=" flex w-full justify-between border-t border-borderColor p-2">
                 <p>Karbohydrater</p>
-                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.Karbohydrater || "N/A"}</p>
+                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.carbohydrates || "N/A"}</p>
             </div>
             <div class=" flex w-full justify-between border-t border-borderColor p-2">
                 <p>Kostfiber</p>
-                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.Kostfiber || "N/A"}</p>
+                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.dietaryFiber || "N/A"}</p>
             </div>
             <div class=" flex w-full justify-between border-t border-borderColor p-2">
                 <p>Mettet fett</p>
-                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.MettetFett || "N/A"}</p>
+                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.saturateddat || "N/A"}</p>
             </div>
             <div class=" flex w-full justify-between border-t border-borderColor p-2">
                 <p>Protein</p>
-                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.Protein || "N/A"}</p>
+                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.protein || "N/A"}</p>
             </div>
             <div class=" flex w-full justify-between border-t border-borderColor p-2">
                 <p>Salt</p>
-                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.Salt || "N/A"}</p>
+                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.salt || "N/A"}</p>
             </div>
             <div class=" flex w-full justify-between border-t border-borderColor p-2">
                 <p>Sukkerarter</p>
-                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.Sukkerarter || "N/A"}</p>
+                <p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.sugars || "N/A"}</p>
             </div>
         {/if}
     </div>
