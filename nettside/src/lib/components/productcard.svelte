@@ -1,32 +1,46 @@
 <script lang="ts">
-    import {BookPlus} from 'lucide-svelte'
-    import type { products } from '@prisma/client';
-    export let product: products;
-
+	import { BookPlus } from 'lucide-svelte';
+	import type { products } from '@prisma/client';
+	export let product: products;
 </script>
 
-<div class=" z-20 w-44 md:w-60 h-full border border-borderColor/26 rounded-lg flex flex-col justify-between hover:border-purple-500 shadow-sm hover:shadow-md hover:scale-[1.01] transition p-2">
-    <a href="/produkt/{product.id}" title="product" class=" relative max-h-40 lg:w-full flex justify-center items-center py-1 aspect-square">
-        <img class=" max-h-40" loading="lazy" src={product.imagelink} alt="produktbilde">
-        <img loading="lazy" class=" absolute bottom-0 left-0 w-10 rounded-md ml-2" src="/{product.prices[0].Store}.svg" alt="nettside">
-    </a>
-    <div class=" pb-1">
-        <a href="/produkt/{product.id}" title="product">
-            <div class=" space-y-0 mt-1 px-2">
-                <p class=" font-semibold">{product.title}</p>
-                <p class=" text-gray-500/60 text-sm">{product.vendor}</p>
-            </div>
-        </a>
-        <div class=" flex mt-1 px-2 justify-between">
-            <a class=" w-full" href="/produkt/{product.id}" title="product">
-                <div class=" space-y-0 w-fit">
-                    <p class=" font-semibold">{product.prices[0].Price + " kr"}</p>
-                    <p class=" text-gray-500/60 text-sm border-t border-gray-500/60">{product.prices[0].UnitPrice} kr/{product.unittype || "N/A"}</p>
-                </div>
-            </a>
-            <button on:click={() => alert("added to handlelapp")} class=" h-10 w-10 aspect-square bg-purple-500 rounded-md flex justify-center items-center hover:brightness-110 transition z-50">
-                <BookPlus color="#fff"/>
-            </button>
-        </div>
-    </div>
+
+<div
+	class="border-borderColor/26 relative flex h-full w-44 flex-col justify-between rounded-lg border p-2 shadow-sm transition hover:scale-[1.01] hover:border-mainPurple hover:shadow-md md:w-60"
+>
+	<div title="product" class="relative flex aspect-square max-h-40 justify-center py-1">
+		<img loading="lazy" src={product.imagelinksmall} alt="produktbilde" />
+		<img
+			loading="lazy"
+			class="absolute bottom-0 left-0 ml-2 w-10 rounded-md"
+			src="/{product.prices[0].store}.svg"
+			alt="nettside"
+		/>
+	</div>
+	<div class="pb-1">
+		<div class="mt-1 space-y-0 px-2">
+			<p class="font-semibold">{product.title}</p>
+			<p class="text-sm text-gray-500/60">{product.vendor}</p>
+		</div>
+		<div class="mt-1 flex justify-between px-2">
+			<div class="w-fit space-y-0">
+				<p class="font-semibold">{product.prices[0].price} kr</p>
+				<p class="border-t border-gray-500/60 text-sm text-gray-500/60">
+					{product.prices[0].unitprice || product.prices[0].price} kr/{product.unittype || 'stk'}
+				</p>
+			</div>
+			<button
+				on:click={() => alert('added to handlelapp')}
+				class="z-10 flex aspect-square h-10 w-10 items-center justify-center rounded-md bg-mainPurple transition hover:brightness-110"
+			>
+				<BookPlus color="#fff" />
+			</button>
+		</div>
+	</div>
+	<a
+		href="/produkt/{product.id}"
+		class="absolute inset-0 z-0"
+		title="Gå til produkt"
+		target="_blank"
+	></a>
 </div>
