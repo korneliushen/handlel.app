@@ -6,6 +6,7 @@
 </script>
 
 <section class="flex flex-col gap-y-14">
+  <img class="w-full flex items-center justify-center h-96 rounded-md my-6" src="http://1.vgc.no/vgnett-prod/img/vgLogoSquare.png?28042014-1" alt="Banner"/>
 	{#each Object.entries(data.products) as [category, products]}
 		<div class="space-y-1">
     <a href="#" title="Gå til kategori" class="flex items-center">
