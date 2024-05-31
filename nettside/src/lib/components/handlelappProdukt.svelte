@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { Minus, Plus, X } from 'lucide-svelte';
 	import { onMount } from 'svelte';
-	export let product: import('@prisma/client').products;
+	import type { ExtendedProduct } from '$lib/types/extendedPrisma';
+	export let product: ExtendedProduct;
 	export let id: number;
 
 	let desktopView = false;
