@@ -158,57 +158,64 @@
 			>
 		{/if}
 	</div>
-	<div use:autoAnimate class=" mb-24 mt-3 border-y border-borderColor lg:mt-0 lg:h-fit lg:w-full">
-		<button
-			on:click={() => (dropdown = !dropdown)}
-			class=" flex h-20 w-full items-center justify-between py-3"
-		>
-			<p class=" py-1 text-xl font-bold">Næringsinnhold per 100g</p>
-			<ChevronDown class=" {dropdown ? 'rotate-180' : 'rotate-0'}" strokeWidth={3} />
-		</button>
-		{#if dropdown}
-			<div class=" flex w-full justify-between border-t border-borderColor p-2">
-				<p>Kalorier</p>
-				<p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.calories || 'N/A'}</p>
-			</div>
-			<div class=" flex w-full justify-between border-t border-borderColor p-2">
-				<p>Energi</p>
-				<p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.energy || 'N/A'}</p>
-			</div>
-			<div class=" flex w-full justify-between border-t border-borderColor p-2">
-				<p>Fett</p>
-				<p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.fat || 'N/A'}</p>
-			</div>
-			<div class=" flex w-full justify-between border-t border-borderColor p-2">
-				<p>Karbohydrater</p>
-				<p class=" w-2/3 text-end font-bold">
-					{data.product.nutritionalcontent.carbohydrates || 'N/A'}
-				</p>
-			</div>
-			<div class=" flex w-full justify-between border-t border-borderColor p-2">
-				<p>Kostfiber</p>
-				<p class=" w-2/3 text-end font-bold">
-					{data.product.nutritionalcontent.dietaryfiber || 'N/A'}
-				</p>
-			</div>
-			<div class=" flex w-full justify-between border-t border-borderColor p-2">
-				<p>Mettet fett</p>
-				<p class=" w-2/3 text-end font-bold">
-					{data.product.nutritionalcontent.saturatedfat || 'N/A'}
-				</p>
-			</div>
-			<div class=" flex w-full justify-between border-t border-borderColor p-2">
-				<p>Protein</p>
-				<p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.protein || 'N/A'}</p>
-			</div>
-			<div class=" flex w-full justify-between border-t border-borderColor p-2">
-				<p>Salt</p>
-				<p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.salt || 'N/A'}</p>
-			</div>
-			<div class=" flex w-full justify-between border-t border-borderColor p-2">
-				<p>Sukkerarter</p>
-				<p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.sugars || 'N/A'}</p>
-			</div>
-		{/if}
-	</div>
+	{#if data.product.nutritionalcontent}
+		<!-- content here -->
+		<div use:autoAnimate class=" mb-24 mt-3 border-y border-borderColor lg:mt-0 lg:h-fit lg:w-full">
+			<button
+				on:click={() => (dropdown = !dropdown)}
+				class=" flex h-20 w-full items-center justify-between py-3"
+			>
+				<p class=" py-1 text-xl font-bold">Næringsinnhold per 100g</p>
+				<ChevronDown class=" {dropdown ? 'rotate-180' : 'rotate-0'}" strokeWidth={3} />
+			</button>
+			{#if dropdown}
+				<div class=" flex w-full justify-between border-t border-borderColor p-2">
+					<p>Kalorier</p>
+					<p class=" w-2/3 text-end font-bold">
+						{data.product.nutritionalcontent.calories || 'N/A'}
+					</p>
+				</div>
+				<div class=" flex w-full justify-between border-t border-borderColor p-2">
+					<p>Energi</p>
+					<p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.energy || 'N/A'}</p>
+				</div>
+				<div class=" flex w-full justify-between border-t border-borderColor p-2">
+					<p>Fett</p>
+					<p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.fat || 'N/A'}</p>
+				</div>
+				<div class=" flex w-full justify-between border-t border-borderColor p-2">
+					<p>Karbohydrater</p>
+					<p class=" w-2/3 text-end font-bold">
+						{data.product.nutritionalcontent.carbohydrates || 'N/A'}
+					</p>
+				</div>
+				<div class=" flex w-full justify-between border-t border-borderColor p-2">
+					<p>Kostfiber</p>
+					<p class=" w-2/3 text-end font-bold">
+						{data.product.nutritionalcontent.dietaryfiber || 'N/A'}
+					</p>
+				</div>
+				<div class=" flex w-full justify-between border-t border-borderColor p-2">
+					<p>Mettet fett</p>
+					<p class=" w-2/3 text-end font-bold">
+						{data.product.nutritionalcontent.saturatedfat || 'N/A'}
+					</p>
+				</div>
+				<div class=" flex w-full justify-between border-t border-borderColor p-2">
+					<p>Protein</p>
+					<p class=" w-2/3 text-end font-bold">
+						{data.product.nutritionalcontent.protein || 'N/A'}
+					</p>
+				</div>
+				<div class=" flex w-full justify-between border-t border-borderColor p-2">
+					<p>Salt</p>
+					<p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.salt || 'N/A'}</p>
+				</div>
+				<div class=" flex w-full justify-between border-t border-borderColor p-2">
+					<p>Sukkerarter</p>
+					<p class=" w-2/3 text-end font-bold">{data.product.nutritionalcontent.sugars || 'N/A'}</p>
+				</div>
+			{/if}
+		</div>
+	{/if}
 </main>
