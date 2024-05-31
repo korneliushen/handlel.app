@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { BookPlus } from 'lucide-svelte';
+	import { handlelapp } from '$lib/stores/handlelapp';
 	import type { ExtendedProduct } from '$lib/types/extendedPrisma';
 	export let product: ExtendedProduct;
 </script>
@@ -32,12 +33,17 @@
 				</p>
 			</div>
 			<button
-				on:click={() => alert('added to handlelapp')}
+				on:click={() => [($handlelapp = [...$handlelapp, product])]}
 				class="z-10 flex aspect-square h-10 w-10 items-center justify-center rounded-md bg-mainPurple transition hover:brightness-110"
+
 			>
 				<BookPlus color="#fff" />
 			</button>
 		</div>
 	</div>
-	<a href="/produkt/{product.id}" class="absolute inset-0 z-0" title="Gå til produkt"></a>
+	<a
+		href="/produkt/{product.id}"
+		class="absolute inset-0 z-0"
+		title="Gå til produkt"
+	></a>
 </div>

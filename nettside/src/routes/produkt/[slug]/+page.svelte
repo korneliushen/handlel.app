@@ -2,6 +2,8 @@
 	import { ChevronDown, Trash2, Minus, Plus } from 'lucide-svelte';
 	import autoAnimate from '@formkit/auto-animate';
 	import { onMount } from 'svelte';
+	import { handlelapp } from '$lib/stores/handlelapp';
+
 	let antallProdukter = 0;
 	let dropdown = false;
 	let lesmer = '13rem';
@@ -103,7 +105,7 @@
 					</div>
 				{:else}
 					<button
-						on:click={() => antallProdukter++}
+						on:click={() => ($handlelapp = [...$handlelapp, data.product])}
 						class=" flex h-full w-full items-center justify-center rounded-lg border border-mainPurple bg-mainPurple"
 					>
 						<p class=" font-bold text-white">Legg til i handlelisten</p>
