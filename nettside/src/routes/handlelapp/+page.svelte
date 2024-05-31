@@ -16,11 +16,11 @@
     })
 </script>
 
-<main class=" relative flex w-screen  max-w-[400px] lg:max-w-[1200px] py-4 md:py-0">
+<main class=" relative flex w-screen px-4 max-w-[400px] lg:max-w-[1200px] py-4 md:py-0">
     <Filter/>
     <div class=" w-full {desktopView ? "border-l border-gray-200 pl-8" : ""}">
         <div class=" w-full flex h-16">
-            <button on:click={() => selected = false} class="flex flex-col flex-1 h-full cursor-pointer {!selected && "font-semibold"}">
+            <button on:click={() => selected = false} class="flex flex-col flex-1 px-1 h-full cursor-pointer {!selected && "font-semibold"}">
                 <div class=" flex flex-col justify-between h-full w-full px-2">
                     <div class=" flex justify-between">
                         <p class=" text-black {!selected && "!text-mainPurple !font-bold"}">Billigste</p>
