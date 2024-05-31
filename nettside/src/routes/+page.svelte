@@ -2,7 +2,6 @@
 	import { ChevronRight } from 'lucide-svelte';
 	import Productcard from '$lib/components/productcard.svelte';
 	export let data: import('./$types').PageData;
-	console.log(data.products);
 </script>
 
 <div class="my-6 flex w-full items-center justify-center p-4">
