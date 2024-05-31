@@ -1,0 +1,36 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model products {
+  id                 String   @id @db.VarChar(255)
+  title              String   @db.VarChar(255)
+  subtitle           String?  @db.VarChar(255)
+  imagelinkxsmall    String?  @db.VarChar(255)
+  imagelinksmall     String?  @db.VarChar(255)
+  imagelinkmedium    String?  @db.VarChar(255)
+  imagelinklarge     String?  @db.VarChar(255)
+  imagelinkxlarge    String?  @db.VarChar(255)
+  category           String   @db.VarChar(255)
+  subcategory        String?  @db.VarChar(255)
+  onsale             Boolean?
+  description        String?
+  weight             String?  @db.VarChar(255)
+  origincountry      String?  @db.VarChar(255)
+  ingredients        String?
+  vendor             String?  @db.VarChar(255)
+  brand              String?  @db.VarChar(255)
+  size               String?  @db.VarChar(255)
+  unit               String?  @db.VarChar(255)
+  unittype           String?  @db.VarChar(255)
+  allergens          String?
+  maycontaintracesof String?
+  nutritionalcontent Json?
+  prices             Json?
+}
