@@ -1,14 +1,16 @@
 <script lang="ts">
 	import { BookPlus } from 'lucide-svelte';
-	import type { products } from '@prisma/client';
-	export let product: products;
+	import type { ExtendedProduct } from '$lib/types/extendedPrisma';
+	export let product: ExtendedProduct;
 </script>
-
 
 <div
 	class="border-borderColor/26 relative flex h-full w-44 flex-col justify-between rounded-lg border p-2 shadow-sm transition hover:scale-[1.01] hover:border-mainPurple hover:shadow-md md:w-60"
 >
-	<div title="product" class="relative flex aspect-square max-h-40 justify-center py-1 lg:w-full items-center">
+	<div
+		title="product"
+		class="relative flex aspect-square max-h-40 items-center justify-center py-1 lg:w-full"
+	>
 		<img loading="lazy" class="max-h-40" src={product.imagelinksmall} alt="produktbilde" />
 		<img
 			loading="lazy"
@@ -37,9 +39,5 @@
 			</button>
 		</div>
 	</div>
-	<a
-		href="/produkt/{product.id}"
-		class="absolute inset-0 z-0"
-		title="Gå til produkt"
-	></a>
+	<a href="/produkt/{product.id}" class="absolute inset-0 z-0" title="Gå til produkt"></a>
 </div>
