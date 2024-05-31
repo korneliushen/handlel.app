@@ -19,7 +19,7 @@
 				<h2 class="text-xl font-medium">{category}</h2>
 				<ChevronRight color="#7A38D0" />
 			</a>
-			<div class="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-3 md:gap-x-10 lg:grid-cols-4">
+			<div class="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4">
 				{#each products as product}
 					<Productcard {product} />
 				{/each}
