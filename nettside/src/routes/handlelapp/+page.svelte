@@ -16,7 +16,7 @@
     })
 </script>
 
-<main class=" relative flex w-screen px-4 max-w-[400px] lg:max-w-[1200px] py-4 md:py-0">
+<main class=" relative flex w-screen px-4 max-w-[400px] lg:max-w-[1200px]">
     <Filter/>
     <div class=" w-full {desktopView ? "border-l border-gray-200 pl-8" : ""}">
         <div class=" w-full flex h-16">
