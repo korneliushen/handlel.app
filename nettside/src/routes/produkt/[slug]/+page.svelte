@@ -77,7 +77,7 @@
 			{/each}
 		</div>
 		<div
-			class=" fixed bottom-16 left-0 z-50 flex h-20 w-full items-center justify-center border-t border-borderColor bg-white lg:absolute lg:border-none"
+			class=" fixed bottom-16 left-0 z-50 flex h-20 w-full items-center justify-center border-t border-borderColor bg-white lg:absolute lg:bottom-0 lg:border-none"
 		>
 			<div class=" h-12 w-4/5 rounded-lg lg:w-full">
 				{#if antallProdukter !== 0}
