@@ -8,7 +8,6 @@ export const handlelapp = writable<ExtendedProduct[]>(
 
 if (browser) {
 	handlelapp.subscribe((value) => {
-		console.log('Store updated:', value);
 		window.localStorage.setItem('handlelapp', JSON.stringify(value));
 	});
 }
