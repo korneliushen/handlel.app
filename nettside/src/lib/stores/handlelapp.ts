@@ -1,8 +1,8 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
-import type { products } from '@prisma/client';
+import type { ExtendedProduct } from '$lib/types/extendedPrisma';
 
-export const handlelapp = writable<products[]>(
+export const handlelapp = writable<ExtendedProduct[]>(
 	browser ? JSON.parse(window.localStorage.getItem('handlelapp') ?? '[]') : []
 );
 
