@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Minus, Plus, X } from 'lucide-svelte';
 	import { onMount } from 'svelte';
+	import { handlelapp } from '$lib/stores/handlelapp';
 	import type { ExtendedProduct } from '$lib/types/extendedPrisma';
 	export let product: ExtendedProduct;
 	export let id: number;
@@ -37,7 +38,7 @@
 				</div>
 			{/if}
 			<div
-				class=" border-mainPurple rounded-md border {desktopView
+				class=" rounded-md border border-mainPurple {desktopView
 					? 'h-10 w-32'
 					: ' h-9 w-28'} flex items-center justify-between"
 			>
@@ -49,8 +50,9 @@
 					><Plus size="15px" /></button
 				>
 			</div>
-			<button on:click={() => removeProduct(product, id)} class=" ml-3 text-gray-400"
-				><X size="15px" /></button
+			<button
+				on:click={() => ($handlelapp = [...$handlelapp.slice(0, id), ...$handlelapp.slice(id + 1)])}
+				class=" ml-3 text-gray-400"><X size="15px" /></button
 			>
 		</div>
 	</div>

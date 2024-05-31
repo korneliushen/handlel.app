@@ -4,20 +4,16 @@
 	import { filter } from '$lib/stores/filter';
 	import { onMount } from 'svelte';
 	import { ChevronDown, SlidersHorizontal, MapPin } from 'lucide-svelte';
-	import type { products } from '@prisma/client';
+	import { handlelapp } from '$lib/stores/handlelapp';
 
 	let desktopView = false;
 	let selected = false;
-	let handlelapp: products[] = [];
 	onMount(() => {
 		if (window.innerWidth > 1024) {
 			$filter = true;
 			desktopView = true;
 		}
-		// console.log(JSON.parse(localStorage.getItem("handlelapp") as string))
-		// handlelapp = JSON.parse(localStorage.getItem("handlelapp") as string)
 	});
-	// $: console.log(handlelapp);
 </script>
 
 <main class=" relative flex w-screen max-w-[400px] px-4 lg:max-w-[1200px]">
@@ -30,7 +26,7 @@
 			>
 				<div class=" flex h-full w-full flex-col justify-between px-2">
 					<div class=" flex justify-between">
-						<p class=" text-black {!selected && '!text-mainPurple !font-bold'}">Billigste</p>
+						<p class=" text-black {!selected && '!font-bold !text-mainPurple'}">Billigste</p>
 						<img class=" w-7" src="/favicon.png" alt="" />
 					</div>
 					<div class=" flex justify-between pb-1 text-sm">
@@ -41,7 +37,7 @@
 				<div class="flex h-1 w-full items-end">
 					<div
 						class=" h-[0.16rem] w-full rounded-t-2xl bg-gray-400 {!selected &&
-							'!bg-mainPurple !h-1'}"
+							'!h-1 !bg-mainPurple'}"
 					/>
 				</div>
 			</button>
@@ -51,7 +47,7 @@
 			>
 				<div class=" flex h-full w-full flex-col justify-between px-2">
 					<div class=" flex justify-between">
-						<p class=" text-black {selected && '!text-mainPurple !font-bold'}">Raskeste</p>
+						<p class=" text-black {selected && '!font-bold !text-mainPurple'}">Raskeste</p>
 						<img class=" w-7" src="/favicon.png" alt="" />
 					</div>
 					<div class=" flex justify-between pb-1 text-sm">
@@ -62,7 +58,7 @@
 				<div class="flex h-1 w-full items-end">
 					<div
 						class=" h-[0.16rem] w-full rounded-t-2xl bg-gray-400 {selected &&
-							'!bg-mainPurple !h-1'}"
+							'!h-1 !bg-mainPurple'}"
 					/>
 				</div>
 			</button>
@@ -71,7 +67,7 @@
 			<div>
 				<p class=" text-2xl">Handlelapp</p>
 				<p class=" mt-2 flex text-sm">
-					Sorter etter:<button class=" text-mainPurple mx-1 flex items-center font-bold"
+					Sorter etter:<button class=" mx-1 flex items-center font-bold text-mainPurple"
 						>Pris <ChevronDown size="20px" /></button
 					>
 				</p>
@@ -80,17 +76,17 @@
 				<div class=" mt-2 flex">
 					<button
 						on:click={() => ($filter = true)}
-						class=" bg-mainPurple mx-[0.13rem] flex h-9 w-9 items-center justify-center rounded-md"
+						class=" mx-[0.13rem] flex h-9 w-9 items-center justify-center rounded-md bg-mainPurple"
 						><SlidersHorizontal color="#ffffff" /></button
 					>
 					<button
-						class=" bg-mainPurple mx-[0.13rem] flex h-9 w-9 items-center justify-center rounded-md"
+						class=" mx-[0.13rem] flex h-9 w-9 items-center justify-center rounded-md bg-mainPurple"
 						><MapPin color="#ffffff" /></button
 					>
 				</div>
 			{/if}
 		</div>
-		{#each handlelapp as product, id}
+		{#each $handlelapp as product, id}
 			<HandlelappProdukt {product} {id} />
 		{/each}
 	</div>
