@@ -19,7 +19,7 @@
 <div class=" mt-6">
 	<div class=" mt-5 flex h-20 items-center justify-between rounded-xl border border-gray-400">
 		<div class=" flex h-full items-center">
-			<img class=" w-16" src={product.imagelinkxsmall} alt="" />
+			<img class=" mx-4 max-h-16 max-w-16" src={product.imagelinkxsmall} alt="" />
 			<div>
 				<p class=" text-sm font-medium">{product.title}</p>
 				<p class=" text-xs text-gray-400">{product.brand || product.vendor}</p>
