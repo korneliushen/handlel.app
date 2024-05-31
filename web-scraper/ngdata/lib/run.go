@@ -1,15 +1,11 @@
-package main
+package lib
 
 import (
 	"fmt"
-	"log"
 	"sync"
-	"time"
-
-	"github.com/joho/godotenv"
 )
 
-func run() {
+func Run() {
 	products := &Products{}
 
 	categories := getCategories()
@@ -21,8 +17,14 @@ func run() {
 		for j := range category.SubCategories {
 			// får underkategori
 			subCategory := category.SubCategories[j]
-
 			fmt.Println("Henter data for underkategori:", subCategory)
+
+			for _, value := range stores {
+				fmt.Println(value)
+				// kanskje kjør get products her: getProducts(value, category.Name, subCategory.Name)
+			}
+
+			// TODO FOR MEG: gjøre de tre neste getProducts funksjonene uavhengig av navn
 
 			menyData, err := getProducts("meny", category.Name, subCategory.Name)
 			if err != nil {
@@ -79,21 +81,4 @@ func run() {
 	}
 
 	wg.Wait()
-}
-
-func main() {
-	start := time.Now()
-
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Couldn't load env variables: %v\n", err)
-	}
-
-	fmt.Println("Running")
-	run()
-
-	end := time.Now()
-	elapsed := end.Sub(start)
-	fmt.Println("Elapsed: ", elapsed)
-
-	fmt.Println("Everything ran successfully :O")
 }

@@ -1,15 +1,33 @@
-package main
+package lib
 
 import (
 	"cmp"
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"math"
+	"os"
 	"reflect"
 	"slices"
 	"strings"
+
+	_ "github.com/lib/pq"
 )
+
+func db() *sql.DB {
+	connStr := os.Getenv("NEON_SECRET")
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// limiter open og idle connections for å ikke med et uhell overloade databasen
+	db.SetMaxOpenConns(10)
+	db.SetMaxIdleConns(10)
+
+	return db
+}
 
 func getPrices(gtin string, jokerData ApiResponse, sparData ApiResponse) (ApiProduct, ApiProduct) {
 	jokerProduct := ApiProduct{}
