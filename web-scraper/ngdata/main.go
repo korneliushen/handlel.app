@@ -10,31 +10,31 @@ import (
 )
 
 func run() {
-	products := &Produkter{}
+	products := &Products{}
 
 	categories := getCategories()
 
-	for i := range categories.Kategorier {
+	for i := range categories.Category {
 		// får kategori
-		category := categories.Kategorier[i]
+		category := categories.Category[i]
 		fmt.Println("Henter data for kategori:", category)
-		for j := range category.Underkategorier {
+		for j := range category.SubCategories {
 			// får underkategori
-			subCategory := category.Underkategorier[j]
+			subCategory := category.SubCategories[j]
 
 			fmt.Println("Henter data for underkategori:", subCategory)
 
-			menyData, err := getProducts("meny", category.Navn, subCategory.Navn)
+			menyData, err := getProducts("meny", category.Name, subCategory.Name)
 			if err != nil {
 				fmt.Printf("Error getting products: %v\n", err)
 			}
 
-			jokerData, err := getProducts("joker", category.Navn, subCategory.Navn)
+			jokerData, err := getProducts("joker", category.Name, subCategory.Name)
 			if err != nil {
 				fmt.Printf("Error getting products: %v\n", err)
 			}
 
-			sparData, err := getProducts("spar", category.Navn, subCategory.Navn)
+			sparData, err := getProducts("spar", category.Name, subCategory.Name)
 			if err != nil {
 				fmt.Printf("Error getting products: %v\n", err)
 			}
@@ -61,21 +61,21 @@ func run() {
 	// limiter hvor mange go routines som kan kjøre om om gangen
 	sem := make(chan struct{}, 4)
 
-	for i := range products.Produkter {
+	for i := range products.Products {
 		// legger til et item i wait groupen
 		wg.Add(1)
 		sem <- struct{}{}
 
-		go func(product Produkt) {
+		go func(product Product) {
 			// når funksjonen er ferdig, blir waitgroup instansen ferdig + sem (det som keeper track av hvor mange ting som kan kjøre om gangen) blir oppdatert
 			defer wg.Done()
 			defer func() { <-sem }()
 
 			// legger til data i databasen
 			if err := insertData(product, db); err != nil {
-				fmt.Printf("Error inserting data for %s: %v", products.Produkter[i].Tittel, err)
+				fmt.Printf("Error inserting data for %s: %v", products.Products[i].Title, err)
 			}
-		}(products.Produkter[i])
+		}(products.Products[i])
 	}
 
 	wg.Wait()

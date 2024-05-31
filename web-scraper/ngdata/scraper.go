@@ -10,11 +10,11 @@ import (
 // TODO: legg til en timeout på scraper
 const TIMEOUT = 10
 
-func getCategories() Kategorier {
+func getCategories() Categories {
 	fmt.Println("Getting categories")
 
 	// kategorier instans
-	categories := Kategorier{}
+	categories := Categories{}
 
 	c := colly.NewCollector()
 
@@ -27,7 +27,7 @@ func getCategories() Kategorier {
 			categoryLink = fmt.Sprintf("https://meny.no%s", categoryLink)
 
 			// lager instans av kategori med alle verdier jeg har til nå
-			category := Kategori{Navn: categoryName, Link: categoryLink}
+			category := Category{Name: categoryName, Link: categoryLink}
 
 			n := colly.NewCollector()
 
@@ -37,16 +37,16 @@ func getCategories() Kategorier {
 				subCategoryLink := fmt.Sprintf("htts://meny.no%s", h.ChildAttr("a.cw-categories__title", "href"))
 
 				// lager instans av underkategori
-				subCategory := Underkategori{Navn: subCategoryName, Link: subCategoryLink}
+				subCategory := SubCategories{Name: subCategoryName, Link: subCategoryLink}
 
 				// legger til underkategorien i Underkategorier feltet til kategori instansen vi lagde over
-				category.Underkategorier = append(category.Underkategorier, subCategory)
+				category.SubCategories = append(category.SubCategories, subCategory)
 			})
 
 			n.Visit(categoryLink)
 
 			// legger til kategori instansen i Kategorier instansen
-			categories.Kategorier = append(categories.Kategorier, category)
+			categories.Category = append(categories.Category, category)
 		}
 	})
 
