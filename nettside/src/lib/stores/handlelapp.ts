@@ -1,9 +1,14 @@
 import { writable } from 'svelte/store';
-import type {products} from "@prisma/client";
+import { browser } from '$app/environment';
+import type { products } from '@prisma/client';
 
-export const handlelapp = writable<products[]>([]);
+export const handlelapp = writable<products[]>(
+	browser ? JSON.parse(window.localStorage.getItem('handlelapp') ?? '[]') : []
+);
 
-handlelapp.subscribe((value) => {
-    console.log('oppdatert');
-    globalThis.localStorage?.setItem('handlelapp', JSON.stringify(value));
-});
+if (browser) {
+	handlelapp.subscribe((value) => {
+		console.log('Store updated:', value);
+		window.localStorage.setItem('handlelapp', JSON.stringify(value));
+	});
+}

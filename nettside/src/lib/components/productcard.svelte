@@ -38,7 +38,7 @@
 				</div>
 			</a>
 			<button
-				on:click={() => [$handlelapp.push(product), console.log($handlelapp)]}
+				on:click={() => [($handlelapp = [...$handlelapp, product])]}
 				class=" z-50 flex aspect-square h-10 w-10 items-center justify-center rounded-md bg-purple-500 transition hover:brightness-110"
 			>
 				<BookPlus color="#fff" />
