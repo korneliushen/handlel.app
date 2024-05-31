@@ -6,10 +6,8 @@
 </script>
 
 <div class="my-6 flex w-full items-center justify-center p-4">
-	<img
-		class="flex h-[256px] w-full items-center justify-center rounded-md md:h-96 md:w-[1200px]"
-		src="http://1.vgc.no/vgnett-prod/img/vgLogoSquare.png?28042014-1"
-		alt="Banner"
+	<div
+		class="flex bg-gray-300 h-[256px] w-full items-center justify-center rounded-md md:h-96 md:w-[1200px]"
 	/>
 </div>
 <section class="flex flex-col items-center gap-y-14">
