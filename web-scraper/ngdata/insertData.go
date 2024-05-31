@@ -11,9 +11,9 @@ import (
 	"strings"
 )
 
-func getPrices(gtin string, jokerData ApiResponse, sparData ApiResponse) (Product, Product) {
-	jokerProduct := Product{}
-	sparProduct := Product{}
+func getPrices(gtin string, jokerData ApiResponse, sparData ApiResponse) (ApiProduct, ApiProduct) {
+	jokerProduct := ApiProduct{}
+	sparProduct := ApiProduct{}
 
 	// finner produkt fra joker med samme gtin
 	for l := range jokerData.Hits.Products {
@@ -33,53 +33,53 @@ func getPrices(gtin string, jokerData ApiResponse, sparData ApiResponse) (Produc
 }
 
 // lager instanser av egne structs med dataen fra fetchProducts
-func formatData(menyData Product, jokerData Product, sparData Product, products *Produkter) {
-	product := Produkt{}
+func formatData(menyData ApiProduct, jokerData ApiProduct, sparData ApiProduct, products *Products) {
+	product := Product{}
 
 	product.Gtin = menyData.Data.Ean
-	product.Tittel = menyData.Data.Title
-	product.Undertittel = menyData.Data.Subtitle
-	product.Kategori = menyData.Data.Category
-	product.Underkategori = menyData.Data.SubCategory
-	product.PåSalg = menyData.Data.OnSale
+	product.Title = menyData.Data.Title
+	product.SubTitle = menyData.Data.Subtitle
+	product.Category = menyData.Data.Category
+	product.SubCategory = menyData.Data.SubCategory
+	product.OnSale = menyData.Data.OnSale
 	// lager hele url-en for bildelinker for ulike størrelser
-	product.Bilder.BildeLinkXSmall = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/xsmall.jpg")
-	product.Bilder.BildeLinkSmall = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/small.jpg")
-	product.Bilder.BildeLinkMedium = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/medium.jpg")
-	product.Bilder.BildeLinkLarge = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/large.jpg")
-	product.Bilder.BildeLinkXLarge = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/xlarge.jpg")
+	product.Images.ImageLinkXSmall = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/xsmall.jpg")
+	product.Images.ImageLinkSmall = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/small.jpg")
+	product.Images.ImageLinkMedium = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/medium.jpg")
+	product.Images.ImageLinkLarge = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/large.jpg")
+	product.Images.ImageLinkXLarge = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/xlarge.jpg")
 
 	// lager et array av priser, å gjøre det på denne måten gjør det lettere når dataen skal sendes til database
-	prices := Priser{}
+	prices := Prices{}
 	// sjekker at prisen ikke er 0, om den er det er det ikke vits å sende til databasen
 	if menyData.Data.Price != 0 {
-		prices.Priser = append(prices.Priser, Pris{Store: "meny", Price: math.Round(menyData.Data.Price), OriginalPrice: math.Round(menyData.Data.OriginalPrice), UnitPrice: math.Round(menyData.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", "https://meny.no/varer", menyData.Data.Slug)})
+		prices.Prices = append(prices.Prices, Price{Store: "meny", Price: math.Round(menyData.Data.Price), OriginalPrice: math.Round(menyData.Data.OriginalPrice), UnitPrice: math.Round(menyData.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", "https://meny.no/varer", menyData.Data.Slug)})
 	}
 	if jokerData.Data.Price != 0 {
-		prices.Priser = append(prices.Priser, Pris{Store: "joker", Price: math.Round(jokerData.Data.Price), OriginalPrice: math.Round(jokerData.Data.OriginalPrice), UnitPrice: math.Round(jokerData.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", "https://joker.no/nettbutikk/varer", jokerData.Data.Slug)})
+		prices.Prices = append(prices.Prices, Price{Store: "joker", Price: math.Round(jokerData.Data.Price), OriginalPrice: math.Round(jokerData.Data.OriginalPrice), UnitPrice: math.Round(jokerData.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", "https://joker.no/nettbutikk/varer", jokerData.Data.Slug)})
 	}
 	if sparData.Data.Price != 0 {
-		prices.Priser = append(prices.Priser, Pris{Store: "spar", Price: math.Round(sparData.Data.Price), OriginalPrice: math.Round(sparData.Data.OriginalPrice), UnitPrice: math.Round(sparData.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", "https://spar.no/nettbutikk/varer", sparData.Data.Slug)})
+		prices.Prices = append(prices.Prices, Price{Store: "spar", Price: math.Round(sparData.Data.Price), OriginalPrice: math.Round(sparData.Data.OriginalPrice), UnitPrice: math.Round(sparData.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", "https://spar.no/nettbutikk/varer", sparData.Data.Slug)})
 	}
 
 	// sorterer basert på pris, så det første elementet i arrayet vil være det billigste
-	priceCmp := func(a, b Pris) int {
+	priceCmp := func(a, b Price) int {
 		return cmp.Compare(a.Price, b.Price)
 	}
-	slices.SortFunc(prices.Priser, priceCmp)
-	product.Priser = prices
+	slices.SortFunc(prices.Prices, priceCmp)
+	product.Prices = prices
 
 	// innhold
 	// vekt kombinerer vekten og typen (g, kg, osv.)
-	product.Innhold.Vekt = fmt.Sprintf("%v%s", menyData.Data.Weight, menyData.Data.WeightMeasurementType)
-	product.Innhold.Beskrivelse = menyData.Data.Description
-	product.Innhold.Enhet = menyData.Data.Unit
-	product.Innhold.EnhetsType = menyData.Data.CompareUnit
-	product.Innhold.Størrelse = menyData.Data.Size
-	product.Innhold.Leverandør = menyData.Data.Vendor
-	product.Innhold.Merke = menyData.Data.Brand
-	product.Innhold.Opprinnelsesland = menyData.Data.OriginCountry
-	product.Innhold.Ingredienser = menyData.Data.Ingredients
+	product.Content.Weight = fmt.Sprintf("%v%s", menyData.Data.Weight, menyData.Data.WeightMeasurementType)
+	product.Content.Description = menyData.Data.Description
+	product.Content.Unit = menyData.Data.Unit
+	product.Content.UnitType = menyData.Data.CompareUnit
+	product.Content.Size = menyData.Data.Size
+	product.Content.Vendor = menyData.Data.Vendor
+	product.Content.Brand = menyData.Data.Brand
+	product.Content.OriginCountry = menyData.Data.OriginCountry
+	product.Content.Ingredients = menyData.Data.Ingredients
 
 	// mapper over allergener array som vi fikk fra databasen
 	// i databasen så bestemmer koden hva itemet i arrayen betyr for produktet
@@ -93,38 +93,42 @@ func formatData(menyData Product, jokerData Product, sparData Product, products 
 			mayContainTracesOf = append(mayContainTracesOf, allergen.Name)
 		}
 	}
-	product.Innhold.Allergener = strings.Join(allergens, ", ")
-	product.Innhold.KanInneholdeSporAv = strings.Join(mayContainTracesOf, ", ")
+	product.Content.Allergens = strings.Join(allergens, ", ")
+	product.Content.MayContainTracesOf = strings.Join(mayContainTracesOf, ", ")
 
 	// næringsinnhold
-	nutritionalContent := Næringsinnhold{}
 	nutritionalContentData := menyData.Data.NutritionalContent
-	v := reflect.ValueOf(&nutritionalContent).Elem()
 
-	// legger til næringsinnhold data i fields med navn som matcher dataen fra api-en (reflect)
-	for i := range len(nutritionalContentData) {
-		field := v.FieldByName(nutritionalContentData[i].Name)
-		if field.CanSet() {
-			field.SetString(fmt.Sprintf("%v%s", nutritionalContentData[i].Amount, nutritionalContentData[i].Unit))
+	// om det ikke er noe næringsinnhold
+	if len(nutritionalContentData) == 0 {
+		product.Content.NutritionalContent = nil
+	} else {
+		nutritionalContent := NutritionalContent{}
+		v := reflect.ValueOf(&nutritionalContent).Elem()
+		// legger til næringsinnhold data i fields med navn som matcher dataen fra api-en (reflect)
+		for i := range len(nutritionalContentData) {
+			field := v.FieldByName(nutritionalContentData[i].Name)
+			if field.CanSet() {
+				field.SetString(fmt.Sprintf("%v%s", nutritionalContentData[i].Amount, nutritionalContentData[i].Unit))
+			}
 		}
+		product.Content.NutritionalContent = &nutritionalContent
 	}
 
-	product.Innhold.Næringsinnhold = nutritionalContent
-
-	products.Produkter = append(products.Produkter, product)
+	products.Products = append(products.Products, product)
 }
 
-func insertData(product Produkt, db *sql.DB) error {
-	fmt.Println("Legger inn data for:", product.Tittel)
+func insertData(product Product, db *sql.DB) error {
+	fmt.Println("Legger inn data for:", product.Title)
 
 	// gjør om næringsinnhold (type Næringsinnhold struct) til nutritionalContentJson
-	nutritionalContentJson, err := json.Marshal(product.Innhold.Næringsinnhold)
+	nutritionalContentJson, err := json.Marshal(product.Content.NutritionalContent)
 	if err != nil {
 		return err
 	}
 
 	// lager json objekt med priser
-	pricesJson, err := json.Marshal(product.Priser.Priser)
+	pricesJson, err := json.Marshal(product.Prices.Prices)
 	if err != nil {
 		return err
 	}
@@ -166,7 +170,7 @@ func insertData(product Produkt, db *sql.DB) error {
 	defer productsStmt.Close()
 
 	// queryen executes
-	_, err = productsStmt.Exec(product.Gtin, product.Tittel, product.Undertittel, product.Bilder.BildeLinkXSmall, product.Bilder.BildeLinkSmall, product.Bilder.BildeLinkMedium, product.Bilder.BildeLinkLarge, product.Bilder.BildeLinkXLarge, product.Kategori, product.Underkategori, product.PåSalg, product.Innhold.Beskrivelse, product.Innhold.Vekt, product.Innhold.Opprinnelsesland, product.Innhold.Ingredienser, product.Innhold.Leverandør, product.Innhold.Merke, product.Innhold.Størrelse, product.Innhold.Enhet, product.Innhold.EnhetsType, product.Innhold.Allergener, product.Innhold.KanInneholdeSporAv, nutritionalContentJson, pricesJson)
+	_, err = productsStmt.Exec(product.Gtin, product.Title, product.SubTitle, product.Images.ImageLinkXSmall, product.Images.ImageLinkSmall, product.Images.ImageLinkMedium, product.Images.ImageLinkLarge, product.Images.ImageLinkXLarge, product.Category, product.SubCategory, product.OnSale, product.Content.Description, product.Content.Weight, product.Content.OriginCountry, product.Content.Ingredients, product.Content.Vendor, product.Content.Brand, product.Content.Size, product.Content.Unit, product.Content.UnitType, product.Content.Allergens, product.Content.MayContainTracesOf, nutritionalContentJson, pricesJson)
 	if err != nil {
 		return err
 	}
