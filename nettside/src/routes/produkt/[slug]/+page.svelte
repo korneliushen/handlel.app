@@ -70,7 +70,7 @@
 					<div class=" text-end">
 						<p class=" text-lg font-bold">{price.price} kr</p>
 						<p class=" text-sm text-gray-500/60">
-							{price.unitprice || price.prices[0].price} kr/{data.product.unittype || 'stk'}
+							{price.unitprice || price.price} kr/{data.product.unittype || 'stk'}
 						</p>
 					</div>
 				</a>
