@@ -12,6 +12,9 @@ import (
 func run() {
 	products := &Products{}
 
+	// brukes for å ikke legge inn duplicates i products
+	var checkedGtins []string
+
 	categories := getCategories()
 
 	for _, category := range categories.Category {
@@ -37,13 +40,19 @@ func run() {
 				for _, product := range storeData[firstIndex].ApiRes.Hits.Products {
 					gtin := product.Data.Ean
 
+					// sjekker om produktet allerede har blitt sjekket
+					if isIn(gtin, checkedGtins) {
+						continue
+					}
+
+					checkedGtins = append(checkedGtins, gtin)
+
 					secondProduct, thirdProduct := getPrices(gtin, storeData[secondIndex].ApiRes, storeData[thirdIndex].ApiRes)
 
 					formatData(product, secondProduct, thirdProduct, storeData[firstIndex].Store, storeData[secondIndex].Store, storeData[thirdIndex].Store, products)
 				}
 			}
 		}
-		break
 	}
 
 	db := db()
