@@ -1,6 +1,12 @@
 package lib
 
 // brukt for å få alle kategorier som skal hentes produkter fra
+
+type StoreData struct {
+	Store  string
+	ApiRes ApiResponse
+}
+
 type Categories struct {
 	Category []Category
 }

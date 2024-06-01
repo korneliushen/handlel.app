@@ -16,7 +16,7 @@ import (
 )
 
 func db() *sql.DB {
-	connStr := os.Getenv("NEON_SECRET")
+	connStr := os.Getenv("NEON_URL")
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)

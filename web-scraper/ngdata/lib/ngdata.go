@@ -27,8 +27,6 @@ var storeIds = map[string]string{
 }
 
 func getCategories() Categories {
-	fmt.Println("Getting categories")
-
 	// kategorier instans
 	categories := Categories{}
 
@@ -85,7 +83,9 @@ func getProducts(store string, category string, subCategory string) (ApiResponse
 }
 
 // genererer en url for norgesgruppen api med butikk, kategori og underkategori
-func getUrl(store string, category string, subCategory string) string {
+func getUrl(store, category, subCategory string) string {
+	category = getCategoryName(store, category)
+
 	// joker trenger stor bokstav på starten av alle ord i kategori eller underkategori
 	if store == "joker" {
 		category = strings.Title(category)
@@ -100,18 +100,49 @@ func getUrl(store string, category string, subCategory string) string {
 	id := storeIds[store]
 
 	// constructer url
-	url := BASE_URL + id + OPTIONS + category + SEPERATOR + subCategory
+	url := transformUrl(store, BASE_URL+id+OPTIONS+category+SEPERATOR+subCategory)
+	fmt.Println(url)
 
+	return url
+}
+
+// noen kategorier er annerledes på joker, spar og meny (men ikke så mange og underkategorier er for det meste det samme)
+// denne mappen brukes i getCategoryName for å endre kategorinavn om det er nødvendig
+var categoryMappings = map[string]map[string]string{
+	"joker": {
+		"Meieri & egg":       "Meieriprodukter",
+		"Bakeri":             "Bakerivarer",
+		"Drikke":             "Drikkevarer",
+		"Pålegg & frokost":   "Frokost/Pålegg",
+		"Dyr":                "Dyreprodukter",
+		"Hus & hjem":         "Hus/Hjem Artikler",
+		"Bakevarer og kjeks": "Kaker/Bakevarer",
+	},
+	"spar": {
+		"Bakevarer og kjeks": "Bakeriartikler og kjeks",
+		"Dessert og iskrem":  "Dessert",
+		"Barneprodukter":     "Barn",
+	},
+}
+
+func getCategoryName(store, category string) string {
+	if mappings, ok := categoryMappings[store]; ok {
+		if mappedCategory, exists := mappings[category]; exists {
+			return mappedCategory
+		}
+	}
+	return category
+}
+
+func transformUrl(store, url string) string {
 	// joker bruker "/" i stedet for "&"
 	if store == "joker" {
 		url = strings.ReplaceAll(url, "+%26+", "%2F")
 	}
-
 	// spar bruker "og" i stedet for "&", meget hyggelig
 	if store == "spar" {
 		url = strings.ReplaceAll(url, "+%26+", "%20og%20")
 	}
-
 	return url
 }
 
