@@ -14,38 +14,36 @@ func run() {
 
 	categories := getCategories()
 
-	for i := range categories.Category {
-		// får kategori
-		category := categories.Category[i]
-		for j := range category.SubCategories {
-			// får underkategori
-			subCategory := category.SubCategories[j]
+	for _, category := range categories.Category {
+		for _, subCategory := range category.SubCategories {
+			storeData := []StoreData{}
 
-			menyData, err := getProducts("meny", category.Name, subCategory.Name)
-			if err != nil {
-				fmt.Printf("Error getting products: %v\n", err)
-			}
-
-			jokerData, err := getProducts("joker", category.Name, subCategory.Name)
-			if err != nil {
-				fmt.Printf("Error getting products: %v\n", err)
-			}
-
-			sparData, err := getProducts("spar", category.Name, subCategory.Name)
-			if err != nil {
-				fmt.Printf("Error getting products: %v\n", err)
+			for _, store := range stores {
+				res, err := getProducts(store, category.Name, subCategory.Name)
+				if err != nil {
+					fmt.Printf("Error getting products from %s in sub-category %s: %v\n", store, category.Name, err)
+				}
+				storeData = append(storeData, StoreData{Store: store, ApiRes: res, Category: category.Name, SubCategory: subCategory.Name})
 			}
 
 			// for hvert produkt som er returnert fra api-en, legg til dataen i products structen vi fikk som param
-			for k := range menyData.Hits.Products {
-				gtin := menyData.Hits.Products[k].Data.Ean
+			for i := range stores {
+				// bruker no goofy kode fra chatgpt for å kunne rotere hvilken rolle hver butikk har
+				// For eks: første iterasjon vil meny være hoved butikken som itereres over, andre gang blir det spar osv.
+				firstIndex := i
+				secondIndex := (i + 1) % len(stores)
+				thirdIndex := (i + 2) % len(stores)
 
-				menyProduct := menyData.Hits.Products[k]
-				jokerProduct, sparProduct := getPrices(gtin, jokerData, sparData)
+				for _, product := range storeData[firstIndex].ApiRes.Hits.Products {
+					gtin := product.Data.Ean
 
-				formatData(menyProduct, jokerProduct, sparProduct, products)
+					secondProduct, thirdProduct := getPrices(gtin, storeData[secondIndex].ApiRes, storeData[thirdIndex].ApiRes)
+
+					formatData(product, secondProduct, thirdProduct, storeData[firstIndex].Store, storeData[secondIndex].Store, storeData[thirdIndex].Store, products)
+				}
 			}
 		}
+		break
 	}
 
 	db := db()

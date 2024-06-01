@@ -29,55 +29,74 @@ func db() *sql.DB {
 	return db
 }
 
-func getPrices(gtin string, jokerData ApiResponse, sparData ApiResponse) (ApiProduct, ApiProduct) {
-	jokerProduct := ApiProduct{}
-	sparProduct := ApiProduct{}
+func getPrices(gtin string, secondData ApiResponse, thirdData ApiResponse) (ApiProduct, ApiProduct) {
+	secondProduct := ApiProduct{}
+	thirdProduct := ApiProduct{}
 
 	// finner produkt fra joker med samme gtin
-	for l := range jokerData.Hits.Products {
-		if jokerData.Hits.Products[l].Data.Ean == gtin {
-			jokerProduct = jokerData.Hits.Products[l]
+	for l := range secondData.Hits.Products {
+		if secondData.Hits.Products[l].Data.Ean == gtin {
+			secondProduct = secondData.Hits.Products[l]
 		}
 	}
 
 	// finner produkt fra spar med samme gtin
-	for l := range sparData.Hits.Products {
-		if sparData.Hits.Products[l].Data.Ean == gtin {
-			sparProduct = sparData.Hits.Products[l]
+	for l := range thirdData.Hits.Products {
+		if thirdData.Hits.Products[l].Data.Ean == gtin {
+			thirdProduct = thirdData.Hits.Products[l]
 		}
 	}
 
-	return jokerProduct, sparProduct
+	return secondProduct, thirdProduct
+}
+
+// TODO: automatisere dette om det funker (scrape alle sidene og gjør noe goofy)
+// lager et array med kategorinavn som er forskjellige, som så blir brukt etterpå for å gjøre alt i samme kategori til samme kategori navn
+// MENY, JOKER, SPAR
+var categoryNames = [...][3]string{
+	{"Frukt & grønt", "Frukt/Grønt", "Frukt og grønt"},
+}
+
+// bruker slicen av slices over til å gjøre alt til samme kategori navn
+func getCorrectCategoryName(category string) string {
+	for i := range categoryNames {
+		for j := range categoryNames[i] {
+			if categoryNames[i][j] == category {
+				return categoryNames[i][0]
+			}
+		}
+	}
+	return category
 }
 
 // lager instanser av egne structs med dataen fra fetchProducts
-func formatData(menyData ApiProduct, jokerData ApiProduct, sparData ApiProduct, products *Products) {
+func formatData(primaryData, secondaryData, thirdData ApiProduct, primaryStore, secondaryStore, thirdStore string, products *Products) {
 	product := Product{}
 
-	product.Gtin = menyData.Data.Ean
-	product.Title = menyData.Data.Title
-	product.SubTitle = menyData.Data.Subtitle
-	product.Category = menyData.Data.Category
-	product.SubCategory = menyData.Data.SubCategory
-	product.OnSale = menyData.Data.OnSale
+	product.Gtin = primaryData.Data.Ean
+	product.Title = primaryData.Data.Title
+	product.SubTitle = primaryData.Data.Subtitle
+	product.Category = getCorrectCategoryName(primaryData.Data.Category)
+	product.SubCategory = primaryData.Data.SubCategory
+	product.OnSale = primaryData.Data.OnSale
 	// lager hele url-en for bildelinker for ulike størrelser
-	product.Images.ImageLinkXSmall = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/xsmall.jpg")
-	product.Images.ImageLinkSmall = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/small.jpg")
-	product.Images.ImageLinkMedium = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/medium.jpg")
-	product.Images.ImageLinkLarge = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/large.jpg")
-	product.Images.ImageLinkXLarge = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/xlarge.jpg")
+	product.Images.ImageLinkXSmall = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", primaryData.Data.ImageLink, "/xsmall.jpg")
+	product.Images.ImageLinkSmall = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", primaryData.Data.ImageLink, "/small.jpg")
+	product.Images.ImageLinkMedium = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", primaryData.Data.ImageLink, "/medium.jpg")
+	product.Images.ImageLinkLarge = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", primaryData.Data.ImageLink, "/large.jpg")
+	product.Images.ImageLinkXLarge = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", primaryData.Data.ImageLink, "/xlarge.jpg")
 
 	// lager et array av priser, å gjøre det på denne måten gjør det lettere når dataen skal sendes til database
 	prices := Prices{}
 	// sjekker at prisen ikke er 0, om den er det er det ikke vits å sende til databasen
-	if menyData.Data.Price != 0 {
-		prices.Prices = append(prices.Prices, Price{Store: "meny", Price: math.Round(menyData.Data.Price), OriginalPrice: math.Round(menyData.Data.OriginalPrice), UnitPrice: math.Round(menyData.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", "https://meny.no/varer", menyData.Data.Slug)})
+	if primaryData.Data.Price != 0 {
+		prices.Prices = append(prices.Prices, Price{Store: primaryStore, Price: math.Round(primaryData.Data.Price), OriginalPrice: math.Round(primaryData.Data.OriginalPrice), UnitPrice: math.Round(primaryData.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", "https://meny.no/varer", primaryData.Data.Slug)})
 	}
-	if jokerData.Data.Price != 0 {
-		prices.Prices = append(prices.Prices, Price{Store: "joker", Price: math.Round(jokerData.Data.Price), OriginalPrice: math.Round(jokerData.Data.OriginalPrice), UnitPrice: math.Round(jokerData.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", "https://joker.no/nettbutikk/varer", jokerData.Data.Slug)})
+	if secondaryData.Data.Price != 0 {
+		prices.Prices = append(prices.Prices, Price{Store: secondaryStore, Price: math.Round(secondaryData.Data.Price), OriginalPrice: math.Round(secondaryData.Data.OriginalPrice), UnitPrice: math.Round(secondaryData.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", "https://joker.no/nettbutikk/varer", secondaryData.Data.Slug)})
 	}
-	if sparData.Data.Price != 0 {
-		prices.Prices = append(prices.Prices, Price{Store: "spar", Price: math.Round(sparData.Data.Price), OriginalPrice: math.Round(sparData.Data.OriginalPrice), UnitPrice: math.Round(sparData.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", "https://spar.no/nettbutikk/varer", sparData.Data.Slug)})
+	if thirdData.Data.Price != 0 {
+		prices.Prices = append(prices.Prices, Price{Store: thirdStore, Price: math.Round(thirdData.Data.Price), OriginalPrice: math.Round(thirdData.Data.OriginalPrice), UnitPrice: math.Round(thirdData.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", "https://spar.no/nettbutikk/varer", thirdData.Data.Slug)})
 	}
 
 	// sorterer basert på pris, så det første elementet i arrayet vil være det billigste
@@ -89,22 +108,22 @@ func formatData(menyData ApiProduct, jokerData ApiProduct, sparData ApiProduct, 
 
 	// innhold
 	// vekt kombinerer vekten og typen (g, kg, osv.)
-	product.Content.Weight = fmt.Sprintf("%v%s", menyData.Data.Weight, menyData.Data.WeightMeasurementType)
-	product.Content.Description = menyData.Data.Description
-	product.Content.Unit = menyData.Data.Unit
-	product.Content.UnitType = menyData.Data.CompareUnit
-	product.Content.Size = menyData.Data.Size
-	product.Content.Vendor = menyData.Data.Vendor
-	product.Content.Brand = menyData.Data.Brand
-	product.Content.OriginCountry = menyData.Data.OriginCountry
-	product.Content.Ingredients = menyData.Data.Ingredients
+	product.Content.Weight = fmt.Sprintf("%v%s", primaryData.Data.Weight, primaryData.Data.WeightMeasurementType)
+	product.Content.Description = primaryData.Data.Description
+	product.Content.Unit = primaryData.Data.Unit
+	product.Content.UnitType = primaryData.Data.CompareUnit
+	product.Content.Size = primaryData.Data.Size
+	product.Content.Vendor = primaryData.Data.Vendor
+	product.Content.Brand = primaryData.Data.Brand
+	product.Content.OriginCountry = primaryData.Data.OriginCountry
+	product.Content.Ingredients = primaryData.Data.Ingredients
 
 	// mapper over allergener array som vi fikk fra databasen
 	// i databasen så bestemmer koden hva itemet i arrayen betyr for produktet
 	// om koden er JA, blir det lagt til i allergens, om det er kan blir det lagt til i mayContainTracesOf
 	var allergens []string
 	var mayContainTracesOf []string
-	for _, allergen := range menyData.Data.Allergens {
+	for _, allergen := range primaryData.Data.Allergens {
 		if allergen.Code == "JA" {
 			allergens = append(allergens, allergen.Name)
 		} else if allergen.Code == "KAN" {
@@ -115,7 +134,7 @@ func formatData(menyData ApiProduct, jokerData ApiProduct, sparData ApiProduct, 
 	product.Content.MayContainTracesOf = strings.Join(mayContainTracesOf, ", ")
 
 	// næringsinnhold
-	nutritionalContentData := menyData.Data.NutritionalContent
+	nutritionalContentData := primaryData.Data.NutritionalContent
 
 	// om det ikke er noe næringsinnhold
 	if len(nutritionalContentData) == 0 {

@@ -101,7 +101,6 @@ func getUrl(store, category, subCategory string) string {
 
 	// constructer url
 	url := transformUrl(store, BASE_URL+id+OPTIONS+category+SEPERATOR+subCategory)
-	fmt.Println(url)
 
 	return url
 }
