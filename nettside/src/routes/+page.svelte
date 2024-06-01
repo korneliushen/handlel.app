@@ -10,17 +10,22 @@
 	/>
 </div>
 <section class="flex flex-col items-center gap-y-14">
-	{#each Object.entries(data.products) as [category, products]}
-		<div class="space-y-1 p-1 md:p-4">
-			<a href="#" title="Gå til kategori" class="flex items-center">
-				<h2 class="text-xl font-medium">{category}</h2>
-				<ChevronRight color="#7A38D0" />
-			</a>
-			<div class="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4">
-				{#each products as product}
-					<Productcard {product} />
-				{/each}
-			</div>
-		</div>
-	{/each}
+{#await data.streamed.products}
+  Loading....
+{:then loadedProducts}
+	{#each loadedProducts as { category, products }}
+  <div class="space-y-1 p-1 md:p-4">
+    <a href="#" title="Gå til kategori" class="flex items-center">
+      <h2 class="text-xl font-medium">{category}</h2>
+      <ChevronRight color="#7A38D0" />
+    </a>
+    <div class="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4">
+      {#each products as product}
+        <Productcard {product} />
+      {/each}
+    </div>
+  </div>
+{/each}
+{/await}
+
 </section>
