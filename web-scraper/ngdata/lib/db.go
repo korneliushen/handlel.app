@@ -50,11 +50,28 @@ func getPrices(gtin string, secondData ApiResponse, thirdData ApiResponse) (ApiP
 	return secondProduct, thirdProduct
 }
 
-// TODO: automatisere dette om det funker (scrape alle sidene og gjør noe goofy)
+// TODO: automatisere dette om det funker (scrape alle sidene / finne endpoint i api med alle kategorier (det hadde vært crazy))
+// TODO: en mulig løsning som funker på mye er å bare replace "/" og "og" med "&"
+// temporary løsning til jeg finner ut hvordan vi kan automatisere det
 // lager et array med kategorinavn som er forskjellige, som så blir brukt etterpå for å gjøre alt i samme kategori til samme kategori navn
 // MENY, JOKER, SPAR
 var categoryNames = [...][3]string{
+	// ting som basically kan automatiseres
 	{"Frukt & grønt", "Frukt/Grønt", "Frukt og grønt"},
+	{"Fisk & skalldyr", "Fisk/Skalldyr", "Fisk og skalldyr"},
+	{"Personlige artikler", "Personlige Artikler"},
+
+	// ting som er mobbing (må kjøre noe contains greier ig)
+	{"Bakeri", "Bakerivarer", "Brød og bakervarer"},
+	{"Meieri & egg", "Meieriprodukter", "Meieri og egg"},
+	{"Pålegg & frokost", "Frokost/Pålegg", "Pålegg og frokost"},
+	{"Drikke", "Drikkevarer"},
+	{"Dessert og iskrem", "Dessert"},
+	{"Bakevarer og kjeks", "Kaker/Bakevarer", "Bakeartikler og kjeks"},
+	{"Barneprodukter", "Barn"},
+	{"Hus & hjem", "Hus/Hjem Artikler", "Hus og hjem"},
+	{"Snacks & godteri", "Snacks/Godteri", "Snacks og godteri"},
+	{"Dyr", "Dyreprodukter"},
 }
 
 // bruker slicen av slices over til å gjøre alt til samme kategori navn
@@ -77,6 +94,7 @@ func formatData(primaryData, secondaryData, thirdData ApiProduct, primaryStore, 
 	product.Title = primaryData.Data.Title
 	product.SubTitle = primaryData.Data.Subtitle
 	product.Category = getCorrectCategoryName(primaryData.Data.Category)
+	fmt.Println(product.Category)
 	product.SubCategory = primaryData.Data.SubCategory
 	product.OnSale = primaryData.Data.OnSale
 	// lager hele url-en for bildelinker for ulike størrelser

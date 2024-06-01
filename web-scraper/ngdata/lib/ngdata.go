@@ -105,6 +105,7 @@ func getUrl(store, category, subCategory string) string {
 	return url
 }
 
+// TODO: vil også finne en måte å automatisere dette på
 // noen kategorier er annerledes på joker, spar og meny (men ikke så mange og underkategorier er for det meste det samme)
 // denne mappen brukes i getCategoryName for å endre kategorinavn om det er nødvendig
 var categoryMappings = map[string]map[string]string{
@@ -121,6 +122,7 @@ var categoryMappings = map[string]map[string]string{
 		"Bakevarer og kjeks": "Bakeriartikler og kjeks",
 		"Dessert og iskrem":  "Dessert",
 		"Barneprodukter":     "Barn",
+		"Bakeri":             "Brød og bakevarer",
 	},
 }
 
