@@ -50,6 +50,7 @@ func getPrices(gtin string, secondData ApiResponse, thirdData ApiResponse) (ApiP
 	return secondProduct, thirdProduct
 }
 
+// TODO IMRGN: TROR JEG HAR EN LØSNING. bruk subcategory som er i Product eller ApiProduct, og map over Products.Subcategories, om den er der, legg til i kategorien (kategorien over sub kategorien assa)
 // TODO: automatisere dette om det funker (scrape alle sidene / finne endpoint i api med alle kategorier (det hadde vært crazy))
 // TODO: en mulig løsning som funker på mye er å bare replace "/" og "og" med "&"
 // temporary løsning til jeg finner ut hvordan vi kan automatisere det
@@ -87,14 +88,15 @@ func getCorrectCategoryName(category string) string {
 }
 
 // lager instanser av egne structs med dataen fra fetchProducts
-func formatData(primaryData, secondaryData, thirdData ApiProduct, primaryStore, secondaryStore, thirdStore string, products *Products) {
+func formatData(productData []ApiProduct, products *[]Product) {
 	product := Product{}
+
+	primaryData := productData[0]
 
 	product.Gtin = primaryData.Data.Ean
 	product.Title = primaryData.Data.Title
 	product.SubTitle = primaryData.Data.Subtitle
 	product.Category = getCorrectCategoryName(primaryData.Data.Category)
-	fmt.Println(product.Category)
 	product.SubCategory = primaryData.Data.SubCategory
 	product.OnSale = primaryData.Data.OnSale
 	// lager hele url-en for bildelinker for ulike størrelser
@@ -106,15 +108,14 @@ func formatData(primaryData, secondaryData, thirdData ApiProduct, primaryStore, 
 
 	// lager et array av priser, å gjøre det på denne måten gjør det lettere når dataen skal sendes til database
 	prices := Prices{}
+	storeMap := map[string]bool{}
 	// sjekker at prisen ikke er 0, om den er det er det ikke vits å sende til databasen
-	if primaryData.Data.Price != 0 {
-		prices.Prices = append(prices.Prices, Price{Store: primaryStore, Price: math.Round(primaryData.Data.Price), OriginalPrice: math.Round(primaryData.Data.OriginalPrice), UnitPrice: math.Round(primaryData.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", "https://meny.no/varer", primaryData.Data.Slug)})
-	}
-	if secondaryData.Data.Price != 0 {
-		prices.Prices = append(prices.Prices, Price{Store: secondaryStore, Price: math.Round(secondaryData.Data.Price), OriginalPrice: math.Round(secondaryData.Data.OriginalPrice), UnitPrice: math.Round(secondaryData.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", "https://joker.no/nettbutikk/varer", secondaryData.Data.Slug)})
-	}
-	if thirdData.Data.Price != 0 {
-		prices.Prices = append(prices.Prices, Price{Store: thirdStore, Price: math.Round(thirdData.Data.Price), OriginalPrice: math.Round(thirdData.Data.OriginalPrice), UnitPrice: math.Round(thirdData.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", "https://spar.no/nettbutikk/varer", thirdData.Data.Slug)})
+	for _, product := range productData {
+		if _, exists := storeMap[product.Store]; exists {
+			continue
+		}
+		storeMap[product.Store] = true
+		prices.Prices = append(prices.Prices, Price{Store: product.Store, Price: math.Round(product.Data.Price), OriginalPrice: math.Round(product.Data.OriginalPrice), UnitPrice: math.Round(product.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", product.BaseUrl, product.Data.Slug)})
 	}
 
 	// sorterer basert på pris, så det første elementet i arrayet vil være det billigste
@@ -170,7 +171,7 @@ func formatData(primaryData, secondaryData, thirdData ApiProduct, primaryStore, 
 		product.Content.NutritionalContent = &nutritionalContent
 	}
 
-	products.Products = append(products.Products, product)
+	*products = append(*products, product)
 }
 
 func insertData(product Product, db *sql.DB) error {

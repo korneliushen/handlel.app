@@ -10,18 +10,13 @@ type StoreData struct {
 }
 
 type Categories struct {
-	Category []Category
+	Categories []Category
 }
 
 type Category struct {
 	Name          string
-	Link          string
-	SubCategories []SubCategories
-}
-
-type SubCategories struct {
-	Name string
-	Link string
+	Store         string
+	SubCategories []string
 }
 
 // produkter som skal bli til json data/lagt inn i database
@@ -109,9 +104,11 @@ type Hits struct {
 }
 
 type ApiProduct struct {
-	Type  string         `json:"_type"`
-	ApiId string         `json:"_id"`
-	Data  ApiProductData `json:"_source"`
+	Store   string         `json:"store"`
+	BaseUrl string         `json:"base_url"`
+	Type    string         `json:"_type"`
+	ApiId   string         `json:"_id"`
+	Data    ApiProductData `json:"_source"`
 }
 
 type ApiProductData struct {

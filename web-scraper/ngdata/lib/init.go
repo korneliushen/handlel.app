@@ -10,49 +10,62 @@ import (
 )
 
 func run() {
-	products := &Products{}
+	products := &[]Product{}
 
-	// brukes for å ikke legge inn duplicates i products
+	categories := &[]Category{}
+
+	for _, store := range stores {
+		getCategories(store, categories)
+	}
+
 	var checkedGtins []string
 
-	categories := getCategories()
+	apiProducts := []ApiProduct{}
 
-	for _, category := range categories.Category {
-		for _, subCategory := range category.SubCategories {
-			storeData := []StoreData{}
-
-			for _, store := range stores {
-				res, err := getProducts(store, category.Name, subCategory.Name)
-				if err != nil {
-					fmt.Printf("Error getting products from %s in sub-category %s: %v\n", store, category.Name, err)
-				}
-				storeData = append(storeData, StoreData{Store: store, ApiRes: res, Category: category.Name, SubCategory: subCategory.Name})
+	for _, category := range *categories {
+		for _, store := range stores {
+			// om kategorien sin butikk og butikken ikke er den samme, er det ikke vits å kjøre request fordi den vil ikke få noe data (og om den får det vil det være duplicate)
+			if category.Store != store {
+				continue
 			}
 
-			// for hvert produkt som er returnert fra api-en, legg til dataen i products structen vi fikk som param
-			for i := range stores {
-				// bruker no goofy kode fra chatgpt for å kunne rotere hvilken rolle hver butikk har
-				// For eks: første iterasjon vil meny være hoved butikken som itereres over, andre gang blir det spar osv.
-				firstIndex := i
-				secondIndex := (i + 1) % len(stores)
-				thirdIndex := (i + 2) % len(stores)
+			// får data om alle produkter i kategorien
+			res, err := getProducts(store, category.Name)
+			if err != nil {
+				fmt.Printf("Error getting products from %s in category %s: %v\n", store, category, err)
+				continue
+			}
 
-				for _, product := range storeData[firstIndex].ApiRes.Hits.Products {
-					gtin := product.Data.Ean
-
-					// sjekker om produktet allerede har blitt sjekket
-					if isIn(gtin, checkedGtins) {
-						continue
-					}
-
-					checkedGtins = append(checkedGtins, gtin)
-
-					secondProduct, thirdProduct := getPrices(gtin, storeData[secondIndex].ApiRes, storeData[thirdIndex].ApiRes)
-
-					formatData(product, secondProduct, thirdProduct, storeData[firstIndex].Store, storeData[secondIndex].Store, storeData[thirdIndex].Store, products)
+			// legger til produktet i apiProducts array som mappes over senere, legger også til Store (for senere bruk)
+			for _, product := range res {
+				// legger til underkategorier, legger bare til om underkategorien ikke allerede er lagt til
+				// underkategorier er jeg ganske sikker på at er basically helt likt på alle sidene, så det vil ikke være duplicates med forskjellig navn, om det er annerledes må jeg bytte til id approach
+				if !isIn(product.Data.SubCategory, category.SubCategories) {
+					category.SubCategories = append(category.SubCategories, product.Data.SubCategory)
 				}
+				apiProducts = append(apiProducts, ApiProduct{Store: store, Data: product.Data, BaseUrl: storeData[store].url})
 			}
 		}
+	}
+
+	// mapper over alle produkter vi har fått fra databasen og formatterer dataen i egne structs
+	for _, firstProduct := range apiProducts {
+		gtin := firstProduct.Data.Ean
+
+		if isIn(gtin, checkedGtins) {
+			continue
+		}
+		checkedGtins = append(checkedGtins, gtin)
+
+		sameProduct := []ApiProduct{firstProduct}
+
+		for _, secondProduct := range apiProducts {
+			if gtin == secondProduct.Data.Ean {
+				sameProduct = append(sameProduct, secondProduct)
+			}
+		}
+
+		formatData(sameProduct, products)
 	}
 
 	db := db()
@@ -63,7 +76,7 @@ func run() {
 	// limiter hvor mange go routines som kan kjøre om om gangen
 	sem := make(chan struct{}, 4)
 
-	for i := range products.Products {
+	for i := range *products {
 		// legger til et item i wait groupen
 		wg.Add(1)
 		sem <- struct{}{}
@@ -75,9 +88,9 @@ func run() {
 
 			// legger til data i databasen
 			if err := insertData(product, db); err != nil {
-				fmt.Printf("Error inserting data for %s: %v", products.Products[i].Title, err)
+				fmt.Printf("Error inserting data for %s: %v", product.Title, err)
 			}
-		}(products.Products[i])
+		}((*products)[i])
 	}
 
 	wg.Wait()
