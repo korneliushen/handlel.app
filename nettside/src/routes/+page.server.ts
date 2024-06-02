@@ -3,7 +3,10 @@ import type { PageServerLoad } from "./$types";
 import { error } from "@sveltejs/kit";
 import type { ExtendedProduct } from "$lib/types/extendedPrisma";
 
-export const load: PageServerLoad = () => {
+export const load: PageServerLoad = ({setHeaders}) => {
+  setHeaders({
+      'cache-control': 'max-age=3600'
+  });
   return {
     streamed: {
       products: new Promise<{ category: string; products: ExtendedProduct[] }[]>(async (resolve, reject) => {
