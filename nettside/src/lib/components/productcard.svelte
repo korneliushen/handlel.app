@@ -3,6 +3,8 @@
 	import { handlelapp } from '$lib/stores/handlelapp';
 	import type { ExtendedProduct } from '$lib/types/extendedPrisma';
 	export let product: ExtendedProduct;
+
+	const handleError = (e: any) => e.target.src = "/handlelapp.png"
 </script>
 
 <div
@@ -12,7 +14,7 @@
 		title="product"
 		class="relative flex aspect-square max-h-40 items-center justify-center py-1 lg:w-full"
 	>
-		<img loading="lazy" class="max-h-40" src={product.imagelinksmall} alt="produktbilde" />
+		<img loading="lazy" class="max-h-40" src={product.imagelinksmall} on:error={handleError} alt="produktbilde" />
 		<img
 			loading="lazy"
 			class="absolute bottom-0 left-0 ml-2 w-10 rounded-md"
