@@ -5,6 +5,8 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+
+	"github.com/gocolly/colly"
 )
 
 // separerer kategori og sub-kategori
@@ -23,6 +25,27 @@ var storeData = map[string]struct {
 	"meny":  {targetClass: "li.cw-categories__item", firstCategory: "Frukt & grønt", url: "https://meny.no/varer/", id: "/1300/7080001150488"},
 	"joker": {targetClass: "li.product-categories__item", firstCategory: "Bakerivarer", url: "https://joker.no/nettbutikk/varer/", id: "/1220/7080001395933"},
 	"spar":  {targetClass: "li.product-categories__item", firstCategory: "Bakeartikler og kjeks", url: "https://spar.no/nettbutikk/varer/", id: "/1210/7080001097950"},
+}
+
+func getCategories(store string, categories *[]Category) {
+	c := colly.NewCollector()
+
+	categoriesStarted := false
+
+	c.OnHTML(storeData[store].targetClass, func(e *colly.HTMLElement) {
+		categoryName := e.ChildText("a span")
+
+		if categoryName == storeData[store].firstCategory {
+			categoriesStarted = true
+		}
+
+		if categoriesStarted {
+			// lager instans av kategori med alle verdier jeg har til nå
+			*categories = append(*categories, Category{Name: categoryName, Store: store})
+		}
+	})
+
+	c.Visit(storeData[store].url)
 }
 
 func getProducts(store, category string) ([]ApiProduct, error) {

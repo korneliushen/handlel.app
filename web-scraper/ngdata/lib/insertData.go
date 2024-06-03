@@ -5,54 +5,15 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"math"
-	"os"
 	"reflect"
 	"slices"
 	"strings"
+	"sync"
 
 	_ "github.com/lib/pq"
 )
 
-func db() *sql.DB {
-	connStr := os.Getenv("NEON_URL")
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// limiter open og idle connections for å ikke med et uhell overloade databasen
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(10)
-
-	return db
-}
-
-func getPrices(gtin string, secondData ApiResponse, thirdData ApiResponse) (ApiProduct, ApiProduct) {
-	secondProduct := ApiProduct{}
-	thirdProduct := ApiProduct{}
-
-	// finner produkt fra joker med samme gtin
-	for l := range secondData.Hits.Products {
-		if secondData.Hits.Products[l].Data.Ean == gtin {
-			secondProduct = secondData.Hits.Products[l]
-		}
-	}
-
-	// finner produkt fra spar med samme gtin
-	for l := range thirdData.Hits.Products {
-		if thirdData.Hits.Products[l].Data.Ean == gtin {
-			thirdProduct = thirdData.Hits.Products[l]
-		}
-	}
-
-	return secondProduct, thirdProduct
-}
-
-// TODO IMRGN: TROR JEG HAR EN LØSNING. bruk subcategory som er i Product eller ApiProduct, og map over Products.Subcategories, om den er der, legg til i kategorien (kategorien over sub kategorien assa)
-// TODO: automatisere dette om det funker (scrape alle sidene / finne endpoint i api med alle kategorier (det hadde vært crazy))
-// TODO: en mulig løsning som funker på mye er å bare replace "/" og "og" med "&"
 // temporary løsning til jeg finner ut hvordan vi kan automatisere det
 // lager et array med kategorinavn som er forskjellige, som så blir brukt etterpå for å gjøre alt i samme kategori til samme kategori navn
 // MENY, JOKER, SPAR
@@ -174,7 +135,36 @@ func formatData(productData []ApiProduct, products *[]Product) {
 	*products = append(*products, product)
 }
 
-func insertData(product Product, db *sql.DB) error {
+func insertData(products *[]Product) {
+	db := db()
+	defer db.Close()
+
+	// lager en waitgroup, som venter på goroutines for å bli ferdig før den starter en ny
+	var wg sync.WaitGroup
+	// limiter hvor mange go routines som kan kjøre om om gangen
+	sem := make(chan struct{}, 4)
+
+	for i := range *products {
+		// legger til et item i wait groupen
+		wg.Add(1)
+		sem <- struct{}{}
+
+		go func(product Product) {
+			// når funksjonen er ferdig, blir waitgroup instansen ferdig + sem (det som keeper track av hvor mange ting som kan kjøre om gangen) blir oppdatert
+			defer wg.Done()
+			defer func() { <-sem }()
+
+			// legger til data i databasen
+			if err := query(product, db); err != nil {
+				fmt.Printf("Error inserting data for %s: %v", product.Title, err)
+			}
+		}((*products)[i])
+	}
+
+	wg.Wait()
+}
+
+func query(product Product, db *sql.DB) error {
 	fmt.Println("Legger inn data for:", product.Title)
 
 	// gjør om næringsinnhold (type Næringsinnhold struct) til nutritionalContentJson

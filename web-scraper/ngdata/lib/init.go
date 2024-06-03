@@ -3,7 +3,6 @@ package lib
 import (
 	"fmt"
 	"log"
-	"sync"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -18,6 +17,7 @@ func run() {
 		getCategories(store, categories)
 	}
 
+	// har produkter som allerede er sjekket i et array, så det ikke blir duplicates av samme produkt (sparer også tid fordi den exiter tidlig)
 	var checkedGtins []string
 
 	apiProducts := []ApiProduct{}
@@ -52,48 +52,25 @@ func run() {
 	for _, firstProduct := range apiProducts {
 		gtin := firstProduct.Data.Ean
 
+		// om produktet allerede er sjekket, continue
 		if isIn(gtin, checkedGtins) {
 			continue
 		}
 		checkedGtins = append(checkedGtins, gtin)
 
+		// finner andre produkter med samme gtin og legger til i et array
 		sameProduct := []ApiProduct{firstProduct}
-
 		for _, secondProduct := range apiProducts {
-			if gtin == secondProduct.Data.Ean {
+			if gtin == secondProduct.Data.Ean && firstProduct.Store != secondProduct.Store {
 				sameProduct = append(sameProduct, secondProduct)
 			}
 		}
 
+		// formaterer dataen til alle produkter med samme gtin
 		formatData(sameProduct, products)
 	}
 
-	db := db()
-	defer db.Close()
-
-	// lager en waitgroup, som venter på goroutines for å bli ferdig før den starter en ny
-	var wg sync.WaitGroup
-	// limiter hvor mange go routines som kan kjøre om om gangen
-	sem := make(chan struct{}, 4)
-
-	for i := range *products {
-		// legger til et item i wait groupen
-		wg.Add(1)
-		sem <- struct{}{}
-
-		go func(product Product) {
-			// når funksjonen er ferdig, blir waitgroup instansen ferdig + sem (det som keeper track av hvor mange ting som kan kjøre om gangen) blir oppdatert
-			defer wg.Done()
-			defer func() { <-sem }()
-
-			// legger til data i databasen
-			if err := insertData(product, db); err != nil {
-				fmt.Printf("Error inserting data for %s: %v", product.Title, err)
-			}
-		}((*products)[i])
-	}
-
-	wg.Wait()
+	insertData(products)
 }
 
 func Init() {
