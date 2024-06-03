@@ -1,4 +1,4 @@
-package main
+package lib
 
 import (
 	"cmp"
@@ -9,57 +9,74 @@ import (
 	"reflect"
 	"slices"
 	"strings"
+	"sync"
+
+	_ "github.com/lib/pq"
 )
 
-func getPrices(gtin string, jokerData ApiResponse, sparData ApiResponse) (ApiProduct, ApiProduct) {
-	jokerProduct := ApiProduct{}
-	sparProduct := ApiProduct{}
+// temporary løsning til jeg finner ut hvordan vi kan automatisere det
+// lager et array med kategorinavn som er forskjellige, som så blir brukt etterpå for å gjøre alt i samme kategori til samme kategori navn
+// MENY, JOKER, SPAR
+var categoryNames = [...][3]string{
+	// ting som basically kan automatiseres
+	{"Frukt & grønt", "Frukt/Grønt", "Frukt og grønt"},
+	{"Fisk & skalldyr", "Fisk/Skalldyr", "Fisk og skalldyr"},
+	{"Personlige artikler", "Personlige Artikler"},
 
-	// finner produkt fra joker med samme gtin
-	for l := range jokerData.Hits.Products {
-		if jokerData.Hits.Products[l].Data.Ean == gtin {
-			jokerProduct = jokerData.Hits.Products[l]
+	// ting som er mobbing (må kjøre noe contains greier ig)
+	{"Bakeri", "Bakerivarer", "Brød og bakervarer"},
+	{"Meieri & egg", "Meieriprodukter", "Meieri og egg"},
+	{"Pålegg & frokost", "Frokost/Pålegg", "Pålegg og frokost"},
+	{"Drikke", "Drikkevarer"},
+	{"Dessert og iskrem", "Dessert"},
+	{"Bakevarer og kjeks", "Kaker/Bakevarer", "Bakeartikler og kjeks"},
+	{"Barneprodukter", "Barn"},
+	{"Hus & hjem", "Hus/Hjem Artikler", "Hus og hjem"},
+	{"Snacks & godteri", "Snacks/Godteri", "Snacks og godteri"},
+	{"Dyr", "Dyreprodukter"},
+}
+
+// bruker slicen av slices over til å gjøre alt til samme kategori navn
+func getCorrectCategoryName(category string) string {
+	for i := range categoryNames {
+		for j := range categoryNames[i] {
+			if categoryNames[i][j] == category {
+				return categoryNames[i][0]
+			}
 		}
 	}
-
-	// finner produkt fra spar med samme gtin
-	for l := range sparData.Hits.Products {
-		if sparData.Hits.Products[l].Data.Ean == gtin {
-			sparProduct = sparData.Hits.Products[l]
-		}
-	}
-
-	return jokerProduct, sparProduct
+	return category
 }
 
 // lager instanser av egne structs med dataen fra fetchProducts
-func formatData(menyData ApiProduct, jokerData ApiProduct, sparData ApiProduct, products *Products) {
+func formatData(productData []ApiProduct, products *[]Product) {
 	product := Product{}
 
-	product.Gtin = menyData.Data.Ean
-	product.Title = menyData.Data.Title
-	product.SubTitle = menyData.Data.Subtitle
-	product.Category = menyData.Data.Category
-	product.SubCategory = menyData.Data.SubCategory
-	product.OnSale = menyData.Data.OnSale
+	primaryData := productData[0]
+
+	product.Gtin = primaryData.Data.Ean
+	product.Title = primaryData.Data.Title
+	product.SubTitle = primaryData.Data.Subtitle
+	product.Category = getCorrectCategoryName(primaryData.Data.Category)
+	product.SubCategory = primaryData.Data.SubCategory
+	product.OnSale = primaryData.Data.OnSale
 	// lager hele url-en for bildelinker for ulike størrelser
-	product.Images.ImageLinkXSmall = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/xsmall.jpg")
-	product.Images.ImageLinkSmall = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/small.jpg")
-	product.Images.ImageLinkMedium = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/medium.jpg")
-	product.Images.ImageLinkLarge = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/large.jpg")
-	product.Images.ImageLinkXLarge = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", menyData.Data.ImageLink, "/xlarge.jpg")
+	product.Images.ImageLinkXSmall = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", primaryData.Data.ImageLink, "/xsmall.jpg")
+	product.Images.ImageLinkSmall = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", primaryData.Data.ImageLink, "/small.jpg")
+	product.Images.ImageLinkMedium = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", primaryData.Data.ImageLink, "/medium.jpg")
+	product.Images.ImageLinkLarge = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", primaryData.Data.ImageLink, "/large.jpg")
+	product.Images.ImageLinkXLarge = fmt.Sprintf("%s%s%s", "https://bilder.ngdata.no/", primaryData.Data.ImageLink, "/xlarge.jpg")
 
 	// lager et array av priser, å gjøre det på denne måten gjør det lettere når dataen skal sendes til database
 	prices := Prices{}
+	storeMap := map[string]bool{}
 	// sjekker at prisen ikke er 0, om den er det er det ikke vits å sende til databasen
-	if menyData.Data.Price != 0 {
-		prices.Prices = append(prices.Prices, Price{Store: "meny", Price: math.Round(menyData.Data.Price), OriginalPrice: math.Round(menyData.Data.OriginalPrice), UnitPrice: math.Round(menyData.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", "https://meny.no/varer", menyData.Data.Slug)})
-	}
-	if jokerData.Data.Price != 0 {
-		prices.Prices = append(prices.Prices, Price{Store: "joker", Price: math.Round(jokerData.Data.Price), OriginalPrice: math.Round(jokerData.Data.OriginalPrice), UnitPrice: math.Round(jokerData.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", "https://joker.no/nettbutikk/varer", jokerData.Data.Slug)})
-	}
-	if sparData.Data.Price != 0 {
-		prices.Prices = append(prices.Prices, Price{Store: "spar", Price: math.Round(sparData.Data.Price), OriginalPrice: math.Round(sparData.Data.OriginalPrice), UnitPrice: math.Round(sparData.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", "https://spar.no/nettbutikk/varer", sparData.Data.Slug)})
+	for _, product := range productData {
+		if _, exists := storeMap[product.Store]; exists {
+			continue
+		}
+		storeMap[product.Store] = true
+		prices.Prices = append(prices.Prices, Price{Store: product.Store, Price: math.Round(product.Data.Price), OriginalPrice: math.Round(product.Data.OriginalPrice), UnitPrice: math.Round(product.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", product.BaseUrl, product.Data.Slug)})
 	}
 
 	// sorterer basert på pris, så det første elementet i arrayet vil være det billigste
@@ -71,22 +88,22 @@ func formatData(menyData ApiProduct, jokerData ApiProduct, sparData ApiProduct, 
 
 	// innhold
 	// vekt kombinerer vekten og typen (g, kg, osv.)
-	product.Content.Weight = fmt.Sprintf("%v%s", menyData.Data.Weight, menyData.Data.WeightMeasurementType)
-	product.Content.Description = menyData.Data.Description
-	product.Content.Unit = menyData.Data.Unit
-	product.Content.UnitType = menyData.Data.CompareUnit
-	product.Content.Size = menyData.Data.Size
-	product.Content.Vendor = menyData.Data.Vendor
-	product.Content.Brand = menyData.Data.Brand
-	product.Content.OriginCountry = menyData.Data.OriginCountry
-	product.Content.Ingredients = menyData.Data.Ingredients
+	product.Content.Weight = fmt.Sprintf("%v%s", primaryData.Data.Weight, primaryData.Data.WeightMeasurementType)
+	product.Content.Description = primaryData.Data.Description
+	product.Content.Unit = primaryData.Data.Unit
+	product.Content.UnitType = primaryData.Data.CompareUnit
+	product.Content.Size = primaryData.Data.Size
+	product.Content.Vendor = primaryData.Data.Vendor
+	product.Content.Brand = primaryData.Data.Brand
+	product.Content.OriginCountry = primaryData.Data.OriginCountry
+	product.Content.Ingredients = primaryData.Data.Ingredients
 
 	// mapper over allergener array som vi fikk fra databasen
 	// i databasen så bestemmer koden hva itemet i arrayen betyr for produktet
 	// om koden er JA, blir det lagt til i allergens, om det er kan blir det lagt til i mayContainTracesOf
 	var allergens []string
 	var mayContainTracesOf []string
-	for _, allergen := range menyData.Data.Allergens {
+	for _, allergen := range primaryData.Data.Allergens {
 		if allergen.Code == "JA" {
 			allergens = append(allergens, allergen.Name)
 		} else if allergen.Code == "KAN" {
@@ -97,7 +114,7 @@ func formatData(menyData ApiProduct, jokerData ApiProduct, sparData ApiProduct, 
 	product.Content.MayContainTracesOf = strings.Join(mayContainTracesOf, ", ")
 
 	// næringsinnhold
-	nutritionalContentData := menyData.Data.NutritionalContent
+	nutritionalContentData := primaryData.Data.NutritionalContent
 
 	// om det ikke er noe næringsinnhold
 	if len(nutritionalContentData) == 0 {
@@ -115,10 +132,39 @@ func formatData(menyData ApiProduct, jokerData ApiProduct, sparData ApiProduct, 
 		product.Content.NutritionalContent = &nutritionalContent
 	}
 
-	products.Products = append(products.Products, product)
+	*products = append(*products, product)
 }
 
-func insertData(product Product, db *sql.DB) error {
+func insertData(products *[]Product) {
+	db := db()
+	defer db.Close()
+
+	// lager en waitgroup, som venter på goroutines for å bli ferdig før den starter en ny
+	var wg sync.WaitGroup
+	// limiter hvor mange go routines som kan kjøre om om gangen
+	sem := make(chan struct{}, 4)
+
+	for i := range *products {
+		// legger til et item i wait groupen
+		wg.Add(1)
+		sem <- struct{}{}
+
+		go func(product Product) {
+			// når funksjonen er ferdig, blir waitgroup instansen ferdig + sem (det som keeper track av hvor mange ting som kan kjøre om gangen) blir oppdatert
+			defer wg.Done()
+			defer func() { <-sem }()
+
+			// legger til data i databasen
+			if err := query(product, db); err != nil {
+				fmt.Printf("Error inserting data for %s: %v", product.Title, err)
+			}
+		}((*products)[i])
+	}
+
+	wg.Wait()
+}
+
+func query(product Product, db *sql.DB) error {
 	fmt.Println("Legger inn data for:", product.Title)
 
 	// gjør om næringsinnhold (type Næringsinnhold struct) til nutritionalContentJson
