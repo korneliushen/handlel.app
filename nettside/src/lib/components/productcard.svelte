@@ -4,7 +4,7 @@
 	import type { ExtendedProduct } from '$lib/types/extendedPrisma';
 	export let product: ExtendedProduct;
 
-	const handleError = (e: any) => e.target.src = "/handlelapp.png"
+	const handleError = (e: Event) => ((e.target as HTMLImageElement).src = '/handlelapp.png');
 </script>
 
 <div
@@ -14,7 +14,13 @@
 		title="product"
 		class="relative flex aspect-square max-h-40 items-center justify-center py-1 lg:w-full"
 	>
-		<img loading="lazy" class="max-h-40" src={product.imagelinksmall} on:error={handleError} alt="produktbilde" />
+		<img
+			loading="lazy"
+			class="max-h-40"
+			src={product.imagelinksmall}
+			on:error={handleError}
+			alt="produktbilde"
+		/>
 		<img
 			loading="lazy"
 			class="absolute bottom-0 left-0 ml-2 w-10 rounded-md"
@@ -37,15 +43,10 @@
 			<button
 				on:click={() => [($handlelapp = [...$handlelapp, product])]}
 				class="z-10 flex aspect-square h-10 w-10 items-center justify-center rounded-md bg-mainPurple transition hover:brightness-110"
-
 			>
 				<BookPlus color="#fff" />
 			</button>
 		</div>
 	</div>
-	<a
-		href="/produkt/{product.id}"
-		class="absolute inset-0 z-0"
-		title="Gå til produkt"
-	></a>
+	<a href="/produkt/{product.id}" class="absolute inset-0 z-0" title="Gå til produkt"></a>
 </div>

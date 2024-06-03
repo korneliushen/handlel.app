@@ -1,5 +1,5 @@
 <script>
-	import { Search, User, Home } from 'lucide-svelte';
+	import { Search, User, Home, Book } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { handlelapp } from '$lib/stores/handlelapp';
 
@@ -37,9 +37,14 @@
 		<div class=" flex flex-1 items-center justify-end gap-4 font-medium">
 			<a href="/">Hjem</a>
 			<a href="/">Produkter</a>
-			<a class=" relative" href="/handlelapp">
-				Handlelapp
-				<p class=" absolute top-[-17px] right-[-10px] border border-red-600 rounded-full text-sm w-6 h-6 place-items-center grid text-red-600 font-bold">{$handlelapp.length}</p>
+			<a
+				class=" relative flex h-10 w-10 items-center justify-center rounded-md bg-mainPurple text-white transition active:scale-95"
+				href="/handlelapp"
+			>
+				<Book />
+				<p class=" absolute mb-1 grid h-4 w-4 place-items-center text-xs font-bold text-white">
+					{$handlelapp.length}
+				</p>
 			</a>
 			<button
 				class=" flex h-10 w-10 items-center justify-center rounded-md bg-mainPurple text-white transition active:scale-95"
@@ -60,10 +65,14 @@
 				<Search size="25px" />
 				<p class=" mt-1 text-xs text-black">Søk</p>
 			</a>
-			<a class=" flex flex-col items-center relative" href="/handlelapp">
+			<a class=" relative flex flex-col items-center" href="/handlelapp">
 				<img class=" h-[25px]" src="/handlelapp.png" alt="" />
 				<p class=" mt-1 text-xs text-black">Handlelapp</p>
-				<p class=" absolute top-[-5px] right-[-5px] rounded-full text-sm w-5 h-5 place-items-center grid text-red-600 font-bold">{$handlelapp.length}</p>
+				<p
+					class=" absolute right-[-5px] top-[-5px] grid h-5 w-5 place-items-center rounded-full text-sm font-bold text-red-600"
+				>
+					{$handlelapp.length}
+				</p>
 			</a>
 			<a class=" flex flex-col items-center" href="/">
 				<User size="25px" />
