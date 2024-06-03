@@ -23,10 +23,10 @@
 				<img class=" max-h-16 max-w-16" src={product.imagelinkxsmall} alt="" />
 			</div>
 			<div>
-				<p class=" text-sm font-medium">{product.title}</p>
+				<p class=" text-xs md:text-sm font-medium">{product.title}</p>
 				<p class=" text-xs text-gray-400">{product.brand || product.vendor}</p>
 				{#if !desktopView}
-					<p class=" text-sm font-medium">{product.prices[0].price} kr</p>
+					<p class=" text-xs md:text-sm font-medium">{product.prices[0].price} kr</p>
 				{/if}
 			</div>
 		</div>
@@ -42,14 +42,14 @@
 			<div
 				class=" rounded-md border border-mainPurple {desktopView
 					? 'h-10 w-32'
-					: ' h-9 w-28'} flex items-center justify-between"
+					: ' h-7 w-20'} flex items-center justify-between"
 			>
 				<button on:click={() => antallProdukt--} class=" flex w-10 items-center justify-center"
-					><Minus size="15px" /></button
+					><Minus size={desktopView ? '15px' : '10px'} /></button
 				>
-				<p>{antallProdukt}</p>
+				<p class=" text-sm md:text-base">{antallProdukt}</p>
 				<button on:click={() => antallProdukt++} class=" flex w-10 items-center justify-center"
-					><Plus size="15px" /></button
+					><Plus size={desktopView ? '15px' : '10px'} /></button
 				>
 			</div>
 			<button
