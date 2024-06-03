@@ -27,7 +27,7 @@
 </script>
 
 <main
-	class=" relative grid w-screen max-w-[600px] grid-cols-1 gap-x-8 gap-y-4 overflow-hidden rounded-lg px-5 lg:max-w-[1200px] lg:grid-cols-2 lg:px-20"
+	class=" relative grid w-screen max-w-[600px] grid-cols-1 gap-x-8 gap-y-4 overflow-hidden rounded-lg px-5 lg:max-w-[1200px] lg:grid-cols-2 lg:px-20 pb-16 sm:pb-0"
 >
 	<div class=" relative flex aspect-square min-h-80 items-center justify-center py-1 lg:w-full">
 		<img src={data.product.imagelinkmedium} alt="Produktbilde" />
@@ -117,7 +117,7 @@
 	</div>
 	<div
 		use:autoAnimate
-		class=" relative overflow-hidden border-t border-borderColor lg:w-full"
+		class=" relative overflow-hidden border-t border-borderColor lg:w-full {data.product.nutritionalcontent ? "mb-0" : "mb-24"}"
 		style="max-height: {lesmer};"
 	>
 		{#if !lesmerBool}
