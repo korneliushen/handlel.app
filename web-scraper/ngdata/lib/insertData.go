@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"math"
 	"os"
 	"reflect"
 	"slices"
@@ -59,18 +58,28 @@ func formatData(productData []ApiProduct, products *[]Product) {
 	// for algolia
 	product.ObjectID = primaryData.Data.Ean
 
-	product.Gtin = primaryData.Data.Ean
-	// for algolia
-	product.ObjectID = primaryData.Data.Ean
-
 	product.Id = primaryData.Data.Ean
-	product.Title = primaryData.Data.Title
-	product.SubTitle = primaryData.Data.Subtitle
-	product.Category = getCorrectCategoryName(primaryData.Data.Category)
-	product.SubCategory = primaryData.Data.SubCategory
-	product.OnSale = primaryData.Data.OnSale
+
+	// legger til alle fields fra ApiProduct som har samme navn som Product
+	vDest := reflect.ValueOf(&product).Elem()
+	vSrc := reflect.ValueOf(&primaryData.Data).Elem()
+	for i := 0; i < vDest.NumField(); i++ {
+		fieldDest := vDest.Field(i)
+		fieldSrc := vSrc.FieldByName(vDest.Type().Field(i).Name)
+
+		if fieldSrc.IsValid() && fieldSrc.Type() == fieldDest.Type() {
+			fieldDest.Set(fieldSrc)
+		}
+	}
+
+	// lager en string for vekt, med value og unit
+	product.Weight = fmt.Sprintf("%v%s", primaryData.Data.Weight, primaryData.Data.WeightMeasurementType)
+
 	// lager hele url-en for bildelinker for ulike størrelser
 	product.ImageLink = fmt.Sprintf("%s%s", "https://bilder.ngdata.no/", primaryData.Data.ImageLink)
+
+	// fikser kategori navn (bruker hard-coda kategori navn for å gjøre ting til samme kategori)
+	product.Category = getCorrectCategoryName(primaryData.Data.Category)
 
 	// lager et array av priser, å gjøre det på denne måten gjør det lettere når dataen skal sendes til database
 	var prices []Price
@@ -90,18 +99,6 @@ func formatData(productData []ApiProduct, products *[]Product) {
 	}
 	slices.SortFunc(prices, priceCmp)
 	product.Prices = prices
-
-	// innhold
-	// vekt kombinerer vekten og typen (g, kg, osv.)
-	product.Weight = fmt.Sprintf("%v%s", primaryData.Data.Weight, primaryData.Data.WeightMeasurementType)
-	product.Description = primaryData.Data.Description
-	product.Unit = primaryData.Data.Unit
-	product.UnitType = primaryData.Data.CompareUnit
-	product.Size = primaryData.Data.Size
-	product.Vendor = primaryData.Data.Vendor
-	product.Brand = primaryData.Data.Brand
-	product.OriginCountry = primaryData.Data.OriginCountry
-	product.Ingredients = primaryData.Data.Ingredients
 
 	// mapper over allergener array som vi fikk fra databasen
 	// i databasen så bestemmer koden hva itemet i arrayen betyr for produktet

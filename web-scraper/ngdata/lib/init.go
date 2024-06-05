@@ -45,7 +45,9 @@ func run() {
 				}
 				apiProducts = append(apiProducts, ApiProduct{Store: store, Data: product.Data, BaseUrl: storeData[store].url})
 			}
+			break
 		}
+		break
 	}
 
 	// mapper over alle produkter vi har fått fra databasen og formatterer dataen i egne structs

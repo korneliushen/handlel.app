@@ -24,66 +24,7 @@ type Products struct {
 	Products []Product `json:"products"`
 }
 
-// produkt data
 type Product struct {
-	ObjectID    string  `json:"objectID"`
-	Id        string  `json:"id"`
-	Title       string  `json:"title"`
-	SubTitle    string  `json:"subtitle"`
-	Category    string  `json:"category"`
-	SubCategory string  `json:"subcategory"`
-	Prices      Prices  `json:"prices"`
-	OnSale      bool    `json:"onsale"`
-	Content     Content `json:"content"`
-	Images      Images  `json:"images"`
-	Gtin        string
-	Title       string
-	SubTitle    string
-	Category    string
-	SubCategory string
-	Prices      Prices
-	OnSale      bool
-	Content     Content
-	Images      Images
-}
-
-// ulik størrelse på bilder
-type Images struct {
-	ImageLinkXSmall string `json:"imagelinkxsmall"`
-	ImageLinkSmall  string `json:"imagelinksmall"`
-	ImageLinkMedium string `json:"imagelinkmedium"`
-	ImageLinkLarge  string `json:"imagelinklarge"`
-	ImageLinkXLarge string `json:"imagelinkxlarge"`
-}
-
-type Prices struct {
-	Prices []Price `json:"prices"`
-}
-
-type Price struct {
-	Store         string  `json:"store"`
-	Price         float64 `json:"price"`
-	OriginalPrice float64 `json:"originalprice"`
-	UnitPrice     float64 `json:"unitprice"`
-	Url           string  `json:"url"`
-}
-
-type Content struct {
-	Description        string
-	Duration           string
-	Unit               string
-	UnitType           string
-	Size               string
-	Vendor             string
-	Brand              string
-	Ingredients        string
-	Storage            string
-	OriginCountry      string
-	Features           string
-	Allergens          string
-	MayContainTracesOf string
-	Weight             string
-	NutritionalContent *NutritionalContent
 	ObjectID           string              `json:"objectID"`
 	Id                 string              `json:"id"`
 	Title              string              `json:"title"`
@@ -165,7 +106,7 @@ type ApiProductData struct {
 	Price                 float64                 `json:"pricePerUnit"`
 	OriginalPrice         float64                 `json:"pricePerUnitOriginal"`
 	ComparePricePerUnit   float64                 `json:"comparePricePerUnit"`
-	CompareUnit           string                  `json:"compareUnit"`
+	UnitType              string                  `json:"compareUnit"`
 	ImageLink             string                  `json:"imagePath"`
 	WeightMeasurementType string                  `json:"measurementType"`
 	Weight                float64                 `json:"measurementValue"`
