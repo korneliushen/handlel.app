@@ -4,6 +4,8 @@ go 1.22.2
 
 require github.com/gocolly/colly v1.2.0
 
+require github.com/algolia/algoliasearch-client-go/v3 v3.31.1 // indirect
+
 require (
 	github.com/PuerkitoBio/goquery v1.5.1 // indirect
 	github.com/andybalholm/cascadia v1.2.0 // indirect
