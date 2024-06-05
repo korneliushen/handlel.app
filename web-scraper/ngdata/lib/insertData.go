@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"math"
 	"reflect"
 	"slices"
 	"strings"
@@ -76,7 +75,12 @@ func formatData(productData []ApiProduct, products *[]Product) {
 			continue
 		}
 		storeMap[product.Store] = true
-		prices.Prices = append(prices.Prices, Price{Store: product.Store, Price: math.Round(product.Data.Price), OriginalPrice: math.Round(product.Data.OriginalPrice), UnitPrice: math.Round(product.Data.ComparePricePerUnit), Url: fmt.Sprintf("%s%s", product.BaseUrl, product.Data.Slug)})
+		prices.Prices = append(prices.Prices, Price{
+			Store:         product.Store,
+			Price:         product.Data.Price,
+			OriginalPrice: product.Data.OriginalPrice,
+			UnitPrice:     product.Data.ComparePricePerUnit,
+			Url:           fmt.Sprintf("%s%s", product.BaseUrl, product.Data.Slug)})
 	}
 
 	// sorterer basert på pris, så det første elementet i arrayet vil være det billigste
