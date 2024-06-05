@@ -24,9 +24,10 @@ type Products struct {
 	Products []Product `json:"products"`
 }
 
+// produkt data
 type Product struct {
 	ObjectID    string  `json:"objectID"`
-	Gtin        string  `json:"gtin"`
+	Id        string  `json:"id"`
 	Title       string  `json:"title"`
 	SubTitle    string  `json:"subtitle"`
 	Category    string  `json:"category"`
@@ -35,6 +36,15 @@ type Product struct {
 	OnSale      bool    `json:"onsale"`
 	Content     Content `json:"content"`
 	Images      Images  `json:"images"`
+	Gtin        string
+	Title       string
+	SubTitle    string
+	Category    string
+	SubCategory string
+	Prices      Prices
+	OnSale      bool
+	Content     Content
+	Images      Images
 }
 
 // ulik størrelse på bilder
@@ -59,6 +69,30 @@ type Price struct {
 }
 
 type Content struct {
+	Description        string
+	Duration           string
+	Unit               string
+	UnitType           string
+	Size               string
+	Vendor             string
+	Brand              string
+	Ingredients        string
+	Storage            string
+	OriginCountry      string
+	Features           string
+	Allergens          string
+	MayContainTracesOf string
+	Weight             string
+	NutritionalContent *NutritionalContent
+	ObjectID           string              `json:"objectID"`
+	Id                 string              `json:"id"`
+	Title              string              `json:"title"`
+	SubTitle           string              `json:"subtitle"`
+	Category           string              `json:"category"`
+	SubCategory        string              `json:"subcategory"`
+	Prices             []Price             `json:"prices"`
+	OnSale             bool                `json:"onsale"`
+	ImageLink          string              `json:"imagelink"`
 	Description        string              `json:"description"`
 	Duration           string              `json:"duration"`
 	Unit               string              `json:"unit"`
@@ -74,6 +108,14 @@ type Content struct {
 	MayContainTracesOf string              `json:"maycontaintracesof"`
 	Weight             string              `json:"weight"`
 	NutritionalContent *NutritionalContent `json:"nutritionalcontent"`
+}
+
+type Price struct {
+	Store         string  `json:"store"`
+	Price         float64 `json:"price"`
+	OriginalPrice float64 `json:"originalprice"`
+	UnitPrice     float64 `json:"unitprice"`
+	Url           string  `json:"url"`
 }
 
 // fields er på norsk her for å kunne matche de med det som kommer fra databasen med reflect
