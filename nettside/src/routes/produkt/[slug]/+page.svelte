@@ -3,6 +3,7 @@
 	import autoAnimate from '@formkit/auto-animate';
 	import { onMount } from 'svelte';
 	import { handlelapp } from '$lib/stores/handlelapp';
+	import type { Price } from '$lib/types/extendedPrisma';
 
 	let antallProdukter = 0;
 	let dropdown = false;
@@ -30,7 +31,7 @@
 	class=" relative grid w-screen max-w-[600px] grid-cols-1 gap-x-8 gap-y-4 overflow-hidden rounded-lg px-5 lg:max-w-[1200px] lg:grid-cols-2 lg:px-20"
 >
 	<div class=" relative flex aspect-square min-h-80 items-center justify-center py-1 lg:w-full">
-		<img src={data.product.imagelinkmedium} alt="Produktbilde" />
+		<img src="{data.product.imagelink}/medium.png" alt="Produktbilde" />
 	</div>
 	<div class=" flex flex-col lg:relative">
 		<div class=" mt-5">
@@ -61,18 +62,18 @@
 			<p class=" text-xl font-bold">Andre butikker</p>
 			{#each data.product?.prices.slice(1) as price}
 				<a
-					href={price.url}
+					href={price?.url}
 					target="_blank"
 					class=" my-1 flex w-full justify-between rounded-md border border-borderColor p-2"
 				>
 					<div class=" flex w-12 items-center">
-						<img class=" mr-3 w-full rounded-md" src="/{price.store}.svg" alt="Butikklogo" />
-						<p class=" font-bold">{price.store[0].toUpperCase() + price.store.substring(1)}</p>
+						<img class=" mr-3 w-full rounded-md" src="/{price?.store}.svg" alt="Butikklogo" />
+						<p class=" font-bold">{price?.store[0].toUpperCase() + price?.store.substring(1)}</p>
 					</div>
 					<div class=" text-end">
 						<p class=" text-lg font-bold">{price.price} kr</p>
 						<p class=" text-sm text-gray-500/60">
-							{price.unitprice || price.price} kr/{data.product.unittype || 'stk'}
+							{price?.unitprice || price?.price} kr/{data.product.unittype || 'stk'}
 						</p>
 					</div>
 				</a>
