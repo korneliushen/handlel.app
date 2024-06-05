@@ -70,7 +70,12 @@ func run() {
 		formatData(sameProduct, products)
 	}
 
+	// legger data inn i neon database og legger til records i algolia
 	insertData(products)
+
+	if err := insertRecords(*products); err != nil {
+		fmt.Printf("Error: %v\n", err)
+	}
 }
 
 func Init() {

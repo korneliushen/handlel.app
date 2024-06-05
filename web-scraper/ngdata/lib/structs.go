@@ -3,50 +3,51 @@ package lib
 // brukt for å få alle kategorier som skal hentes produkter fra
 
 type StoreData struct {
-	Store       string
-	ApiRes      ApiResponse
-	Category    string
-	SubCategory string
+	Store       string      `json:"store"`
+	ApiRes      ApiResponse `json:"apires"`
+	Category    string      `json:"category"`
+	SubCategory string      `json:"subcategory"`
 }
 
 type Categories struct {
-	Categories []Category
+	Categories []Category `json:"categories"`
 }
 
 type Category struct {
-	Name          string
-	Store         string
-	SubCategories []string
+	Name          string   `json:"name"`
+	Store         string   `json:"store"`
+	SubCategories []string `json:"subcategories"`
 }
 
 // produkter som skal bli til json data/lagt inn i database
 type Products struct {
-	Products []Product
+	Products []Product `json:"products"`
 }
 
 type Product struct {
-	Gtin        string
-	Title       string
-	SubTitle    string
-	Category    string
-	SubCategory string
-	Prices      Prices
-	OnSale      bool
-	Content     Content
-	Images      Images
+	ObjectID    string  `json:"objectID"`
+	Gtin        string  `json:"gtin"`
+	Title       string  `json:"title"`
+	SubTitle    string  `json:"subtitle"`
+	Category    string  `json:"category"`
+	SubCategory string  `json:"subcategory"`
+	Prices      Prices  `json:"prices"`
+	OnSale      bool    `json:"onsale"`
+	Content     Content `json:"content"`
+	Images      Images  `json:"images"`
 }
 
 // ulik størrelse på bilder
 type Images struct {
-	ImageLinkXSmall string
-	ImageLinkSmall  string
-	ImageLinkMedium string
-	ImageLinkLarge  string
-	ImageLinkXLarge string
+	ImageLinkXSmall string `json:"imagelinkxsmall"`
+	ImageLinkSmall  string `json:"imagelinksmall"`
+	ImageLinkMedium string `json:"imagelinkmedium"`
+	ImageLinkLarge  string `json:"imagelinklarge"`
+	ImageLinkXLarge string `json:"imagelinkxlarge"`
 }
 
 type Prices struct {
-	Prices []Price
+	Prices []Price `json:"prices"`
 }
 
 type Price struct {
@@ -58,21 +59,21 @@ type Price struct {
 }
 
 type Content struct {
-	Description        string
-	Duration           string
-	Unit               string
-	UnitType           string
-	Size               string
-	Vendor             string
-	Brand              string
-	Ingredients        string
-	Storage            string
-	OriginCountry      string
-	Features           string
-	Allergens          string
-	MayContainTracesOf string
-	Weight             string
-	NutritionalContent *NutritionalContent
+	Description        string              `json:"description"`
+	Duration           string              `json:"duration"`
+	Unit               string              `json:"unit"`
+	UnitType           string              `json:"unittype"`
+	Size               string              `json:"size"`
+	Vendor             string              `json:"vendor"`
+	Brand              string              `json:"brand"`
+	Ingredients        string              `json:"ingredients"`
+	Storage            string              `json:"storage"`
+	OriginCountry      string              `json:"origincountry"`
+	Features           string              `json:"features"`
+	Allergens          string              `json:"allergens"`
+	MayContainTracesOf string              `json:"maycontaintracesof"`
+	Weight             string              `json:"weight"`
+	NutritionalContent *NutritionalContent `json:"nutritionalcontent"`
 }
 
 // fields er på norsk her for å kunne matche de med det som kommer fra databasen med reflect

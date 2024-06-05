@@ -11,6 +11,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/algolia/algoliasearch-client-go/v3/algolia/search"
 	_ "github.com/lib/pq"
 )
 
@@ -53,6 +54,9 @@ func formatData(productData []ApiProduct, products *[]Product) {
 	product := Product{}
 
 	primaryData := productData[0]
+
+	// for algolia
+	product.ObjectID = primaryData.Data.Ean
 
 	product.Gtin = primaryData.Data.Ean
 	product.Title = primaryData.Data.Title
@@ -136,10 +140,12 @@ func formatData(productData []ApiProduct, products *[]Product) {
 }
 
 func insertData(products *[]Product) {
+	// neon
 	db := db()
 	defer db.Close()
 
-	// lager en waitgroup, som venter på goroutines for å bli ferdig før den starter en ny
+	// lager en waitgroup, som venter på goroutines for å bli ferdig før den
+	// starter en ny
 	var wg sync.WaitGroup
 	// limiter hvor mange go routines som kan kjøre om om gangen
 	sem := make(chan struct{}, 4)
@@ -150,13 +156,16 @@ func insertData(products *[]Product) {
 		sem <- struct{}{}
 
 		go func(product Product) {
-			// når funksjonen er ferdig, blir waitgroup instansen ferdig + sem (det som keeper track av hvor mange ting som kan kjøre om gangen) blir oppdatert
+			fmt.Println("Legger inn data for:", product.Title)
+			// når funksjonen er ferdig, blir waitgroup instansen ferdig + sem
+			// (hvor mange ting som kan kjøre om gangen) blir oppdatert
 			defer wg.Done()
 			defer func() { <-sem }()
 
 			// legger til data i databasen
 			if err := query(product, db); err != nil {
-				fmt.Printf("Error inserting data for %s: %v", product.Title, err)
+				fmt.Printf("Error inserting data into neon db for %s: %v",
+					product.Title, err)
 			}
 		}((*products)[i])
 	}
@@ -165,8 +174,6 @@ func insertData(products *[]Product) {
 }
 
 func query(product Product, db *sql.DB) error {
-	fmt.Println("Legger inn data for:", product.Title)
-
 	// gjør om næringsinnhold (type Næringsinnhold struct) til nutritionalContentJson
 	nutritionalContentJson, err := json.Marshal(product.Content.NutritionalContent)
 	if err != nil {
@@ -220,6 +227,20 @@ func query(product Product, db *sql.DB) error {
 	if err != nil {
 		return err
 	}
+
+	return nil
+}
+
+func insertRecords(products []Product) error {
+	// algolia
+	client := search.NewClient("AA8FDXU3JW", "b8ec70b7c4a1d7cd6c7081c8d168fa66")
+	index := client.InitIndex("test")
+
+	res, err := index.SaveObjects(products)
+	if err != nil {
+		return err
+	}
+	res.Wait()
 
 	return nil
 }
