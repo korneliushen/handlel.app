@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"os"
 	"reflect"
 	"slices"
 	"strings"
@@ -233,7 +234,7 @@ func query(product Product, db *sql.DB) error {
 
 func insertRecords(products []Product) error {
 	// algolia
-	client := search.NewClient("AA8FDXU3JW", "b8ec70b7c4a1d7cd6c7081c8d168fa66")
+	client := search.NewClient("AA8FDXU3JW", os.Getenv("ALGOLIA_SECRET"))
 	index := client.InitIndex("test")
 
 	res, err := index.SaveObjects(products)
