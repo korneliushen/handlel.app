@@ -24,7 +24,9 @@ type Products struct {
 	Products []Product
 }
 
+// produkt data
 type Product struct {
+<<<<<<< Updated upstream
 	Gtin        string
 	Title       string
 	SubTitle    string
@@ -73,6 +75,40 @@ type Content struct {
 	MayContainTracesOf string
 	Weight             string
 	NutritionalContent *NutritionalContent
+=======
+	ObjectID           string              `json:"objectID"`
+	Id                 string              `json:"id"`
+	Title              string              `json:"title"`
+	SubTitle           string              `json:"subtitle"`
+	Category           string              `json:"category"`
+	SubCategory        string              `json:"subcategory"`
+	Prices             []Price             `json:"prices"`
+	OnSale             bool                `json:"onsale"`
+	ImageLink          string              `json:"imagelink"`
+	Description        string              `json:"description"`
+	Duration           string              `json:"duration"`
+	Unit               string              `json:"unit"`
+	UnitType           string              `json:"unittype"`
+	Size               string              `json:"size"`
+	Vendor             string              `json:"vendor"`
+	Brand              string              `json:"brand"`
+	Ingredients        string              `json:"ingredients"`
+	Storage            string              `json:"storage"`
+	OriginCountry      string              `json:"origincountry"`
+	Features           string              `json:"features"`
+	Allergens          string              `json:"allergens"`
+	MayContainTracesOf string              `json:"maycontaintracesof"`
+	Weight             string              `json:"weight"`
+	NutritionalContent *NutritionalContent `json:"nutritionalcontent"`
+>>>>>>> Stashed changes
+}
+
+type Price struct {
+	Store         string  `json:"store"`
+	Price         float64 `json:"price"`
+	OriginalPrice float64 `json:"originalprice"`
+	UnitPrice     float64 `json:"unitprice"`
+	Url           string  `json:"url"`
 }
 
 // fields er på norsk her for å kunne matche de med det som kommer fra databasen med reflect
