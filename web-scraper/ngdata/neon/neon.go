@@ -8,7 +8,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/korneliushen/handlel.app/meny/lib"
+	"github.com/korneliushen/handlel.app/meny/ngdata"
 	_ "github.com/lib/pq"
 )
 
@@ -27,7 +27,7 @@ func db() *sql.DB {
 }
 
 // legger til data i neon databasen
-func InsertData(products *[]lib.Product) {
+func InsertData(products *[]ngdata.Product) {
 	// neon
 	db := db()
 	defer db.Close()
@@ -43,7 +43,7 @@ func InsertData(products *[]lib.Product) {
 		wg.Add(1)
 		sem <- struct{}{}
 
-		go func(product lib.Product) {
+		go func(product ngdata.Product) {
 			fmt.Println("Legger inn data for:", product.Title)
 			// når funksjonen er ferdig, blir waitgroup instansen ferdig + sem
 			// (hvor mange ting som kan kjøre om gangen) blir oppdatert
@@ -61,7 +61,7 @@ func InsertData(products *[]lib.Product) {
 	wg.Wait()
 }
 
-func query(product lib.Product, db *sql.DB) error {
+func query(product ngdata.Product, db *sql.DB) error {
 	// gjør om næringsinnhold (type Næringsinnhold struct) til
 	// nutritionalContentJson (basically bare gjør om til json)
 	nutritionalContentJson, err := json.Marshal(product.NutritionalContent)

@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/algolia/algoliasearch-client-go/v3/algolia/search"
-	"github.com/korneliushen/handlel.app/meny/lib"
+	"github.com/korneliushen/handlel.app/meny/ngdata"
 )
 
 // TODO: bare legge til data om det er ny data
@@ -17,7 +17,7 @@ func index() *search.Index {
 }
 
 // legger til data i algolia index
-func InsertRecords(products []lib.Product) error {
+func InsertRecords(products []ngdata.Product) error {
 	fmt.Println("Legger data inn i algolia index")
 	// instanse av index brukt til å interacte med algolia indexen
 	index := index()
