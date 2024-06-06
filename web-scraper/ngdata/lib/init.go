@@ -17,14 +17,17 @@ func run() {
 		getCategories(store, categories)
 	}
 
-	// har produkter som allerede er sjekket i et array, så det ikke blir duplicates av samme produkt (sparer også tid fordi den exiter tidlig)
+	// har produkter som allerede er sjekket i et array, så det ikke blir
+	// duplicates av samme produkt (sparer også tid fordi den exiter tidlig)
 	var checkedGtins []string
 
 	apiProducts := []ApiProduct{}
 
 	for _, category := range *categories {
 		for _, store := range stores {
-			// om kategorien sin butikk og butikken ikke er den samme, er det ikke vits å kjøre request fordi den vil ikke få noe data (og om den får det vil det være duplicate)
+			// om kategorien sin butikk og butikken ikke er den samme, er det ikke
+			// vits å kjøre request fordi den vil ikke få noe data
+			// (og om den får det vil det være duplicate)
 			if category.Store != store {
 				continue
 			}
@@ -32,25 +35,34 @@ func run() {
 			// får data om alle produkter i kategorien
 			res, err := getProducts(store, category.Name)
 			if err != nil {
-				fmt.Printf("Error getting products from %s in category %s: %v\n", store, category, err)
+				fmt.Printf("Error getting products from %s in category %s: %v\n",
+					store, category, err)
 				continue
 			}
 
-			// legger til produktet i apiProducts array som mappes over senere, legger også til Store (for senere bruk)
+			// legger til produktet i apiProducts array som mappes over senere,
+			// legger også til Store (for senere bruk)
 			for _, product := range res {
-				// legger til underkategorier, legger bare til om underkategorien ikke allerede er lagt til
-				// underkategorier er jeg ganske sikker på at er basically helt likt på alle sidene, så det vil ikke være duplicates med forskjellig navn, om det er annerledes må jeg bytte til id approach
+				// legger til underkategorier, om underkategorien ikke er lagt til
+				// underkategorier er jeg ganske sikker på at er basically helt likt
+				// på alle sidene, så det vil ikke være duplicates med forskjellig
+				// navn, om det er annerledes må jeg bytte til id approach
 				if !isIn(product.Data.SubCategory, category.SubCategories) {
-					category.SubCategories = append(category.SubCategories, product.Data.SubCategory)
+					category.SubCategories = append(
+						category.SubCategories, product.Data.SubCategory,
+					)
 				}
-				apiProducts = append(apiProducts, ApiProduct{Store: store, Data: product.Data, BaseUrl: storeData[store].url})
+				apiProducts = append(apiProducts, ApiProduct{
+					Store: store, Data: product.Data, BaseUrl: storeData[store].url,
+				})
 			}
 			break
 		}
 		break
 	}
 
-	// mapper over alle produkter vi har fått fra databasen og formatterer dataen i egne structs
+	// mapper over alle produkter vi har fått fra databasen og formatterer
+	// dataen i egne structs
 	for _, firstProduct := range apiProducts {
 		gtin := firstProduct.Data.Ean
 
@@ -63,13 +75,14 @@ func run() {
 		// finner andre produkter med samme gtin og legger til i et array
 		sameProduct := []ApiProduct{firstProduct}
 		for _, secondProduct := range apiProducts {
-			if gtin == secondProduct.Data.Ean && firstProduct.Store != secondProduct.Store {
+			if gtin == secondProduct.Data.Ean &&
+				firstProduct.Store != secondProduct.Store {
 				sameProduct = append(sameProduct, secondProduct)
 			}
 		}
 
 		// formaterer dataen til alle produkter med samme gtin
-		formatData(sameProduct, products)
+		firstProduct.FormatData(sameProduct, products)
 	}
 
 	// legger data inn i neon database og legger til records i algolia

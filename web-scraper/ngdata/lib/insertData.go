@@ -5,13 +5,11 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"os"
 	"reflect"
 	"slices"
 	"strings"
 	"sync"
 
-	"github.com/algolia/algoliasearch-client-go/v3/algolia/search"
 	_ "github.com/lib/pq"
 )
 
@@ -49,21 +47,19 @@ func getCorrectCategoryName(category string) string {
 	return category
 }
 
-// lager instanser av egne structs med dataen fra fetchProducts
-func formatData(productData []ApiProduct, products *[]Product) {
+// legger en method til i ApiProduct struct så vi kan accesse apiProduct
+func (apiProduct *ApiProduct) FormatData(productData []ApiProduct, products *[]Product) {
 	product := Product{}
 
-	primaryData := productData[0]
-
 	// for algolia
-	product.ObjectID = primaryData.Data.Ean
+	product.ObjectID = apiProduct.Data.Ean
 
-	product.Id = primaryData.Data.Ean
+	product.Id = apiProduct.Data.Ean
 
 	// legger til alle fields fra ApiProduct som har samme navn som Product
 	vDest := reflect.ValueOf(&product).Elem()
-	vSrc := reflect.ValueOf(&primaryData.Data).Elem()
-	for i := 0; i < vDest.NumField(); i++ {
+	vSrc := reflect.ValueOf(&apiProduct.Data).Elem()
+	for i := range vDest.NumField() {
 		fieldDest := vDest.Field(i)
 		fieldSrc := vSrc.FieldByName(vDest.Type().Field(i).Name)
 
@@ -73,13 +69,13 @@ func formatData(productData []ApiProduct, products *[]Product) {
 	}
 
 	// lager en string for vekt, med value og unit
-	product.Weight = fmt.Sprintf("%v%s", primaryData.Data.Weight, primaryData.Data.WeightMeasurementType)
+	product.Weight = fmt.Sprintf("%v%s", apiProduct.Data.Weight, apiProduct.Data.WeightMeasurementType)
 
 	// lager hele url-en for bildelinker for ulike størrelser
-	product.ImageLink = fmt.Sprintf("%s%s", "https://bilder.ngdata.no/", primaryData.Data.ImageLink)
+	product.ImageLink = fmt.Sprintf("%s%s", "https://bilder.ngdata.no/", apiProduct.Data.ImageLink)
 
 	// fikser kategori navn (bruker hard-coda kategori navn for å gjøre ting til samme kategori)
-	product.Category = getCorrectCategoryName(primaryData.Data.Category)
+	product.Category = getCorrectCategoryName(apiProduct.Data.Category)
 
 	// lager et array av priser, å gjøre det på denne måten gjør det lettere når dataen skal sendes til database
 	var prices []Price
@@ -105,7 +101,7 @@ func formatData(productData []ApiProduct, products *[]Product) {
 	// om koden er JA, blir det lagt til i allergens, om det er kan blir det lagt til i mayContainTracesOf
 	var allergens []string
 	var mayContainTracesOf []string
-	for _, allergen := range primaryData.Data.Allergens {
+	for _, allergen := range apiProduct.Data.Allergens {
 		if allergen.Code == "JA" {
 			allergens = append(allergens, allergen.Name)
 		} else if allergen.Code == "KAN" {
@@ -116,7 +112,7 @@ func formatData(productData []ApiProduct, products *[]Product) {
 	product.MayContainTracesOf = strings.Join(mayContainTracesOf, ", ")
 
 	// næringsinnhold
-	nutritionalContentData := primaryData.Data.NutritionalContent
+	nutritionalContentData := apiProduct.Data.NutritionalContent
 
 	// om det ikke er noe næringsinnhold
 	if len(nutritionalContentData) == 0 {
@@ -226,9 +222,9 @@ func query(product Product, db *sql.DB) error {
 }
 
 func insertRecords(products []Product) error {
+	fmt.Println("Legger data inn i algolia index")
 	// algolia
-	client := search.NewClient("AA8FDXU3JW", os.Getenv("ALGOLIA_SECRET"))
-	index := client.InitIndex("test")
+	index := index()
 
 	res, err := index.SaveObjects(products)
 	if err != nil {

@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"log"
 	"os"
+
+	"github.com/algolia/algoliasearch-client-go/v3/algolia/search"
 )
 
 func db() *sql.DB {
@@ -18,6 +20,12 @@ func db() *sql.DB {
 	db.SetMaxIdleConns(10)
 
 	return db
+}
+
+// henter indexen som dataen skal sendes til i algolia
+func index() *search.Index {
+	client := search.NewClient("AA8FDXU3JW", os.Getenv("ALGOLIA_SECRET"))
+	return client.InitIndex("test")
 }
 
 func isIn[T comparable](e T, arr []T) bool {
