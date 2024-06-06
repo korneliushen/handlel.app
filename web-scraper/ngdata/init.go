@@ -1,4 +1,4 @@
-package lib
+package main
 
 import (
 	"fmt"
@@ -6,25 +6,30 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+	"github.com/korneliushen/handlel.app/meny/algolia"
+	"github.com/korneliushen/handlel.app/meny/lib"
+	"github.com/korneliushen/handlel.app/meny/neon"
+	"github.com/korneliushen/handlel.app/meny/ngdata"
 )
 
 func run() {
-	products := &[]Product{}
+	products := &[]lib.Product{}
 
-	categories := &[]Category{}
+	categories := &[]lib.Category{}
 
-	for _, store := range stores {
-		getCategories(store, categories)
+	// henter alle kategorier
+	for _, store := range ngdata.Stores {
+		ngdata.GetCategories(store, categories)
 	}
 
 	// har produkter som allerede er sjekket i et array, så det ikke blir
 	// duplicates av samme produkt (sparer også tid fordi den exiter tidlig)
 	var checkedGtins []string
 
-	apiProducts := []ApiProduct{}
+	apiProducts := []lib.ApiProduct{}
 
 	for _, category := range *categories {
-		for _, store := range stores {
+		for _, store := range ngdata.Stores {
 			// om kategorien sin butikk og butikken ikke er den samme, er det ikke
 			// vits å kjøre request fordi den vil ikke få noe data
 			// (og om den får det vil det være duplicate)
@@ -33,7 +38,7 @@ func run() {
 			}
 
 			// får data om alle produkter i kategorien
-			res, err := getProducts(store, category.Name)
+			res, err := ngdata.GetProducts(store, category.Name)
 			if err != nil {
 				fmt.Printf("Error getting products from %s in category %s: %v\n",
 					store, category, err)
@@ -47,13 +52,13 @@ func run() {
 				// underkategorier er jeg ganske sikker på at er basically helt likt
 				// på alle sidene, så det vil ikke være duplicates med forskjellig
 				// navn, om det er annerledes må jeg bytte til id approach
-				if !isIn(product.Data.SubCategory, category.SubCategories) {
+				if !lib.IsIn(product.Data.SubCategory, category.SubCategories) {
 					category.SubCategories = append(
 						category.SubCategories, product.Data.SubCategory,
 					)
 				}
-				apiProducts = append(apiProducts, ApiProduct{
-					Store: store, Data: product.Data, BaseUrl: storeData[store].url,
+				apiProducts = append(apiProducts, lib.ApiProduct{
+					Store: store, Data: product.Data, BaseUrl: ngdata.StoreInfo[store].Url,
 				})
 			}
 			break
@@ -67,13 +72,13 @@ func run() {
 		gtin := firstProduct.Data.Ean
 
 		// om produktet allerede er sjekket, continue
-		if isIn(gtin, checkedGtins) {
+		if lib.IsIn(gtin, checkedGtins) {
 			continue
 		}
 		checkedGtins = append(checkedGtins, gtin)
 
 		// finner andre produkter med samme gtin og legger til i et array
-		sameProduct := []ApiProduct{firstProduct}
+		sameProduct := []lib.ApiProduct{firstProduct}
 		for _, secondProduct := range apiProducts {
 			if gtin == secondProduct.Data.Ean &&
 				firstProduct.Store != secondProduct.Store {
@@ -86,9 +91,9 @@ func run() {
 	}
 
 	// legger data inn i neon database og legger til records i algolia
-	insertData(products)
+	neon.InsertData(products)
 
-	if err := insertRecords(*products); err != nil {
+	if err := algolia.InsertRecords(*products); err != nil {
 		fmt.Printf("Error: %v\n", err)
 	}
 }
@@ -101,6 +106,7 @@ func Init() {
 	}
 
 	run()
+
 	elapsed := time.Now().Sub(start)
 	fmt.Println("Elapsed: ", elapsed)
 }
