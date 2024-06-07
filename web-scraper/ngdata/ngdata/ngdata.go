@@ -12,45 +12,34 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly"
+	"github.com/korneliushen/handlel.app/meny/lib"
 )
 
-// separerer kategori og sub-kategori
-const BASE_URL = "https://platform-rest-prod.ngdata.no/api/products"
-const OPTIONS = "?page=1&page_size=10000&full_response=true&fieldset=maximal&facets=Category&facet=Categories:"
+//////////////////////////
+///// Category(ies) /////
+////////////////////////
 
-var Stores = [3]string{"meny", "joker", "spar"}
+func (categories *Categories) GetCategories() {
+	for _, store := range stores {
+		c := colly.NewCollector()
 
-// data som trengs rundt-om-kring i applikasjonen, brukes for å kunne reuse funksjoner
-var StoreInfo = map[string]struct {
-	targetClass   string
-	firstCategory string
-	Url           string
-	id            string
-}{
-	"meny":  {targetClass: "li.cw-categories__item", firstCategory: "Frukt & grønt", Url: "https://meny.no/varer/", id: "/1300/7080001150488"},
-	"joker": {targetClass: "li.product-categories__item", firstCategory: "Bakerivarer", Url: "https://joker.no/nettbutikk/varer/", id: "/1220/7080001395933"},
-	"spar":  {targetClass: "li.product-categories__item", firstCategory: "Bakeartikler og kjeks", Url: "https://spar.no/nettbutikk/varer/", id: "/1210/7080001097950"},
-}
+		categoriesStarted := false
 
-func (categories *Categories) GetCategories(store string) {
-	c := colly.NewCollector()
+		c.OnHTML(storeInfo[store].targetClass, func(e *colly.HTMLElement) {
+			categoryName := e.ChildText("a span")
 
-	categoriesStarted := false
+			if categoryName == storeInfo[store].firstCategory {
+				categoriesStarted = true
+			}
 
-	c.OnHTML(StoreInfo[store].targetClass, func(e *colly.HTMLElement) {
-		categoryName := e.ChildText("a span")
+			if categoriesStarted {
+				// lager instans av kategori med alle verdier jeg har til nå
+				categories.Categories = append(categories.Categories, Category{Name: categoryName, Store: store})
+			}
+		})
 
-		if categoryName == StoreInfo[store].firstCategory {
-			categoriesStarted = true
-		}
-
-		if categoriesStarted {
-			// lager instans av kategori med alle verdier jeg har til nå
-			categories.Categories = append(categories.Categories, Category{Name: categoryName, Store: store})
-		}
-	})
-
-	c.Visit(StoreInfo[store].Url)
+		c.Visit(storeInfo[store].Url)
+	}
 }
 
 func (category Category) GetProducts(store string) ([]ApiProduct, error) {
@@ -68,14 +57,20 @@ func (category Category) GetProducts(store string) ([]ApiProduct, error) {
 
 // genererer en url for norgesgruppen api med butikk id, og kategori
 func getUrl(store, category string) string {
-	// bruker QueryEscape for å gjøre at man kan putte kategorien i url-en for fetch requesten
+	// bruker QueryEscape for å gjøre at man kan putte kategorien i url-en
+	// for fetch requesten
 	queryCategory := url.QueryEscape(category)
 
 	// får id fra ids map
-	id := StoreInfo[store].id
+	id := storeInfo[store].id
 
-	// constructer url
-	apiUrl := BASE_URL + id + OPTIONS + queryCategory
+	// constructer url, base url + id-en til butikken + options
+	// (denne kan endres på for annen data) + kategorien (dette kan også endres
+	// på avhengig av options)
+	apiUrl := "https://platform-rest-prod.ngdata.no/api/products" +
+		id +
+		"?page=1&page_size=10000&full_response=true&fieldset=maximal&facets=Category&facet=Categories:" +
+		queryCategory
 
 	return apiUrl
 }
@@ -102,43 +97,57 @@ func fetchProducts(url string) (ApiResponse, error) {
 	return produkter, nil
 }
 
-// temporary løsning til jeg finner ut hvordan vi kan automatisere det
-// lager et array med kategorinavn som er forskjellige, som så blir brukt
-// etterpå for å gjøre alt i samme kategori til samme kategori navn
-// MENY, JOKER, SPAR
-var categoryNames = [...][3]string{
-	// ting som basically kan automatiseres
-	{"Frukt & grønt", "Frukt/Grønt", "Frukt og grønt"},
-	{"Fisk & skalldyr", "Fisk/Skalldyr", "Fisk og skalldyr"},
-	{"Personlige artikler", "Personlige Artikler"},
+//////////////////////////
+///// ApiProduct(s) /////
+////////////////////////
 
-	// ting som er mobbing (må kjøre noe contains greier ig)
-	{"Bakeri", "Bakerivarer", "Brød og bakervarer"},
-	{"Meieri & egg", "Meieriprodukter", "Meieri og egg"},
-	{"Pålegg & frokost", "Frokost/Pålegg", "Pålegg og frokost"},
-	{"Drikke", "Drikkevarer"},
-	{"Dessert og iskrem", "Dessert"},
-	{"Bakevarer og kjeks", "Kaker/Bakevarer", "Bakeartikler og kjeks"},
-	{"Barneprodukter", "Barn"},
-	{"Hus & hjem", "Hus/Hjem Artikler", "Hus og hjem"},
-	{"Snacks & godteri", "Snacks/Godteri", "Snacks og godteri"},
-	{"Dyr", "Dyreprodukter"},
+func (products *ApiProducts) GetProducts(categories Categories) {
+	for _, category := range categories.Categories {
+		for _, store := range stores {
+			// om kategorien sin butikk og butikken ikke er den samme, er det ikke
+			// vits å kjøre request fordi den vil ikke få noe data
+			// (og om den får det vil det være duplicate)
+			if category.Store != store {
+				continue
+			}
+
+			// får data om alle produkter i kategorien
+			res, err := category.GetProducts(store)
+			if err != nil {
+				fmt.Printf("Error getting products from %s in category %s: %v\n",
+					store, category, err)
+				continue
+			}
+
+			// legger til produktet i apiProducts array som mappes over senere,
+			// legger også til Store (for senere bruk)
+			for _, product := range res {
+				// legger til underkategorier, om underkategorien ikke er lagt til
+				// underkategorier er jeg ganske sikker på at er basically helt likt
+				// på alle sidene, så det vil ikke være duplicates med forskjellig
+				// navn, om det er annerledes må jeg bytte til id approach
+				if !lib.IsIn(product.Data.SubCategory, category.SubCategories) {
+					category.SubCategories = append(
+						category.SubCategories, product.Data.SubCategory,
+					)
+				}
+				*products = append(*products, product.Extend(store, storeInfo[store].Url))
+			}
+			break
+		}
+		break
+	}
 }
 
-// bruker slicen av slices over til å gjøre alt til samme kategori navn
-func getCorrectCategoryName(category string) string {
-	for i := range categoryNames {
-		for j := range categoryNames[i] {
-			if categoryNames[i][j] == category {
-				return categoryNames[i][0]
-			}
-		}
-	}
-	return category
+// oppdaterer data i ApiProduct
+func (product ApiProduct) Extend(store, baseUrl string) ApiProduct {
+	product.Store = store
+	product.BaseUrl = baseUrl
+	return product
 }
 
 // legger en method til i ApiProduct struct så vi kan accesse apiProduct
-func (apiProduct *ApiProduct) FormatData(productData []ApiProduct, products *[]Product) {
+func (apiProduct *ApiProduct) FormatData(productData []ApiProduct, products *Products) {
 	product := Product{}
 
 	// for algolia
@@ -240,9 +249,75 @@ func (apiProduct *ApiProduct) FormatData(productData []ApiProduct, products *[]P
 	*products = append(*products, product)
 }
 
-// oppdaterer data i ApiProduct
-func (product ApiProduct) Extend(store, baseUrl string) ApiProduct {
-	product.Store = store
-	product.BaseUrl = baseUrl
-	return product
+// temporary løsning til jeg finner ut hvordan vi kan automatisere det
+// lager et array med kategorinavn som er forskjellige, som så blir brukt
+// etterpå for å gjøre alt i samme kategori til samme kategori navn
+// MENY, JOKER, SPAR
+var categoryNames = [...][3]string{
+	// ting som basically kan automatiseres
+	{"Frukt & grønt", "Frukt/Grønt", "Frukt og grønt"},
+	{"Fisk & skalldyr", "Fisk/Skalldyr", "Fisk og skalldyr"},
+	{"Personlige artikler", "Personlige Artikler"},
+
+	// ting som er mobbing (må kjøre noe contains greier ig)
+	{"Bakeri", "Bakerivarer", "Brød og bakervarer"},
+	{"Meieri & egg", "Meieriprodukter", "Meieri og egg"},
+	{"Pålegg & frokost", "Frokost/Pålegg", "Pålegg og frokost"},
+	{"Drikke", "Drikkevarer"},
+	{"Dessert og iskrem", "Dessert"},
+	{"Bakevarer og kjeks", "Kaker/Bakevarer", "Bakeartikler og kjeks"},
+	{"Barneprodukter", "Barn"},
+	{"Hus & hjem", "Hus/Hjem Artikler", "Hus og hjem"},
+	{"Snacks & godteri", "Snacks/Godteri", "Snacks og godteri"},
+	{"Dyr", "Dyreprodukter"},
+}
+
+// bruker slicen av slices over til å gjøre alt til samme kategori navn
+func getCorrectCategoryName(category string) string {
+	for i := range categoryNames {
+		for j := range categoryNames[i] {
+			if categoryNames[i][j] == category {
+				return categoryNames[i][0]
+			}
+		}
+	}
+	return category
+}
+
+//////////////////////////
+///// Product(s) ////////
+////////////////////////
+
+func (products *Products) Format(apiProducts ApiProducts) {
+	// lagrer alle produkter som allerede har blitt sjekket i et array
+	// da blir det ikke duplicates og vi kan returnere tidlig om produktet
+	// allerede er ferdig
+	var checkedGtins []string
+
+	// mapper over alle produkter vi har fått fra databasen og formatterer
+	// dataen i egne structs
+	for _, firstProduct := range apiProducts {
+		gtin := firstProduct.Data.Ean
+
+		// om produktet allerede er sjekket, skip dette produktet
+		if lib.IsIn(gtin, checkedGtins) {
+			continue
+		}
+		checkedGtins = append(checkedGtins, gtin)
+
+		// finner andre produkter med samme gtin og legger til i et array
+		sameProduct := []ApiProduct{firstProduct}
+
+		for _, secondProduct := range apiProducts {
+			if gtin == secondProduct.Data.Ean &&
+				firstProduct.Store != secondProduct.Store {
+				// legger til produktet i sameProduct array, alle produkter i dette
+				// arrayet sjekkes nå priser legges inn
+				sameProduct = append(sameProduct, secondProduct)
+			}
+		}
+
+		// formaterer dataen til alle produkter med samme gtin
+		firstProduct.FormatData(sameProduct, products)
+	}
 }

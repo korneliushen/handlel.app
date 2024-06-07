@@ -17,7 +17,7 @@ func index() *search.Index {
 }
 
 // legger til data i algolia index
-func InsertRecords(products []ngdata.Product) error {
+func InsertRecords(products ngdata.Products) error {
 	fmt.Println("Legger data inn i algolia index")
 	// instanse av index brukt til å interacte med algolia indexen
 	index := index()

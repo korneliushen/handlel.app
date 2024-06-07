@@ -1,5 +1,21 @@
 package ngdata
 
+// TODO: finne ut hvor jeg skal putte dette
+
+var stores = [3]string{"meny", "joker", "spar"}
+
+// data som trengs rundt-om-kring i applikasjonen, brukes for å kunne reuse funksjoner
+var storeInfo = map[string]struct {
+	targetClass   string
+	firstCategory string
+	Url           string
+	id            string
+}{
+	"meny":  {targetClass: "li.cw-categories__item", firstCategory: "Frukt & grønt", Url: "https://meny.no/varer/", id: "/1300/7080001150488"},
+	"joker": {targetClass: "li.product-categories__item", firstCategory: "Bakerivarer", Url: "https://joker.no/nettbutikk/varer/", id: "/1220/7080001395933"},
+	"spar":  {targetClass: "li.product-categories__item", firstCategory: "Bakeartikler og kjeks", Url: "https://spar.no/nettbutikk/varer/", id: "/1210/7080001097950"},
+}
+
 // structs for kategorier
 type Categories struct {
 	Categories []Category `json:"categories"`
@@ -20,9 +36,7 @@ type StoreData struct {
 }
 
 // produkter som skal bli til json data/lagt inn i database
-type Products struct {
-	Products []Product `json:"products"`
-}
+type Products []Product
 
 type Product struct {
 	ObjectID           string              `json:"objectID"`
@@ -86,6 +100,9 @@ type Hits struct {
 	AmountOfProducts int          `json:"total"`
 	Products         []ApiProduct `json:"hits"`
 }
+
+// type alias for an array of ApiProduct
+type ApiProducts []ApiProduct
 
 type ApiProduct struct {
 	Store   string         `json:"store"`

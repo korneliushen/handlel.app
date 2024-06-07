@@ -27,7 +27,7 @@ func db() *sql.DB {
 }
 
 // legger til data i neon databasen
-func InsertData(products *[]ngdata.Product) {
+func InsertData(products ngdata.Products) {
 	// neon
 	db := db()
 	defer db.Close()
@@ -38,7 +38,7 @@ func InsertData(products *[]ngdata.Product) {
 	// limiter hvor mange go routines som kan kjøre om om gangen
 	sem := make(chan struct{}, 4)
 
-	for i := range *products {
+	for i := range products {
 		// legger til et item i wait groupen
 		wg.Add(1)
 		sem <- struct{}{}
@@ -55,7 +55,7 @@ func InsertData(products *[]ngdata.Product) {
 				fmt.Printf("Error inserting data into neon db for %s: %v",
 					product.Title, err)
 			}
-		}((*products)[i])
+		}(products[i])
 	}
 
 	wg.Wait()
