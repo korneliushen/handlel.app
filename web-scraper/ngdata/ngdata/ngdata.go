@@ -34,7 +34,9 @@ func (categories *Categories) GetCategories() {
 
 			if categoriesStarted {
 				// lager instans av kategori med alle verdier jeg har til nå
-				categories.Categories = append(categories.Categories, Category{Name: categoryName, Store: store})
+				categories.Categories = append(categories.Categories, Category{
+					Name: categoryName, Store: store,
+				})
 			}
 		})
 
