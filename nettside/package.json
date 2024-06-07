@@ -33,6 +33,7 @@
 	"dependencies": {
 		"@formkit/auto-animate": "^0.8.2",
 		"@prisma/client": "^5.14.0",
+		"algoliasearch": "^4.23.3",
 		"lucide-svelte": "^0.378.0"
 	}
 }
