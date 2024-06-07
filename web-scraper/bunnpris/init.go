@@ -1,6 +1,8 @@
-package lib
+package main
 
 import (
+	"bunnpris/test/bunnpris"
+	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -8,11 +10,14 @@ import (
 func run() {
 	token := "wlli2e4n52sjbydqekk2nnki"
 
-	err := getCategories(token)
-	if err != nil {
+	var categories bunnpris.Categories
+	if err := categories.Get(token); err != nil {
 		fmt.Printf("Error getting categories: %v\n", err)
 		return
 	}
+
+	json, _ := json.MarshalIndent(categories, "", "  ")
+	fmt.Println(string(json))
 }
 
 func Init() {

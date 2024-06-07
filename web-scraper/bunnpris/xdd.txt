@@ -1,0 +1,379 @@
+https://nettbutikk.bunnpris.no/Itemgroups.aspx
+[
+  {
+    "Name": "AVISER/BLADER/B\ufffdKER",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D3800%26grpnm%3DAVISER%2FBLADER%2FB%D8KER",
+    "SubCategories": null
+  },
+  {
+    "Name": "BABYPLEIE/BARN/BABYLEKER",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D4100%26grpnm%3DBABYPLEIE%2FBARN%2FBABYLEKER",
+    "SubCategories": null
+  },
+  {
+    "Name": "B\ufffdreposer (Salgsemballasj",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D1915%26grpnm%3DB%E6reposer+%28Salgsemballasj",
+    "SubCategories": null
+  },
+  {
+    "Name": "BAKERIVARER - DYPFRYST",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D6400%26grpnm%3DBAKERIVARER+-+DYPFRYST",
+    "SubCategories": null
+  },
+  {
+    "Name": "BAKERIVARER - LANGTIDSHOLDBARE",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D2000%26grpnm%3DBAKERIVARER+-+LANGTIDSHOLDBARE",
+    "SubCategories": null
+  },
+  {
+    "Name": "BAKEVARER",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D2200%26grpnm%3DBAKEVARER",
+    "SubCategories": null
+  },
+  {
+    "Name": "BARNEMAT",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D4000%26grpnm%3DBARNEMAT",
+    "SubCategories": null
+  },
+  {
+    "Name": "BEKLEDNING",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D4900%26grpnm%3DBEKLEDNING",
+    "SubCategories": null
+  },
+  {
+    "Name": "BORDDEKNING",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D4700%26grpnm%3DBORDDEKNING",
+    "SubCategories": null
+  },
+  {
+    "Name": "BR\ufffdD - FERSK",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D6500%26grpnm%3DBR%D8D+-+FERSK",
+    "SubCategories": null
+  },
+  {
+    "Name": "BR\ufffdD SM\ufffdVARER - FERSKE",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D6600%26grpnm%3DBR%D8D+SM%C5VARER+-+FERSKE",
+    "SubCategories": null
+  },
+  {
+    "Name": "BRUS/MINERALVANN",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D100%26grpnm%3DBRUS%2FMINERALVANN",
+    "SubCategories": null
+  },
+  {
+    "Name": "DEIGER OG FARSER - FERSKE",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D7200%26grpnm%3DDEIGER+OG+FARSER+-+FERSKE",
+    "SubCategories": null
+  },
+  {
+    "Name": "DESSERTER",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D3300%26grpnm%3DDESSERTER",
+    "SubCategories": null
+  },
+  {
+    "Name": "DESSERTER DYPFRYSTE OG ISKREM",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D6300%26grpnm%3DDESSERTER+DYPFRYSTE+OG+ISKREM",
+    "SubCategories": null
+  },
+  {
+    "Name": "DRESSING. KRYDDERSAUSER OG OLJER",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D3200%26grpnm%3DDRESSING.+KRYDDERSAUSER+OG+OLJER",
+    "SubCategories": null
+  },
+  {
+    "Name": "DYRESTELL",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D4800%26grpnm%3DDYRESTELL",
+    "SubCategories": null
+  },
+  {
+    "Name": "EGG",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D1700%26grpnm%3DEGG",
+    "SubCategories": null
+  },
+  {
+    "Name": "ELEKTRISK MATERIELL OG BATTERIER",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D5300%26grpnm%3DELEKTRISK+MATERIELL+OG+BATTERIER",
+    "SubCategories": null
+  },
+  {
+    "Name": "ESSENSER/EKSTRAKTER/GL\ufffdGG/TODD",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D1200%26grpnm%3DESSENSER%2FEKSTRAKTER%2FGL%D8GG%2FTODD",
+    "SubCategories": null
+  },
+  {
+    "Name": "FERDIGMAT - DYPFRYST",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D5900%26grpnm%3DFERDIGMAT+-+DYPFRYST",
+    "SubCategories": null
+  },
+  {
+    "Name": "FERDIGMAT - FERSK",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D7700%26grpnm%3DFERDIGMAT+-+FERSK",
+    "SubCategories": null
+  },
+  {
+    "Name": "FISK - DYPFRYST",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D6000%26grpnm%3DFISK+-+DYPFRYST",
+    "SubCategories": null
+  },
+  {
+    "Name": "FISK BEARBEIDET (SALTET. R\ufffdKT.",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D8000%26grpnm%3DFISK+BEARBEIDET+%28SALTET.+R%D8KT.",
+    "SubCategories": null
+  },
+  {
+    "Name": "FISK FERSK",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D7900%26grpnm%3DFISK+FERSK",
+    "SubCategories": null
+  },
+  {
+    "Name": "FISKEMAT/DELIKATESSER",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D8100%26grpnm%3DFISKEMAT%2FDELIKATESSER",
+    "SubCategories": null
+  },
+  {
+    "Name": "FJ\ufffdRFE - FERSK",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D7100%26grpnm%3DFJ%C6RFE+-+FERSK",
+    "SubCategories": null
+  },
+  {
+    "Name": "FROKOSTPRODUKTER",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D1800%26grpnm%3DFROKOSTPRODUKTER",
+    "SubCategories": null
+  },
+  {
+    "Name": "FRUKT/GR\ufffdNT (Pris pr. stk) ",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D0%26grpnm%3DFRUKT%2FGR%D8NT+%28Pris+pr.+stk%29+%26deptno%3D16",
+    "SubCategories": null
+  },
+  {
+    "Name": "FRUKT/GR\ufffdNT - DYPFRYST",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D6200%26grpnm%3DFRUKT%2FGR%D8NT+-+DYPFRYST",
+    "SubCategories": null
+  },
+  {
+    "Name": "GR\ufffdNNSAKSHERMETIKK",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D2600%26grpnm%3DGR%D8NNSAKSHERMETIKK",
+    "SubCategories": null
+  },
+  {
+    "Name": "HAMB.BR\ufffdD. P\ufffdLSEBR\ufffdD. LOMPER/L",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D6700%26grpnm%3DHAMB.BR%D8D.+P%D8LSEBR%D8D.+LOMPER%2FL",
+    "SubCategories": null
+  },
+  {
+    "Name": "HELSEKOST. VITAMINER",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D3900%26grpnm%3DHELSEKOST.+VITAMINER",
+    "SubCategories": null
+  },
+  {
+    "Name": "HOBBY/KONTOR/NONFOOD DIV.",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D5400%26grpnm%3DHOBBY%2FKONTOR%2FNONFOOD+DIV.",
+    "SubCategories": null
+  },
+  {
+    "Name": "HVETE/WIENERBAKST - FERSK",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D6800%26grpnm%3DHVETE%2FWIENERBAKST+-+FERSK",
+    "SubCategories": null
+  },
+  {
+    "Name": "HYGIENE",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D4400%26grpnm%3DHYGIENE",
+    "SubCategories": null
+  },
+  {
+    "Name": "JUICE/NEKTAR",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D1300%26grpnm%3DJUICE%2FNEKTAR",
+    "SubCategories": null
+  },
+  {
+    "Name": "KAFFE",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D800%26grpnm%3DKAFFE",
+    "SubCategories": null
+  },
+  {
+    "Name": "KAFFE/TE TILBEH\ufffdR",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D1000%26grpnm%3DKAFFE%2FTE+TILBEH%D8R",
+    "SubCategories": null
+  },
+  {
+    "Name": "KJEKS",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D2100%26grpnm%3DKJEKS",
+    "SubCategories": null
+  },
+  {
+    "Name": "KJ\ufffdTT - DYPFRYST",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D5800%26grpnm%3DKJ%D8TT+-+DYPFRYST",
+    "SubCategories": null
+  },
+  {
+    "Name": "KJ\ufffdTT - FERSK",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D7000%26grpnm%3DKJ%D8TT+-+FERSK",
+    "SubCategories": null
+  },
+  {
+    "Name": "KJ\ufffdTTP\ufffdLEGG/POSTEIER",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D7500%26grpnm%3DKJ%D8TTP%C5LEGG%2FPOSTEIER",
+    "SubCategories": null
+  },
+  {
+    "Name": "KOMMUNIKASJON/AUDIO-VISUELT UTSTYR",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D5500%26grpnm%3DKOMMUNIKASJON%2FAUDIO-VISUELT+UTSTYR",
+    "SubCategories": null
+  },
+  {
+    "Name": "KRYDDERVARER",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D3100%26grpnm%3DKRYDDERVARER",
+    "SubCategories": null
+  },
+  {
+    "Name": "LEGEMIDLER RESEPTFRIE",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D8700%26grpnm%3DLEGEMIDLER+RESEPTFRIE",
+    "SubCategories": null
+  },
+  {
+    "Name": "MELKEPRODUKTER",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D1500%26grpnm%3DMELKEPRODUKTER",
+    "SubCategories": null
+  },
+  {
+    "Name": "MIDDAGSHERMETIKK",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D2500%26grpnm%3DMIDDAGSHERMETIKK",
+    "SubCategories": null
+  },
+  {
+    "Name": "MIDDAGSRETTER OG TILBEH\ufffdR. T\ufffdR",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D2700%26grpnm%3DMIDDAGSRETTER+OG+TILBEH%D8R.+T%D8R",
+    "SubCategories": null
+  },
+  {
+    "Name": "NON-FOOD",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D9400%26grpnm%3DNON-FOOD",
+    "SubCategories": null
+  },
+  {
+    "Name": "\ufffdL",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D200%26grpnm%3D%D8L",
+    "SubCategories": null
+  },
+  {
+    "Name": "OST",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D7800%26grpnm%3DOST",
+    "SubCategories": null
+  },
+  {
+    "Name": "P\ufffdLEGG. S\ufffdT -OG HERMETISK",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D1900%26grpnm%3DP%C5LEGG.+S%D8T+-OG+HERMETISK",
+    "SubCategories": null
+  },
+  {
+    "Name": "PAPIR. PLAST. FOLIE",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D4600%26grpnm%3DPAPIR.+PLAST.+FOLIE",
+    "SubCategories": null
+  },
+  {
+    "Name": "PASTAPRODUKTER. T\ufffdRR",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D2400%26grpnm%3DPASTAPRODUKTER.+T%D8RR",
+    "SubCategories": null
+  },
+  {
+    "Name": "P\ufffdLSER",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D7300%26grpnm%3DP%D8LSER",
+    "SubCategories": null
+  },
+  {
+    "Name": "RISPRODUKTER. T\ufffdRR",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D2300%26grpnm%3DRISPRODUKTER.+T%D8RR",
+    "SubCategories": null
+  },
+  {
+    "Name": "SAFT/LESKEDRIKKER",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D1400%26grpnm%3DSAFT%2FLESKEDRIKKER",
+    "SubCategories": null
+  },
+  {
+    "Name": "SALATER - FERSKE",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D7600%26grpnm%3DSALATER+-+FERSKE",
+    "SubCategories": null
+  },
+  {
+    "Name": "SANITETSARTIKLER",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D4300%26grpnm%3DSANITETSARTIKLER",
+    "SubCategories": null
+  },
+  {
+    "Name": "SAUSER OG BULJONG",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D3000%26grpnm%3DSAUSER+OG+BULJONG",
+    "SubCategories": null
+  },
+  {
+    "Name": "SJOKOLADE",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D3400%26grpnm%3DSJOKOLADE",
+    "SubCategories": null
+  },
+  {
+    "Name": "SJOKOLADEDRIKKER",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D1100%26grpnm%3DSJOKOLADEDRIKKER",
+    "SubCategories": null
+  },
+  {
+    "Name": "SKALLDYR/SKJELL - DYPFRYST",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D6100%26grpnm%3DSKALLDYR%2FSKJELL+-+DYPFRYST",
+    "SubCategories": null
+  },
+  {
+    "Name": "SKALLDYR/SKJELL - FERSKE",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D8200%26grpnm%3DSKALLDYR%2FSKJELL+-+FERSKE",
+    "SubCategories": null
+  },
+  {
+    "Name": "SM\ufffdR MARGARIN FETT",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D1600%26grpnm%3DSM%D8R+MARGARIN+FETT",
+    "SubCategories": null
+  },
+  {
+    "Name": "SNACKS",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D3600%26grpnm%3DSNACKS",
+    "SubCategories": null
+  },
+  {
+    "Name": "SPEKEVARER",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D7400%26grpnm%3DSPEKEVARER",
+    "SubCategories": null
+  },
+  {
+    "Name": "SUKKERVARER",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D3500%26grpnm%3DSUKKERVARER",
+    "SubCategories": null
+  },
+  {
+    "Name": "SUPPER",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D2900%26grpnm%3DSUPPER",
+    "SubCategories": null
+  },
+  {
+    "Name": "TACO / ETNISK",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D2800%26grpnm%3DTACO+%2F+ETNISK",
+    "SubCategories": null
+  },
+  {
+    "Name": "TE",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D900%26grpnm%3DTE",
+    "SubCategories": null
+  },
+  {
+    "Name": "TEKNISK KJEMISK",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D4500%26grpnm%3DTEKNISK+KJEMISK",
+    "SubCategories": null
+  },
+  {
+    "Name": "TEKSTILER",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D9600%26grpnm%3DTEKSTILER",
+    "SubCategories": null
+  },
+  {
+    "Name": "VASK. RENGJ\ufffdRING. HUSPLEIE",
+    "Link": "%2Fitemgrouplist.aspx%3Fitemgrpno%3D4200%26grpnm%3DVASK.+RENGJ%D8RING.+HUSPLEIE",
+    "SubCategories": null
+  }
+]
+Elapsed: 182.677875ms

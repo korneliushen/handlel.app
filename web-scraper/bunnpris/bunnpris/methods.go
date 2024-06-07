@@ -1,6 +1,8 @@
-package api
+package bunnpris
 
 import (
+	"bytes"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/cookiejar"
@@ -10,11 +12,13 @@ import (
 )
 
 // TODO: bruke riktige status codes
+// TODO: flytte til egen api/methods/req folder (må fikse import cycle problemer først)
 
 const BASE_URL = "https://nettbutikk.bunnpris.no/"
 
 func POST(token, endpoint string) Response {
 	apiUrl := BASE_URL + endpoint
+	fmt.Println(apiUrl)
 	// gjør klar requesten med NewRequest som tar inn method, url og body.
 	// body trengs ikke så er satt til nil
 	req, err := http.NewRequest("POST", apiUrl, nil)
@@ -22,6 +26,10 @@ func POST(token, endpoint string) Response {
 		return Response{Message: "Error preparing request: " + err.Error(),
 			StatusCode: http.StatusInternalServerError}
 	}
+
+	// legger til Content-Type: text/html; charset=iso-8859-1
+	// det var det postman brukte når den fikk valid responses
+	req.Header.Add("Content-Type", "text/html; charset=iso-8859-1")
 
 	// lager jar med cookies
 	// jar har en SetCookies funksjon som tar inn en url med type *url.URL,
@@ -70,8 +78,8 @@ func POST(token, endpoint string) Response {
 			StatusCode: res.StatusCode}
 	}
 
-	// responses er i html, så parser bodyen til *html.Node
-	html, err := html.Parse(res.Body)
+	// responses er i node, så parser bodyen til *node.Node
+	node, err := html.Parse(bytes.NewReader(body))
 	if err != nil {
 		return Response{Message: "Error parsing html: " + err.Error(),
 			StatusCode: http.StatusInternalServerError}
@@ -80,5 +88,5 @@ func POST(token, endpoint string) Response {
 	// returnerer dataen
 	return Response{Message: "Success",
 		StatusCode: http.StatusOK,
-		Data:       ResponseData{HTML: html}}
+		Data:       ResponseData{HTML: node}}
 }
