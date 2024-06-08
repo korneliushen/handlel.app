@@ -2,16 +2,19 @@ package main
 
 import (
 	"bunnpris/test/bunnpris"
+	"context"
 	"encoding/json"
 	"fmt"
 	"time"
 )
 
 func run() {
+	ctx := context.Background()
+
 	token := "wlli2e4n52sjbydqekk2nnki"
 
 	var categories bunnpris.Categories
-	if err := categories.Get(token); err != nil {
+	if err := categories.Get(ctx, token); err != nil {
 		fmt.Printf("Error getting categories: %v\n", err)
 		return
 	}
@@ -25,5 +28,5 @@ func Init() {
 
 	run()
 
-	fmt.Println("Elapsed:", time.Now().Sub(start))
+	fmt.Println("Elapsed:", time.Since(start))
 }
