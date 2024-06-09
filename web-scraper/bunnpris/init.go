@@ -19,7 +19,13 @@ func run() {
 		return
 	}
 
-	json, _ := json.MarshalIndent(categories, "", "  ")
+	var products bunnpris.Products
+	for _, category := range categories {
+		products.Get(ctx, token, category.Link)
+	}
+
+	json, _ := json.MarshalIndent(products, "", "  ")
+
 	fmt.Println(string(json))
 }
 

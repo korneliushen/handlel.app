@@ -3,7 +3,8 @@ package bunnpris
 import (
 	"fmt"
 	"net/http"
-	"net/url"
+	"strconv"
+	"strings"
 
 	"golang.org/x/net/html"
 )
@@ -48,7 +49,7 @@ func (data Response) IsError() bool {
 // TODO: hva man vil returnere (element, type osv.) (nå er det bare href og title)
 // legger til en method til Response struct som parser html og returnerer
 // alle instanser av et element
-func (data Response) ParseHTML() Categories {
+func (data Response) GetCategories() Categories {
 	var categories Categories
 
 	var crawler func(*html.Node)
@@ -67,7 +68,7 @@ func (data Response) ParseHTML() Categories {
 				}
 				if attr.Key == "href" {
 					// bruker queryescape for å kunne bruke linken i en url
-					href = url.QueryEscape(attr.Val)
+					href = attr.Val
 				}
 			}
 
@@ -93,4 +94,77 @@ func (data Response) ParseHTML() Categories {
 	crawler(data.Data.HTML)
 
 	return categories
+}
+
+func (data Response) GetProducts() Products {
+	var products Products
+
+	// Definerer en funksjon som går gjennom base noden
+	var crawler func(*html.Node)
+	crawler = func(node *html.Node) {
+		// sjekker om node-en er en ElementNode
+		if node.Type == html.ElementNode {
+			product := Product{}
+
+			// Mapper over alle attributter elementet har
+			// Om attr sin value er products-container, kjøres en ny funksjon
+			// på alle child elements
+			for _, attr := range node.Attr {
+				if attr.Key == "class" && attr.Val == "products-container" {
+					// Definerer ny funksjon som henter data om produktet
+					var traverseChildren func(*html.Node)
+					traverseChildren = func(child *html.Node) {
+						if child.Type == html.ElementNode {
+							for _, attr := range child.Attr {
+								// Switch statement som sjekker verdien til attributten
+								// Om den har values som passer til elementer med data vi vil
+								// ha, lagres dataen i product (instansen av Product)
+								switch attr.Val {
+								case "productImage":
+									product.ImageLink = child.FirstChild.Attr[5].Val
+								case "lblName":
+									product.Name = child.FirstChild.Data
+									product.Link = child.Parent.Attr[1].Val
+									// Henter gtin fra linken (henter fra itemno search paramen
+									// ved å splitte 2 ganger)
+									product.Gtin = strings.Split(strings.Split(product.Link, "itemno=")[1], "&")[0]
+								case "nPrice priceSymbolBefore priceSymbolAfter":
+									price := child.FirstChild.Data
+									priceFloat, err := strconv.ParseFloat(strings.TrimSpace(price), 64)
+									if err != nil {
+										fmt.Printf("Couldnt convert string to float: %s", err.Error())
+										continue
+									}
+									product.Price = priceFloat
+								}
+							}
+						}
+
+						// Kjører funksjonen for hvert child for å gå gjennom hele tre-et
+						for c := child.FirstChild; c != nil; c = c.NextSibling {
+							traverseChildren(c)
+						}
+					}
+
+					// Kjører traverseChildren når en produkt er funnet
+					for child := node.FirstChild; child != nil; child = child.NextSibling {
+						traverseChildren(child)
+					}
+
+					// Legger til produktet som har blitt funnet i products arrayet
+					products = append(products, product)
+				}
+			}
+		}
+
+		// går gjennom html-noden og så går til sibling
+		for child := node.FirstChild; child != nil; child = child.NextSibling {
+			crawler(child)
+		}
+	}
+
+	// kjører crawler på base-noden
+	crawler(data.Data.HTML)
+
+	return products
 }

@@ -2,11 +2,13 @@ package bunnpris
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"time"
 
 	"golang.org/x/net/html"
 )
@@ -14,9 +16,11 @@ import (
 // TODO: bruke riktige status codes
 // TODO: flytte til egen api/methods/req folder (må fikse import cycle problemer først)
 
-const BASE_URL = "https://nettbutikk.bunnpris.no/"
+const BASE_URL = "https://nettbutikk.bunnpris.no"
 
-func POST(token, endpoint string) Response {
+func POST(ctx context.Context, token, endpoint string) Response {
+	// lager en url som requests skal sendes til ved å kombinere base url og
+	// endpoint vi får som arg
 	apiUrl := BASE_URL + endpoint
 	fmt.Println(apiUrl)
 	// gjør klar requesten med NewRequest som tar inn method, url og body.
@@ -54,14 +58,53 @@ func POST(token, endpoint string) Response {
 	cookies := []*http.Cookie{{Name: "ASP.NET_SessionId", Value: token}}
 	jar.SetCookies(parsedUrl, cookies)
 
+	// Implementerer en timeout, etter 10 sekunder vil funksjonen time out
+	// og returnere en error (da er det enten noe feil med api-en, eller
+	// internettet er så dårlig at ingenting vil funke)
+	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
+	defer cancel()
+
+	// Lager en channel som holder en value med type Response, som vil bli
+	// returnert fra api kallet
+	reschan := make(chan *http.Response)
+
 	// lager en http client med jar så cookies blir sendt med requesten
 	// og kjører requesten
 	client := &http.Client{Jar: jar}
-	res, err := client.Do(req)
-	if err != nil {
-		return Response{Message: "Error executing request: " + err.Error(),
-			StatusCode: http.StatusInternalServerError}
+
+	// Kjører requesten i en go func, så vi kan sjekke om den er timed out
+	// eller returnert en value
+	go func() {
+		// gjør en post request til /Itemgroups.aspx
+		res, _ := client.Do(req)
+		reschan <- res
+	}()
+
+	// Lager en variabel som responsen fra api-en blir lagret i inni for loopen
+	var res *http.Response
+
+	// Variabel som sjekker om respons har kommet fra databasen
+	// Om done blir gjort om til true, vil for loopen breake og res vil ha en
+	// verdi
+	done := false
+
+	// Sjekker om funksjonen har tima ut, om den har det returneres en error
+	// Om den ikke har tima ut, får res verdien til reschan og done blir true
+	// og funksjonen breaker
+	for {
+		if done {
+			break
+		}
+		select {
+		case <-ctx.Done():
+			return Response{
+				Message:    "Function timed out fetching from bunnpris api",
+				StatusCode: http.StatusInternalServerError}
+		case res = <-reschan:
+			done = true
+		}
 	}
+	// kan kjøre defer close nå som res har en verdi
 	defer res.Body.Close()
 
 	// leser body responsen og lagrer i body variabel, dette blir brukt
