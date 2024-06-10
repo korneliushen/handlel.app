@@ -28,3 +28,20 @@ Denne funksjonen må ta inn et argument med type *model.ApiProducts
 Kjør funksjonen i main.go og gi apiProducts som argument.
 
 Om dataen du henter er formatert som model.ApiProducts, skal det funke av seg selv og dataen skal legges til.
+
+
+#### Fil struktur
+```js
+~/web-scraper/
+├── algolia // funksjoner som interacter med algolia
+├── neon // funksjoner som interacter med neon
+├── lib // dir for funksjoner som skal brukes flere steder og har ganske basic funksjonalitet ig
+├── model // dir for felles structs (produkter og kategorier)
+├── ngdata/bunnpris/oda/osv. // scrapere av ulike butikker
+├── .gitignore // no leaking
+├── Dockerfile // docker (funker)
+├── README.md // det du leser rn
+├── go.mod
+├── go.sum
+└── main.go // entry
+```
