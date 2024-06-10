@@ -12,11 +12,7 @@ model products {
   id                 String   @id @db.VarChar(255)
   title              String   @db.VarChar(255)
   subtitle           String?  @db.VarChar(255)
-  imagelinkxsmall    String?  @db.VarChar(255)
-  imagelinksmall     String?  @db.VarChar(255)
-  imagelinkmedium    String?  @db.VarChar(255)
-  imagelinklarge     String?  @db.VarChar(255)
-  imagelinkxlarge    String?  @db.VarChar(255)
+  imagelink          String?  @db.VarChar(255)
   category           String   @db.VarChar(255)
   subcategory        String?  @db.VarChar(255)
   onsale             Boolean?

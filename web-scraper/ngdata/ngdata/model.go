@@ -1,52 +1,68 @@
-package lib
+package ngdata
 
-// brukt for å få alle kategorier som skal hentes produkter fra
+// TODO: finne ut hvor jeg skal putte dette
 
-type StoreData struct {
-	Store       string
-	ApiRes      ApiResponse
-	Category    string
-	SubCategory string
+var stores = [3]string{"meny", "joker", "spar"}
+
+// data som trengs rundt-om-kring i applikasjonen, brukes for å kunne reuse funksjoner
+var storeInfo = map[string]struct {
+	targetClass   string
+	firstCategory string
+	Url           string
+	id            string
+}{
+	"meny":  {targetClass: "li.cw-categories__item", firstCategory: "Frukt & grønt", Url: "https://meny.no/varer/", id: "/1300/7080001150488"},
+	"joker": {targetClass: "li.product-categories__item", firstCategory: "Bakerivarer", Url: "https://joker.no/nettbutikk/varer/", id: "/1220/7080001395933"},
+	"spar":  {targetClass: "li.product-categories__item", firstCategory: "Bakeartikler og kjeks", Url: "https://spar.no/nettbutikk/varer/", id: "/1210/7080001097950"},
 }
 
+// structs for kategorier
 type Categories struct {
-	Categories []Category
+	Categories []Category `json:"categories"`
 }
 
 type Category struct {
-	Name          string
-	Store         string
-	SubCategories []string
+	Name          string   `json:"name"`
+	Store         string   `json:"store"`
+	SubCategories []string `json:"subcategories"`
+}
+
+// brukt for å få alle kategorier som skal hentes produkter fra
+type StoreData struct {
+	Store       string      `json:"store"`
+	ApiRes      ApiResponse `json:"apires"`
+	Category    string      `json:"category"`
+	SubCategory string      `json:"subcategory"`
 }
 
 // produkter som skal bli til json data/lagt inn i database
-type Products struct {
-	Products []Product
-}
+type Products []Product
 
 type Product struct {
-	Gtin        string
-	Title       string
-	SubTitle    string
-	Category    string
-	SubCategory string
-	Prices      Prices
-	OnSale      bool
-	Content     Content
-	Images      Images
-}
-
-// ulik størrelse på bilder
-type Images struct {
-	ImageLinkXSmall string
-	ImageLinkSmall  string
-	ImageLinkMedium string
-	ImageLinkLarge  string
-	ImageLinkXLarge string
-}
-
-type Prices struct {
-	Prices []Price
+	ObjectID           string              `json:"objectID"`
+	Id                 string              `json:"id"`
+	Title              string              `json:"title"`
+	SubTitle           string              `json:"subtitle"`
+	Category           string              `json:"category"`
+	SubCategory        string              `json:"subcategory"`
+	Prices             []Price             `json:"prices"`
+	OnSale             bool                `json:"onsale"`
+	ImageLink          string              `json:"imagelink"`
+	Description        string              `json:"description"`
+	Duration           string              `json:"duration"`
+	Unit               string              `json:"unit"`
+	UnitType           string              `json:"unittype"`
+	Size               string              `json:"size"`
+	Vendor             string              `json:"vendor"`
+	Brand              string              `json:"brand"`
+	Ingredients        string              `json:"ingredients"`
+	Storage            string              `json:"storage"`
+	OriginCountry      string              `json:"origincountry"`
+	Features           string              `json:"features"`
+	Allergens          string              `json:"allergens"`
+	MayContainTracesOf string              `json:"maycontaintracesof"`
+	Weight             string              `json:"weight"`
+	NutritionalContent *NutritionalContent `json:"nutritionalcontent"`
 }
 
 type Price struct {
@@ -55,24 +71,6 @@ type Price struct {
 	OriginalPrice float64 `json:"originalprice"`
 	UnitPrice     float64 `json:"unitprice"`
 	Url           string  `json:"url"`
-}
-
-type Content struct {
-	Description        string
-	Duration           string
-	Unit               string
-	UnitType           string
-	Size               string
-	Vendor             string
-	Brand              string
-	Ingredients        string
-	Storage            string
-	OriginCountry      string
-	Features           string
-	Allergens          string
-	MayContainTracesOf string
-	Weight             string
-	NutritionalContent *NutritionalContent
 }
 
 // fields er på norsk her for å kunne matche de med det som kommer fra databasen med reflect
@@ -103,6 +101,9 @@ type Hits struct {
 	Products         []ApiProduct `json:"hits"`
 }
 
+// type alias for an array of ApiProduct
+type ApiProducts []ApiProduct
+
 type ApiProduct struct {
 	Store   string         `json:"store"`
 	BaseUrl string         `json:"base_url"`
@@ -122,7 +123,7 @@ type ApiProductData struct {
 	Price                 float64                 `json:"pricePerUnit"`
 	OriginalPrice         float64                 `json:"pricePerUnitOriginal"`
 	ComparePricePerUnit   float64                 `json:"comparePricePerUnit"`
-	CompareUnit           string                  `json:"compareUnit"`
+	UnitType              string                  `json:"compareUnit"`
 	ImageLink             string                  `json:"imagePath"`
 	WeightMeasurementType string                  `json:"measurementType"`
 	Weight                float64                 `json:"measurementValue"`

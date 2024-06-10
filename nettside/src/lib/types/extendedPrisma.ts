@@ -5,7 +5,7 @@ export type ExtendedProduct = products & {
 	nutritionalcontent: NutritionalContent;
 };
 
-type Price = {
+export type Price = {
 	url: string;
 	price: number;
 	store: string;
