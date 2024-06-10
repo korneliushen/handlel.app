@@ -11,7 +11,7 @@
 		class="flex h-[256px] w-full items-center justify-center rounded-md bg-gray-300 md:h-96 md:w-[1200px]"
 	/>
 </div>
-<section class="flex flex-col items-center gap-y-3">
+<section class="flex max-w-[100vw] flex-col items-center gap-y-3">
 	{#await data.streamed.products}
 		<div class="space-y-1 p-1 md:p-4">
 			<div title="Gå til kategori" class="flex items-center gap-2">
