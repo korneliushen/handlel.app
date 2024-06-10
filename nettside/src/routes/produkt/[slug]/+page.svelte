@@ -39,7 +39,7 @@
 			>
 			<div class=" mt-2 flex justify-between">
 				<p class=" text-lg text-gray-500/60">{data.product?.vendor}</p>
-				<div class=" flex items-center">
+				<div class=" w-1/2 flex items-center justify-end">
 					<a target="_blank" href={data.product?.prices[0].url}
 						><img
 							class=" mr-4 h-12 rounded-md"
@@ -48,9 +48,9 @@
 						/></a
 					>
 					<div class=" text-end">
-						<p class=" text-2xl font-bold text-mainPurple">{data.product?.prices[0].price} kr</p>
+						<p class=" text-2xl font-bold text-mainPurple">{data.product?.prices[0].price.toFixed(2)} kr</p>
 						<p class=" text-lg text-gray-500/60">
-							{data.product?.prices[0].unitprice || data.product?.prices[0].price} kr/{data.product
+							{data.product?.prices[0].unitprice.toFixed(2) || data.product?.prices[0].price.toFixed(2)} kr/{data.product
 								?.unittype || 'stk'}
 						</p>
 					</div>
@@ -70,9 +70,9 @@
 						<p class=" font-bold">{price.store[0].toUpperCase() + price.store.substring(1)}</p>
 					</div>
 					<div class=" text-end">
-						<p class=" text-lg font-bold">{price.price} kr</p>
+						<p class=" text-lg font-bold">{price.price.toFixed(2)} kr</p>
 						<p class=" text-sm text-gray-500/60">
-							{price.unitprice || price.price} kr/{data.product.unittype || 'stk'}
+							{price.unitprice.toFixed(2) || price.price.toFixed(2)} kr/{data.product.unittype || 'stk'}
 						</p>
 					</div>
 				</a>

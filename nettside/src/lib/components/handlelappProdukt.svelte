@@ -28,16 +28,16 @@
 				<p class=" text-xs md:text-sm font-medium">{product.title}</p>
 				<p class=" text-xs text-gray-400">{product.brand || product.vendor}</p>
 				{#if !desktopView}
-					<p class=" text-xs md:text-sm font-medium">{product.prices[0].price} kr</p>
+					<p class=" text-xs md:text-sm font-medium">{product.prices[0].price.toFixed(2)} kr</p>
 				{/if}
 			</div>
 		</div>
 		<div class=" mr-4 flex h-full items-center">
 			{#if desktopView}
 				<div class=" mr-3 text-end">
-					<p class=" font-medium">{product.prices[0].price} kr</p>
+					<p class=" font-medium">{product.prices[0].price.toFixed(2)} kr</p>
 					<p class=" text-xs font-medium text-gray-400">
-						{product.prices[0].unitprice || product.prices[0].price} kr/{product.unittype || 'stk'}
+						{product.prices[0].unitprice.toFixed(2) || product.prices[0].price.toFixed(2)} kr/{product.unittype || 'stk'}
 					</p>
 				</div>
 			{/if}

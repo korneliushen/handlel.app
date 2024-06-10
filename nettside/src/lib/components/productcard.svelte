@@ -35,9 +35,9 @@
 		</div>
 		<div class="mt-1 flex justify-between px-2">
 			<div class="w-fit space-y-0">
-				<p class="font-semibold">{product.prices[0].price} kr</p>
+				<p class="font-semibold">{product.prices[0].price.toFixed(2)} kr</p>
 				<p class="border-t border-gray-500/60 text-sm text-gray-500/60">
-					{product.prices[0].unitprice || product.prices[0].price} kr/{product.unittype || 'stk'}
+					{product.prices[0].unitprice.toFixed(2) || product.prices[0].price.toFixed(2)} kr/{product.unittype || 'stk'}
 				</p>
 			</div>
 			<button
