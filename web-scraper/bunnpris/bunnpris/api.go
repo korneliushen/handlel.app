@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/korneliushen/handlel.app/scraper/model"
 	"golang.org/x/net/html"
 )
 
@@ -96,15 +97,13 @@ func (data Response) GetCategories() Categories {
 	return categories
 }
 
-func (data Response) GetProducts() Products {
-	var products Products
-
+func (data Response) GetProducts(apiProducts *model.ApiProducts) {
 	// Definerer en funksjon som går gjennom base noden
 	var crawler func(*html.Node)
 	crawler = func(node *html.Node) {
 		// sjekker om node-en er en ElementNode
 		if node.Type == html.ElementNode {
-			product := Product{}
+			product := model.ApiProduct{Store: "bunnpris", BaseUrl: ""}
 
 			// Mapper over alle attributter elementet har
 			// Om attr sin value er products-container, kjøres en ny funksjon
@@ -121,13 +120,14 @@ func (data Response) GetProducts() Products {
 								// ha, lagres dataen i product (instansen av Product)
 								switch attr.Val {
 								case "productImage":
-									product.ImageLink = child.FirstChild.Attr[5].Val
+									product.Data.ImageLink = child.FirstChild.Attr[5].Val
 								case "lblName":
-									product.Name = child.FirstChild.Data
-									product.Link = child.Parent.Attr[1].Val
+									product.Data.Title = child.FirstChild.Data
+									product.Data.Slug = child.Parent.Attr[1].Val
 									// Henter gtin fra linken (henter fra itemno search paramen
 									// ved å splitte 2 ganger)
-									product.Gtin = strings.Split(strings.Split(product.Link, "itemno=")[1], "&")[0]
+									product.Data.Ean = strings.Split(strings.Split(product.Data.Slug, "itemno=")[1], "&")[0]
+									fmt.Println(product.Data.Title, product.Data.Ean)
 								case "nPrice priceSymbolBefore priceSymbolAfter":
 									price := child.FirstChild.Data
 									priceFloat, err := strconv.ParseFloat(strings.TrimSpace(price), 64)
@@ -135,7 +135,7 @@ func (data Response) GetProducts() Products {
 										fmt.Printf("Couldnt convert string to float: %s", err.Error())
 										continue
 									}
-									product.Price = priceFloat
+									product.Data.Price = priceFloat
 								}
 							}
 						}
@@ -152,7 +152,7 @@ func (data Response) GetProducts() Products {
 					}
 
 					// Legger til produktet som har blitt funnet i products arrayet
-					products = append(products, product)
+					*apiProducts = append(*apiProducts, product)
 				}
 			}
 		}
@@ -165,6 +165,4 @@ func (data Response) GetProducts() Products {
 
 	// kjører crawler på base-noden
 	crawler(data.Data.HTML)
-
-	return products
 }

@@ -3,20 +3,11 @@ package bunnpris
 import (
 	"context"
 	"fmt"
+
+	"github.com/korneliushen/handlel.app/scraper/model"
 )
 
-type Products []Product
-
-type Product struct {
-	Gtin      string
-	Name      string
-	Link      string
-	Category  string
-	Price     float64
-	ImageLink string
-}
-
-func (p *Products) Get(ctx context.Context, token, endpoint string) error {
+func GetProducts(apiProducts *model.ApiProducts, ctx context.Context, token, endpoint string) error {
 	// Gjør en post request til Itemgroups.aspx endpoint i bunnpris api
 	// post tar inn en ctx av type context.Context som brukes til
 	// time ut funksjonen om den tar for lang tid
@@ -30,9 +21,7 @@ func (p *Products) Get(ctx context.Context, token, endpoint string) error {
 		return fmt.Errorf("No html returned")
 	}
 
-	products := res.GetProducts()
-
-	*p = products
+	res.GetProducts(apiProducts)
 
 	return nil
 }

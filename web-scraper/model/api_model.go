@@ -1,144 +1,79 @@
-package ngdata
+package model
 
 import (
 	"cmp"
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-	"net/url"
 	"reflect"
 	"slices"
 	"strings"
-
-	"github.com/gocolly/colly"
-	"github.com/korneliushen/handlel.app/meny/lib"
 )
 
-//////////////////////////
-///// Category(ies) /////
-////////////////////////
+// TODO: Rename alt her til noe annet enn bare Api... (kanskje shared eller no)
 
-func (categories *Categories) GetCategories() {
-	for _, store := range stores {
-		c := colly.NewCollector()
-
-		categoriesStarted := false
-
-		c.OnHTML(storeInfo[store].targetClass, func(e *colly.HTMLElement) {
-			categoryName := e.ChildText("a span")
-
-			if categoryName == storeInfo[store].firstCategory {
-				categoriesStarted = true
-			}
-
-			if categoriesStarted {
-				// lager instans av kategori med alle verdier jeg har til nå
-				categories.Categories = append(categories.Categories, Category{
-					Name: categoryName, Store: store,
-				})
-			}
-		})
-
-		c.Visit(storeInfo[store].Url)
-	}
+// Bare no extra som trengs til ngdata (har ikke giddet å flytte ennå)
+type ApiResponse struct {
+	TimedOut bool `json:"timed_out"`
+	Hits     Hits `json:"hits"`
 }
 
-func (category Category) GetProducts(store string) ([]ApiProduct, error) {
-	// bare meny funker helt for nå
-	url := getUrl(store, category.Name)
-
-	// får data om produkter fra api-en
-	data, err := fetchProducts(url)
-	if err != nil {
-		return []ApiProduct{}, err
-	}
-
-	return data.Hits.Products, nil
+type Hits struct {
+	AmountOfProducts int          `json:"total"`
+	Products         []ApiProduct `json:"hits"`
 }
 
-// genererer en url for norgesgruppen api med butikk id, og kategori
-func getUrl(store, category string) string {
-	// bruker QueryEscape for å gjøre at man kan putte kategorien i url-en
-	// for fetch requesten
-	queryCategory := url.QueryEscape(category)
+// type alias for an array of ApiProduct
+type ApiProducts []ApiProduct
 
-	// får id fra ids map
-	id := storeInfo[store].id
-
-	// constructer url, base url + id-en til butikken + options
-	// (denne kan endres på for annen data) + kategorien (dette kan også endres
-	// på avhengig av options)
-	apiUrl := "https://platform-rest-prod.ngdata.no/api/products" +
-		id +
-		"?page=1&page_size=10000&full_response=true&fieldset=maximal&facets=Category&facet=Categories:" +
-		queryCategory
-
-	return apiUrl
+type ApiProduct struct {
+	Store   string         `json:"store"`
+	BaseUrl string         `json:"base_url"`
+	Type    string         `json:"_type"`
+	ApiId   string         `json:"_id"`
+	Data    ApiProductData `json:"_source"`
 }
 
-// henter data for produkter med url-en som blir generert over
-func fetchProducts(url string) (ApiResponse, error) {
-	// gjør request til url-en
-	res, err := http.Get(url)
-	if err != nil {
-		return ApiResponse{}, err
-	}
-
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return ApiResponse{}, err
-	}
-
-	var produkter ApiResponse
-	err = json.Unmarshal(body, &produkter)
-	if err != nil {
-		return ApiResponse{}, err
-	}
-
-	return produkter, nil
+type ApiProductData struct {
+	Ean                   string                  `json:"ean"`
+	Title                 string                  `json:"title"`
+	Subtitle              string                  `json:"subtitle"`
+	Slug                  string                  `json:"slugifiedUrl"`
+	Description           string                  `json:"description"`
+	Category              string                  `json:"categoryName"`
+	SubCategory           string                  `json:"shoppingListGroupName"`
+	Price                 float64                 `json:"pricePerUnit"`
+	OriginalPrice         float64                 `json:"pricePerUnitOriginal"`
+	ComparePricePerUnit   float64                 `json:"comparePricePerUnit"`
+	UnitType              string                  `json:"compareUnit"`
+	ImageLink             string                  `json:"imagePath"`
+	WeightMeasurementType string                  `json:"measurementType"`
+	Weight                float64                 `json:"measurementValue"`
+	Unit                  string                  `json:"unit"`
+	Size                  string                  `json:"packageSize"`
+	Ingredients           string                  `json:"ingredients"`
+	AllergyDeclaration    string                  `json:"allergyDeclaration"`
+	Vendor                string                  `json:"vendor"`
+	Brand                 string                  `json:"brand"`
+	OnSale                bool                    `json:"isOffer"`
+	OriginCountry         string                  `json:"countryOfOrigin"`
+	Allergens             []ApiAllergens          `json:"allergens"`
+	NutritionalContent    []ApiNutritionalContent `json:"nutritionalContent"`
+	Associated            ApiAssociated           `json:"associated"`
 }
 
-//////////////////////////
-///// ApiProduct(s) /////
-////////////////////////
+type ApiAllergens struct {
+	Name string `json:"displayName"`
+	Code string `json:"code"`
+}
 
-func (products *ApiProducts) GetProducts(categories Categories) {
-	for _, category := range categories.Categories {
-		for _, store := range stores {
-			// om kategorien sin butikk og butikken ikke er den samme, er det ikke
-			// vits å kjøre request fordi den vil ikke få noe data
-			// (og om den får det vil det være duplicate)
-			if category.Store != store {
-				continue
-			}
+type ApiNutritionalContent struct {
+	Id     string  `json:"name"`
+	Name   string  `json:"displayName"`
+	Amount float32 `json:"amount"`
+	Unit   string  `json:"unit"`
+}
 
-			// får data om alle produkter i kategorien
-			res, err := category.GetProducts(store)
-			if err != nil {
-				fmt.Printf("Error getting products from %s in category %s: %v\n",
-					store, category, err)
-				continue
-			}
-
-			// legger til produktet i apiProducts array som mappes over senere,
-			// legger også til Store (for senere bruk)
-			for _, product := range res {
-				// legger til underkategorier, om underkategorien ikke er lagt til
-				// underkategorier er jeg ganske sikker på at er basically helt likt
-				// på alle sidene, så det vil ikke være duplicates med forskjellig
-				// navn, om det er annerledes må jeg bytte til id approach
-				if !lib.IsIn(product.Data.SubCategory, category.SubCategories) {
-					category.SubCategories = append(
-						category.SubCategories, product.Data.SubCategory,
-					)
-				}
-				*products = append(*products, product.Extend(store, storeInfo[store].Url))
-			}
-			break
-		}
-		break
-	}
+type ApiAssociated struct {
+	Products []string `json:"slg"`
 }
 
 // oppdaterer data i ApiProduct
@@ -284,42 +219,4 @@ func getCorrectCategoryName(category string) string {
 		}
 	}
 	return category
-}
-
-//////////////////////////
-///// Product(s) ////////
-////////////////////////
-
-func (products *Products) Format(apiProducts ApiProducts) {
-	// lagrer alle produkter som allerede har blitt sjekket i et array
-	// da blir det ikke duplicates og vi kan returnere tidlig om produktet
-	// allerede er ferdig
-	var checkedGtins []string
-
-	// mapper over alle produkter vi har fått fra databasen og formatterer
-	// dataen i egne structs
-	for _, firstProduct := range apiProducts {
-		gtin := firstProduct.Data.Ean
-
-		// om produktet allerede er sjekket, skip dette produktet
-		if lib.IsIn(gtin, checkedGtins) {
-			continue
-		}
-		checkedGtins = append(checkedGtins, gtin)
-
-		// finner andre produkter med samme gtin og legger til i et array
-		sameProduct := []ApiProduct{firstProduct}
-
-		for _, secondProduct := range apiProducts {
-			if gtin == secondProduct.Data.Ean &&
-				firstProduct.Store != secondProduct.Store {
-				// legger til produktet i sameProduct array, alle produkter i dette
-				// arrayet sjekkes nå priser legges inn
-				sameProduct = append(sameProduct, secondProduct)
-			}
-		}
-
-		// formaterer dataen til alle produkter med samme gtin
-		firstProduct.FormatData(sameProduct, products)
-	}
 }

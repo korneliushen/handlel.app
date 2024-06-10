@@ -1,14 +1,14 @@
-package main
+package bunnpris
 
 import (
-	"bunnpris/test/bunnpris"
 	"context"
-	"encoding/json"
 	"fmt"
-	"time"
+
+	"github.com/korneliushen/handlel.app/scraper/bunnpris/bunnpris"
+	"github.com/korneliushen/handlel.app/scraper/model"
 )
 
-func run() {
+func Bunnpris(apiProducts *model.ApiProducts) {
 	ctx := context.Background()
 
 	token := "wlli2e4n52sjbydqekk2nnki"
@@ -19,20 +19,7 @@ func run() {
 		return
 	}
 
-	var products bunnpris.Products
 	for _, category := range categories {
-		products.Get(ctx, token, category.Link)
+		bunnpris.GetProducts(apiProducts, ctx, token, category.Link)
 	}
-
-	json, _ := json.MarshalIndent(products, "", "  ")
-
-	fmt.Println(string(json))
-}
-
-func Init() {
-	start := time.Now()
-
-	run()
-
-	fmt.Println("Elapsed:", time.Since(start))
 }
