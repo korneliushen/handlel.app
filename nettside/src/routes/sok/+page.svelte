@@ -4,7 +4,7 @@
 	export let data: import('./$types').PageData;
 </script>
 
-<div class="visible mb-2 mt-4 flex w-full items-center justify-center md:invisible">
+<div class="visible mx-4 mb-2 mt-4 flex w-full items-center justify-center md:invisible">
 	<search class=" w-80 flex-1">
 		<form
 			class="border-borderColor/26 flex w-full items-center justify-between rounded-md border px-2 text-borderColor shadow-sm"
