@@ -8,6 +8,7 @@ import (
 type Categories []Category
 
 type Category struct {
+	Id            string
 	Name          string
 	Link          string
 	SubCategories []string
@@ -17,7 +18,7 @@ func (c *Categories) Get(ctx context.Context, token string) error {
 	// Gjør en post request til Itemgroups.aspx endpoint i bunnpris api
 	// post tar inn en ctx av type context.Context som brukes til
 	// time ut funksjonen om den tar for lang tid
-	res := POST(ctx, token, "/itemgroups.aspx")
+	res := POST(ctx, token, "/itemgroups.aspx", nil, "text/html; charset=us-ascii")
 	if res.IsError() {
 		return fmt.Errorf(res.Error())
 	}

@@ -3,7 +3,6 @@ package bunnpris
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/cookiejar"
@@ -18,14 +17,16 @@ import (
 
 const BASE_URL = "https://nettbutikk.bunnpris.no"
 
-func POST(ctx context.Context, token, endpoint string) Response {
+// TODO: bytte ut body io.Reader med generics?
+// TODO: trenger bare noen ting her og ikke alt (conditional det var den ene videoen jeg husker det)
+
+func POST(ctx context.Context, token, endpoint string, reqBody io.Reader, contentType string) Response {
 	// lager en url som requests skal sendes til ved å kombinere base url og
 	// endpoint vi får som arg
 	apiUrl := BASE_URL + endpoint
-	fmt.Println(apiUrl)
 	// gjør klar requesten med NewRequest som tar inn method, url og body.
 	// body trengs ikke så er satt til nil
-	req, err := http.NewRequest("POST", apiUrl, nil)
+	req, err := http.NewRequest("POST", apiUrl, reqBody)
 	if err != nil {
 		return Response{Message: "Error preparing request: " + err.Error(),
 			StatusCode: http.StatusInternalServerError}
@@ -33,7 +34,7 @@ func POST(ctx context.Context, token, endpoint string) Response {
 
 	// legger til Content-Type: text/html; charset=iso-8859-1
 	// det var det postman brukte når den fikk valid responses
-	req.Header.Add("Content-Type", "text/html; charset=us-ascii")
+	req.Header.Add("Content-Type", contentType)
 
 	// lager jar med cookies
 	// jar har en SetCookies funksjon som tar inn en url med type *url.URL,
@@ -131,5 +132,5 @@ func POST(ctx context.Context, token, endpoint string) Response {
 	// returnerer dataen
 	return Response{Message: "Success",
 		StatusCode: http.StatusOK,
-		Data:       ResponseData{HTML: node}}
+		Data:       ResponseData{HTML: node, JSON: body}}
 }
