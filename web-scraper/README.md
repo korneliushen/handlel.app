@@ -12,18 +12,18 @@ Den trenger en NEON_URL (neon connection string) og en ALGOLIA_SECRET (algolia r
 
 main.go har en variabel som heter apiProducts som er et array med typen ApiProducts.
 
-I main.go hentes data fra butikkene (midlertidig bare ngdata), hvor produkter appendes til apiProducts arrayet.
+I main.go hentes data fra butikkene (for nå ngdata og bunnpris), hvor produkter appendes til apiProducts arrayet.
 
-Når alle produkter er hentet, kjøres en formattering til et format databasen vil ha, og så sendes dataen til databasen og til algolia indexen.
+Når alle produkter er hentet, kjøres en formatering til et format databasen vil ha, og så sendes dataen til databasen og til algolia indexen.
 
 
-### legge til nye data fra nye butikker
+### legge til data fra nye butikker
 
-Lag et nytt directory her og gi den navnet på butikken du scraper.
+Lag et nytt directory her og gi det navnet på butikken du scraper.
 
 Sett opp scraperen hvordan du vil, men lag en funksjon som kan importes og kjøres av main.go
 
-Denne funksjonen må ta inn et argument med type *model.ApiProducts
+Denne funksjonen må ta inn et argument med type *model.ApiProducts. Produktene du får fra scraperen din skal appendes til dette arrayet.
 
 Kjør funksjonen i main.go og gi apiProducts som argument.
 

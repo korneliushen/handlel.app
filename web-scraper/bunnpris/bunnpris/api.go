@@ -58,7 +58,7 @@ func (data Response) GetCategories() Categories {
 		// sjekker om node-en er en ElementNode
 		if node.Type == html.ElementNode {
 			// init variabler som brukes til å holde dataen som blir funnet
-			var className, href, name string
+			var className, link, name string
 
 			// mapper over alle attributter elementet har
 			// om attr er itemgroup link og har en href, blir linken til href-en
@@ -69,7 +69,8 @@ func (data Response) GetCategories() Categories {
 				}
 				if attr.Key == "href" {
 					// bruker queryescape for å kunne bruke linken i en url
-					href = attr.Val
+					href := attr.Val
+					link = strings.Split(href, "&")[0]
 				}
 			}
 
@@ -77,11 +78,17 @@ func (data Response) GetCategories() Categories {
 			// child element (må kjøre FirstChild.NextSibling fordi det første er
 			// ::before). må også kjøre Firstchild etter nextsibling for å få teksten
 			// og ikke bare navnet på html-elementet
-			if className != "" && href != "" {
+			if className != "" && link != "" {
 				if node.FirstChild != nil {
 					name = node.FirstChild.NextSibling.FirstChild.Data
+					// Av en eller annen grunn så er FRUKT/GRNT (Pris pr. stk) annerledes
+					// enn alle andre kategorier og vanlig endpoint funker ikke, så har
+					// hard-coda inn en løsning her
+					if strings.Contains(name, "Pris pr. stk") {
+						link = "/itemgrouplist.aspx?grpnm=FRUKT/GR%D8NT%20(Pris%20pr.%20stk)%20&deptno=16"
+					}
 				}
-				categories = append(categories, Category{Name: name, Link: href})
+				categories = append(categories, Category{Name: name, Link: link})
 			}
 		}
 

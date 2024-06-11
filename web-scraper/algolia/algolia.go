@@ -8,19 +8,23 @@ import (
 	"github.com/korneliushen/handlel.app/scraper/model"
 )
 
-// henter indexen som dataen skal sendes til i algolia
+// Henter indexen som dataen skal sendes til i algolia og lager en instanse av
+// *search.Index
 func index() *search.Index {
 	client := search.NewClient("AA8FDXU3JW", os.Getenv("ALGOLIA_SECRET"))
 	return client.InitIndex("test")
 }
 
-// legger til data i algolia index
+// Legger til data i algolia index
 func InsertRecords(products model.Products) error {
 	fmt.Println("Legger data inn i algolia index")
-	// instanse av index brukt til å interacte med algolia indexen
+	// Instanse av index brukt til å interacte med algolia indexen
 	index := index()
 
-	// sender alle objekter i products arrayet til algolia indexen
+	// Sender alle objekter i products arrayet til algolia indexen
+	// Sendes i batches av 1000 om gangen (default).
+	// Kan endres til å sende flere, men dette går fort nok så trengs i hver
+	// fall ikke ennå
 	res, err := index.SaveObjects(products)
 	if err != nil {
 		return err

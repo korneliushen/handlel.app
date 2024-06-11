@@ -33,7 +33,7 @@ func POST(ctx context.Context, token, endpoint string) Response {
 
 	// legger til Content-Type: text/html; charset=iso-8859-1
 	// det var det postman brukte når den fikk valid responses
-	req.Header.Add("Content-Type", "text/html; charset=iso-8859-1")
+	req.Header.Add("Content-Type", "text/html; charset=us-ascii")
 
 	// lager jar med cookies
 	// jar har en SetCookies funksjon som tar inn en url med type *url.URL,
@@ -47,7 +47,7 @@ func POST(ctx context.Context, token, endpoint string) Response {
 	}
 
 	// parser url-en til *url.URL
-	parsedUrl, err := url.Parse(apiUrl)
+	parsedUrl, err := url.Parse(BASE_URL)
 	if err != nil {
 		return Response{Message: "Error parsing url: " + err.Error(),
 			StatusCode: http.StatusBadRequest}

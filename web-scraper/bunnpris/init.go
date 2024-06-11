@@ -20,6 +20,9 @@ func Bunnpris(apiProducts *model.ApiProducts) {
 	}
 
 	for _, category := range categories {
-		bunnpris.GetProducts(apiProducts, ctx, token, category.Link)
+		err := bunnpris.GetProducts(apiProducts, ctx, token, category.Link)
+		if err != nil {
+			fmt.Printf("Error getting products from %s, %s: %s", category.Name, category.Link, err.Error())
+		}
 	}
 }
