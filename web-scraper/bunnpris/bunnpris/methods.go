@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
-	"time"
 
 	"golang.org/x/net/html"
 )
@@ -59,51 +58,14 @@ func POST(ctx context.Context, token, endpoint string, reqBody io.Reader, conten
 	cookies := []*http.Cookie{{Name: "ASP.NET_SessionId", Value: token}}
 	jar.SetCookies(parsedUrl, cookies)
 
-	// Implementerer en timeout, etter 10 sekunder vil funksjonen time out
-	// og returnere en error (da er det enten noe feil med api-en, eller
-	// internettet er så dårlig at ingenting vil funke)
-	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
-	defer cancel()
-
-	// Lager en channel som holder en value med type Response, som vil bli
-	// returnert fra api kallet
-	reschan := make(chan *http.Response)
-
 	// lager en http client med jar så cookies blir sendt med requesten
 	// og kjører requesten
 	client := &http.Client{Jar: jar}
 
-	// Kjører requesten i en go func, så vi kan sjekke om den er timed out
-	// eller returnert en value
-	go func() {
-		// gjør en post request til /Itemgroups.aspx
-		res, _ := client.Do(req)
-		reschan <- res
-	}()
-
-	// Lager en variabel som responsen fra api-en blir lagret i inni for loopen
-	var res *http.Response
-
-	// Variabel som sjekker om respons har kommet fra databasen
-	// Om done blir gjort om til true, vil for loopen breake og res vil ha en
-	// verdi
-	done := false
-
-	// Sjekker om funksjonen har tima ut, om den har det returneres en error
-	// Om den ikke har tima ut, får res verdien til reschan og done blir true
-	// og funksjonen breaker
-	for {
-		if done {
-			break
-		}
-		select {
-		case <-ctx.Done():
-			return Response{
-				Message:    "Function timed out fetching from bunnpris api",
-				StatusCode: http.StatusInternalServerError}
-		case res = <-reschan:
-			done = true
-		}
+	// gjør en post request til /Itemgroups.aspx
+	res, err := client.Do(req)
+	if err != nil {
+		return Response{Message: "Error during request: " + err.Error(), StatusCode: 500}
 	}
 	// kan kjøre defer close nå som res har en verdi
 	defer res.Body.Close()

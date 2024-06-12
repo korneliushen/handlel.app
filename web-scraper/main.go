@@ -19,13 +19,11 @@ func run() {
 	// legger bare til data i dette arrayet
 	apiProducts := &model.ApiProducts{}
 
-	// henter data fra bunnpris
-	bunnpris.Bunnpris(apiProducts)
-
-	return
-
 	// Henter data fra ngdata api-et (joker, spar og meny).
 	ngdata.Ngdata(apiProducts)
+
+	// henter data fra bunnpris
+	bunnpris.Bunnpris(apiProducts)
 
 	// Mapper over alle produkter vi har fått fra databasen og formatterer
 	// dataen i egne structs

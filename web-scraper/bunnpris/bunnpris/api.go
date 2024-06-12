@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/korneliushen/handlel.app/scraper/model"
 	"golang.org/x/net/html"
@@ -113,55 +114,45 @@ func (data Response) GetCategories() Categories {
 
 type BunnprisProducts []string
 
-func GetProductLinks(data *html.Node, products *BunnprisProducts) {
-	// Definerer en funksjon som går gjennom base noden
-	var crawler func(*html.Node)
-	crawler = func(node *html.Node) {
-		// sjekker om node-en er en ElementNode
-		if node.Type == html.ElementNode {
-			// Mapper over alle attributter elementet har
-			// Om attr sin value er er lblName, legges slug (linken til produktet)
-			// til i et BunnprisProducts arrayet (array med strings)
-			for _, attr := range node.Attr {
-				if attr.Val == "lblName" {
-					*products = append(*products, strings.Split(strings.Split(node.Parent.Attr[1].Val, ".no")[1], "&grpnm")[0])
-				}
-			}
-		}
-
-		// går gjennom html-noden og så går til sibling
-		for child := node.FirstChild; child != nil; child = child.NextSibling {
-			crawler(child)
-		}
-	}
-
-	// kjører crawler på base-noden
-	crawler(data)
-}
-
 func (products BunnprisProducts) FetchProductPages(ctx context.Context, token string, apiProducts *model.ApiProducts) {
-	for _, link := range products {
-		res := POST(ctx, token, link, nil, "text/html; charset=us-ascii")
-		if res.IsError() {
-			// Om det er en error, print den og gå videre til neste produkt
-			fmt.Println(res.Error())
-			continue
-		}
+	// Flere threads ellers tar det sånn 1 time å kjøre
+	var wg sync.WaitGroup
+	sem := make(chan struct{}, 4)
 
-		res.GetProductData(apiProducts)
+	for _, link := range products {
+		wg.Add(1)
+		sem <- struct{}{}
+
+		go func() {
+			defer wg.Done()
+			defer func() { <-sem }()
+
+			res := POST(ctx, token, link, nil, "text/html; charset=us-ascii")
+			if res.IsError() {
+				// Om det er en error, print den og gå videre til neste produkt
+				fmt.Printf("Error getting data from link %s: %v\n", link, res)
+			}
+
+			res.GetProductData(apiProducts)
+		}()
 	}
+
+	wg.Wait()
 }
+
+// TODO FOR MEG IMRGN: alt av logikken for at dette skal kjøre smooth er ferdig
+// så må bare legge til dataen fra produkt siden til ApiProduct instansen
 
 func (data Response) GetProductData(apiProducts *model.ApiProducts) {
+	// Lager en instanse av ApiProduct som data legges til i når det blir funnet
+	// BaseUrl er satt til en empty string fordi linker til produktet har
+	// allerede hele linken
+	product := model.ApiProduct{Store: "bunnpris", BaseUrl: ""}
 	// Definerer en funksjon som går gjennom base noden
 	var crawler func(*html.Node)
 	crawler = func(node *html.Node) {
 		// sjekker om node-en er en ElementNode
 		if node.Type == html.ElementNode {
-			// BaseUrl er satt til en empty string fordi linker til produktet har
-			// allerede hele linken
-			product := model.ApiProduct{Store: "bunnpris", BaseUrl: ""}
-
 			// Mapper over alle attributter elementet har
 			// Om attr sin value er products-container, kjøres en ny funksjon
 			// på alle child elements
@@ -170,20 +161,26 @@ func (data Response) GetProductData(apiProducts *model.ApiProducts) {
 				// Om den har values som passer til elementer med data vi vil
 				// ha, lagres dataen i product (instansen av Product)
 				switch attr.Val {
-				case "titleName":
-					product.Data.Title = node.FirstChild.Data
-					fmt.Println(node.Attr[2].Val)
-				case "productImage":
-					product.Data.ImageLink = node.FirstChild.Attr[5].Val
-				case "lblName":
-					product.Data.Slug = node.Parent.Attr[1].Val
-					// Henter gtin fra linken (henter fra itemno search paramen
-					// ved å splitte 2 ganger)
-					product.Data.Ean = strings.Split(strings.Split(product.Data.Slug, "itemno=")[1], "&")[0]
-					fmt.Println(product.Data.Title, product.Data.Ean)
-				case "ContentPlaceHolder1_ucItemGroupProduct_rptItemGroupProd_lblSalesPrice_0":
+				case "form1":
 					for _, attr := range node.Attr {
-						if attr.Key == "data-dnprice" {
+						if attr.Key == "action" {
+							product.Data.Ean = strings.Split(strings.Split(attr.Val, "itemno=")[1], "&")[0]
+						}
+					}
+				case "titleName":
+					for _, attr := range node.Attr {
+						if attr.Key == "title" {
+							product.Data.Title = attr.Val
+							fmt.Println("Getting data for", product.Data.Title)
+						}
+					}
+
+				// Henter prisen. Henter først originalPrice. Etter det sjekkes
+				// price (campaign price). Om det ikke eksisterer, blir price satt til
+				// originalPrice
+				case "lblSalesPrice":
+					for _, attr := range node.Attr {
+						if attr.Key == "data-dnprice" || attr.Key == "data-dnprice-decimal" {
 							price := attr.Val
 							priceFloat, err := strconv.ParseFloat(strings.TrimSpace(price), 64)
 							if err != nil {
@@ -193,14 +190,10 @@ func (data Response) GetProductData(apiProducts *model.ApiProducts) {
 							product.Data.OriginalPrice = priceFloat
 						}
 					}
-				case "ContentPlaceHolder1_ucItemGroupProduct_rptItemGroupProd_lblCampaignPrice_0":
+				case "lblCampaignPrice":
 					for _, attr := range node.Attr {
-						if attr.Key == "data-dnprice" {
+						if attr.Key == "data-dnprice" || attr.Key == "data-dnprice-decimal" {
 							price := attr.Val
-							if price == "" {
-								product.Data.Price = product.Data.OriginalPrice
-								continue
-							}
 							priceFloat, err := strconv.ParseFloat(strings.TrimSpace(price), 64)
 							if err != nil {
 								fmt.Printf("Couldnt convert string to float: %s", err.Error())
@@ -209,101 +202,21 @@ func (data Response) GetProductData(apiProducts *model.ApiProducts) {
 							product.Data.Price = priceFloat
 						}
 					}
-				}
-			}
-			*apiProducts = append(*apiProducts, product)
-		}
 
-		// går gjennom html-noden og så går til sibling
-		for child := node.FirstChild; child != nil; child = child.NextSibling {
-			crawler(child)
-		}
-	}
-
-	// kjører crawler på base-noden
-	crawler(data.Data.HTML)
-}
-
-func (data Response) OLDGETPRODUCTS(apiProducts *model.ApiProducts) {
-	// Definerer en funksjon som går gjennom base noden
-	var crawler func(*html.Node)
-	crawler = func(node *html.Node) {
-		// sjekker om node-en er en ElementNode
-		if node.Type == html.ElementNode {
-			// BaseUrl er satt til en empty string fordi linker til produktet har
-			// allerede hele linken
-			product := model.ApiProduct{Store: "bunnpris", BaseUrl: ""}
-
-			// Mapper over alle attributter elementet har
-			// Om attr sin value er products-container, kjøres en ny funksjon
-			// på alle child elements
-			for _, attr := range node.Attr {
-				if attr.Key == "class" && attr.Val == "products-container" {
-					// Definerer ny funksjon som henter data om produktet
-					var traverseChildren func(*html.Node)
-					traverseChildren = func(child *html.Node) {
-						if child.Type == html.ElementNode {
-							for _, attr := range child.Attr {
-								// Switch statement som sjekker verdien til attributten
-								// Om den har values som passer til elementer med data vi vil
-								// ha, lagres dataen i product (instansen av Product)
-								switch attr.Val {
-								case "productImage":
-									product.Data.ImageLink = child.FirstChild.Attr[5].Val
-								case "lblName":
-									product.Data.Title = child.FirstChild.Data
-									product.Data.Slug = child.Parent.Attr[1].Val
-									// Henter gtin fra linken (henter fra itemno search paramen
-									// ved å splitte 2 ganger)
-									product.Data.Ean = strings.Split(strings.Split(product.Data.Slug, "itemno=")[1], "&")[0]
-									fmt.Println(product.Data.Title, product.Data.Ean)
-								case "ContentPlaceHolder1_ucItemGroupProduct_rptItemGroupProd_lblSalesPrice_0":
-									for _, attr := range child.Attr {
-										if attr.Key == "data-dnprice" {
-											price := attr.Val
-											priceFloat, err := strconv.ParseFloat(strings.TrimSpace(price), 64)
-											if err != nil {
-												fmt.Printf("Couldnt convert string to float: %s", err.Error())
-												continue
-											}
-											product.Data.OriginalPrice = priceFloat
-										}
-									}
-								case "ContentPlaceHolder1_ucItemGroupProduct_rptItemGroupProd_lblCampaignPrice_0":
-									for _, attr := range child.Attr {
-										if attr.Key == "data-dnprice" {
-											price := attr.Val
-											if price == "" {
-												product.Data.Price = product.Data.OriginalPrice
-												continue
-											}
-											priceFloat, err := strconv.ParseFloat(strings.TrimSpace(price), 64)
-											if err != nil {
-												fmt.Printf("Couldnt convert string to float: %s", err.Error())
-												continue
-											}
-											product.Data.Price = priceFloat
-										}
-									}
-								}
+				// Henter unittype og unitprice
+				case "clearfix div-Weightitem":
+					unitPrice := node.FirstChild.NextSibling
+					for _, attr := range unitPrice.Attr {
+						if attr.Key == "data-dnprice" || attr.Key == "data-dnprice-decimal" {
+							price := attr.Val
+							priceFloat, err := strconv.ParseFloat(strings.TrimSpace(price), 64)
+							if err != nil {
+								fmt.Printf("Couldnt convert string to float: %s", err.Error())
+								continue
 							}
-						}
-
-						// Kjører funksjonen for hvert child for å gå gjennom hele tre-et
-						for c := child.FirstChild; c != nil; c = c.NextSibling {
-							traverseChildren(c)
+							product.Data.ComparePricePerUnit = priceFloat
 						}
 					}
-
-					// Kjører traverseChildren når en produkt er funnet
-					for child := node.FirstChild; child != nil; child = child.NextSibling {
-						traverseChildren(child)
-					}
-
-					fmt.Printf("%+v", product)
-
-					// Legger til produktet som har blitt funnet i products arrayet
-					*apiProducts = append(*apiProducts, product)
 				}
 			}
 		}
@@ -316,4 +229,14 @@ func (data Response) OLDGETPRODUCTS(apiProducts *model.ApiProducts) {
 
 	// kjører crawler på base-noden
 	crawler(data.Data.HTML)
+
+	if product.Data.Price == 0 {
+		product.Data.Price = product.Data.OriginalPrice
+	}
+	if product.Data.ComparePricePerUnit == 0 {
+		product.Data.ComparePricePerUnit = product.Data.OriginalPrice
+	}
+
+	// Gjør noen ekstra checks for å populate fields i databasen
+	*apiProducts = append(*apiProducts, product)
 }
