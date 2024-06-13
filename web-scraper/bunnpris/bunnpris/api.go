@@ -117,13 +117,13 @@ type BunnprisProducts []string
 func (products BunnprisProducts) FetchProductPages(ctx context.Context, token string, apiProducts *model.ApiProducts) {
 	// Flere threads ellers tar det sånn 1 time å kjøre
 	var wg sync.WaitGroup
-	sem := make(chan struct{}, 4)
+	sem := make(chan struct{}, 10)
 
 	for _, link := range products {
 		wg.Add(1)
 		sem <- struct{}{}
 
-		go func() {
+		go func(link string) {
 			defer wg.Done()
 			defer func() { <-sem }()
 
@@ -133,8 +133,8 @@ func (products BunnprisProducts) FetchProductPages(ctx context.Context, token st
 				fmt.Printf("Error getting data from link %s: %v\n", link, res)
 			}
 
-			res.GetProductData(apiProducts)
-		}()
+			res.GetProductData(apiProducts, link)
+		}(link)
 	}
 
 	wg.Wait()
@@ -143,11 +143,9 @@ func (products BunnprisProducts) FetchProductPages(ctx context.Context, token st
 // TODO FOR MEG IMRGN: alt av logikken for at dette skal kjøre smooth er ferdig
 // så må bare legge til dataen fra produkt siden til ApiProduct instansen
 
-func (data Response) GetProductData(apiProducts *model.ApiProducts) {
+func (data Response) GetProductData(apiProducts *model.ApiProducts, link string) {
 	// Lager en instanse av ApiProduct som data legges til i når det blir funnet
-	// BaseUrl er satt til en empty string fordi linker til produktet har
-	// allerede hele linken
-	product := model.ApiProduct{Store: "bunnpris", BaseUrl: ""}
+	product := model.ApiProduct{Store: "bunnpris", BaseUrl: "https://nettbutikk.bunnpris.no"}
 	// Definerer en funksjon som går gjennom base noden
 	var crawler func(*html.Node)
 	crawler = func(node *html.Node) {
@@ -236,6 +234,9 @@ func (data Response) GetProductData(apiProducts *model.ApiProducts) {
 	if product.Data.ComparePricePerUnit == 0 {
 		product.Data.ComparePricePerUnit = product.Data.OriginalPrice
 	}
+
+  // Legger til link som slug
+  product.Data.Slug = link
 
 	// Gjør noen ekstra checks for å populate fields i databasen
 	*apiProducts = append(*apiProducts, product)

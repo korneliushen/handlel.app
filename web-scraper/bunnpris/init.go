@@ -11,7 +11,7 @@ import (
 func Bunnpris(apiProducts *model.ApiProducts) {
 	ctx := context.Background()
 
-	token := "wlli2e4n52sjbydqekk2nnki"
+	token := "by3vb2wp5ezsorsynxfp4qg5"
 
 	fmt.Println("Getting categories")
 
@@ -43,5 +43,5 @@ func productPageTest(ctx context.Context, token, link string, apiProducts *model
 		fmt.Println(res.Error())
 	}
 
-	res.GetProductData(apiProducts)
+	res.GetProductData(apiProducts, link)
 }

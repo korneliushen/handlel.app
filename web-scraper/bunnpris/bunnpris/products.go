@@ -78,6 +78,11 @@ func (products *BunnprisProducts) GetProducts(apiProducts *model.ApiProducts, ct
 }
 
 func genBody(page int, id string) []byte {
+  if id == "0" {
+    fmt.Println("XDDDD")
+    // Frukt og grønt prise pr stk har lyst til å være annerledes
+    return []byte(fmt.Sprintf("%s%d%s", `{dnItemParams: '{"PageName":"itemgrouplist","PageNo":"`, page, `","PageSize":"18","CatType":"","LogicalItemId":"0","Sorting":"","DepartmentNo":"16","DepartmentName":"FRUKT/GRØNT (Pris pr. stk) ","ItemGroupNo":"0","ItemGroupName":"FRUKT/GRØNT (Pris pr. stk) "}'}`))
+  }
 	return []byte(fmt.Sprintf("%s%d%s%s%s", `{dnItemParams: '{"PageName":"itemgrouplist","PageNo":"`, page, `", "ItemGroupNo":"`, id, `"}'}`))
 }
 
