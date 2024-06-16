@@ -4,7 +4,7 @@
 	import type { ExtendedProduct } from '$lib/types/extendedPrisma';
 	export let product: ExtendedProduct;
 
-	const handleError = (e: Event) => ((e.target as HTMLImageElement).src = '/handlelapp.png');
+	let imageError = false;
 </script>
 
 <div
@@ -14,13 +14,19 @@
 		title="product"
 		class="relative flex aspect-square max-h-40 items-center justify-center py-1 lg:w-full"
 	>
-		<img
-			loading="lazy"
-			class="max-h-40"
-			src={product.imagelinksmall}
-			on:error={handleError}
-			alt="produktbilde"
-		/>
+		{#if imageError}
+			<p class=" text-xl text-gray-500 text-center">
+				Det finnes ikke bilde for dette produktet
+			</p>
+		{:else}
+			<img
+				loading="lazy"
+				class="max-h-40"
+				src={product.imagelink+"/small.png"}
+				on:error={() => imageError = true}
+				alt="produktbilde"
+			/>	
+		{/if}
 		<img
 			loading="lazy"
 			class="absolute bottom-0 left-0 ml-2 w-10 rounded-md"

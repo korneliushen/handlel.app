@@ -8,21 +8,26 @@
 
 	let desktopView = false;
 	let antallProdukt = 1;
+	let imageError = false;
 
 	onMount(() => {
 		if (window.innerWidth > 1024) {
 			desktopView = true;
 		}
 	});
-
-	const handleError = (e: any) => e.target.src = "/handlelapp.png"
 </script>
 
 <div class=" mt-6">
 	<div class=" mt-5 flex h-20 items-center justify-between rounded-xl border border-gray-400">
 		<div class=" ml-4 flex h-full items-center gap-4">
 			<div class="flex w-16 items-center justify-center">
-				<img class=" max-h-16 max-w-16" src={product.imagelinkxsmall} on:error={handleError} alt="produktbilde" />
+				{#if imageError}
+					<p class=" text-xs text-gray-500">
+						Det finnes ikke bilde for dette produktet
+					</p>
+				{:else}
+					<img class=" max-h-16 max-w-16" src={product.imagelink+"/small.png"} on:error={() => imageError = true} alt="produktbilde" />
+				{/if}
 			</div>
 			<div>
 				<p class=" text-xs md:text-sm font-medium">{product.title}</p>

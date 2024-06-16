@@ -8,6 +8,7 @@
 	let dropdown = false;
 	let lesmer = '13rem';
 	let lesmerBool = false;
+	let imageError = false;
 
 	onMount(() => {
 		if (window.innerWidth > 1024) {
@@ -24,13 +25,20 @@
 		}
 	}
 	export let data: import('./$types').PageData;
+
 </script>
 
 <main
 	class=" relative grid w-screen max-w-[600px] grid-cols-1 gap-x-8 gap-y-4 overflow-hidden rounded-lg px-5 lg:max-w-[1200px] lg:grid-cols-2 lg:px-20 pb-16 sm:pb-0"
 >
 	<div class=" relative flex aspect-square min-h-80 items-center justify-center py-1 lg:w-full">
-		<img src={data.product.imagelinkmedium} alt="Produktbilde" />
+		{#if imageError}
+			<p class=" text-xl text-gray-500 text-center">
+				Det finnes ikke bilde for dette produktet
+			</p>
+		{:else}
+			<img src={data.product.imagelink+"/medium.png"} alt="Produktbilde" on:error={() => imageError = true}/>
+		{/if}
 	</div>
 	<div class=" flex flex-col lg:relative">
 		<div class=" mt-5">
