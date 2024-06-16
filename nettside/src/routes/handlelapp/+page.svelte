@@ -88,7 +88,7 @@
 		</div>
 		{#if $handlelapp.length <= 0}
 			<div class=" w-full h-full flex justify-center mt-40">
-				<p class=" font-semibold text-xl">Handlelappen er tom</p>
+				<p class=" font-semibold text-gray-400 text-xl">Handlelappen er tom</p>
 			</div>
 		{:else}
 			{#each $handlelapp as product, id}
