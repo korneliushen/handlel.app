@@ -1,4 +1,5 @@
 import prisma from '$lib/prisma';
+import type { ExtendedProduct } from '$lib/types/extendedPrisma';
 import type { PageServerLoad } from './$types';
 import algoliasearch from 'algoliasearch';
 
@@ -13,7 +14,6 @@ export const load: PageServerLoad = async ({ url }) => {
 				attributesToRetrieve: ['*'],
 				hitsPerPage: 20,
 			  }).then(({ hits }) => {
-				console.log(hits)
 				return hits
 			  })
 		};
