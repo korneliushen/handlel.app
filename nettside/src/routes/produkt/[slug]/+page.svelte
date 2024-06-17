@@ -9,6 +9,7 @@
 	let dropdown = false;
 	let lesmer = '13rem';
 	let lesmerBool = false;
+	let imageError = false;
 
 	onMount(() => {
 		if (window.innerWidth > 1024) {
@@ -25,13 +26,20 @@
 		}
 	}
 	export let data: import('./$types').PageData;
+
 </script>
 
 <main
-	class=" relative grid w-screen max-w-[600px] grid-cols-1 gap-x-8 gap-y-4 overflow-hidden rounded-lg px-5 lg:max-w-[1200px] lg:grid-cols-2 lg:px-20"
+	class=" relative grid w-screen max-w-[600px] grid-cols-1 gap-x-8 gap-y-4 overflow-hidden rounded-lg px-5 lg:max-w-[1200px] lg:grid-cols-2 lg:px-20 pb-16 sm:pb-0"
 >
 	<div class=" relative flex aspect-square min-h-80 items-center justify-center py-1 lg:w-full">
-		<img src="{data.product.imagelink}/medium.png" alt="Produktbilde" />
+		{#if imageError}
+			<p class=" text-xl text-gray-500 text-center">
+				Det finnes ikke bilde for dette produktet
+			</p>
+		{:else}
+			<img src={data.product.imagelink+"/medium.png"} alt="Produktbilde" on:error={() => imageError = true}/>
+		{/if}
 	</div>
 	<div class=" flex flex-col lg:relative">
 		<div class=" mt-5">
@@ -40,7 +48,7 @@
 			>
 			<div class=" mt-2 flex justify-between">
 				<p class=" text-lg text-gray-500/60">{data.product?.vendor}</p>
-				<div class=" flex items-center">
+				<div class=" w-1/2 flex items-center justify-end">
 					<a target="_blank" href={data.product?.prices[0].url}
 						><img
 							class=" mr-4 h-12 rounded-md"
@@ -49,9 +57,9 @@
 						/></a
 					>
 					<div class=" text-end">
-						<p class=" text-2xl font-bold text-mainPurple">{data.product?.prices[0].price} kr</p>
+						<p class=" text-2xl font-bold text-mainPurple">{data.product?.prices[0].price.toFixed(2)} kr</p>
 						<p class=" text-lg text-gray-500/60">
-							{data.product?.prices[0].unitprice || data.product?.prices[0].price} kr/{data.product
+							{data.product?.prices[0].unitprice.toFixed(2) || data.product?.prices[0].price.toFixed(2)} kr/{data.product
 								?.unittype || 'stk'}
 						</p>
 					</div>
@@ -71,9 +79,9 @@
 						<p class=" font-bold">{price?.store[0].toUpperCase() + price?.store.substring(1)}</p>
 					</div>
 					<div class=" text-end">
-						<p class=" text-lg font-bold">{price.price} kr</p>
+						<p class=" text-lg font-bold">{price.price.toFixed(2)} kr</p>
 						<p class=" text-sm text-gray-500/60">
-							{price?.unitprice || price?.price} kr/{data.product.unittype || 'stk'}
+							{price.unitprice.toFixed(2) || price.price.toFixed(2)} kr/{data.product.unittype || 'stk'}
 						</p>
 					</div>
 				</a>
@@ -118,7 +126,7 @@
 	</div>
 	<div
 		use:autoAnimate
-		class=" relative overflow-hidden border-t border-borderColor lg:w-full"
+		class=" relative overflow-hidden border-t border-borderColor lg:w-full {data.product.nutritionalcontent ? "mb-0" : "mb-24"}"
 		style="max-height: {lesmer};"
 	>
 		{#if !lesmerBool}

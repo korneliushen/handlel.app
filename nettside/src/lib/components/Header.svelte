@@ -1,6 +1,7 @@
 <script>
-	import { Search, User, Home } from 'lucide-svelte';
+	import { Search, User, Home, Book } from 'lucide-svelte';
 	import { onMount } from 'svelte';
+	import { handlelapp } from '$lib/stores/handlelapp';
 
 	let screensize = 0;
 
@@ -36,7 +37,15 @@
 		<div class=" flex flex-1 items-center justify-end gap-4 font-medium">
 			<a href="/">Hjem</a>
 			<a href="/">Produkter</a>
-			<a href="/handlelapp">Handlelapp</a>
+			<a
+				class=" relative flex h-10 w-10 items-center justify-center rounded-md bg-mainPurple text-white transition active:scale-95"
+				href="/handlelapp"
+			>
+				<Book />
+				<p class=" absolute mb-1 grid h-4 w-4 place-items-center text-xs font-bold text-white">
+					{$handlelapp.length}
+				</p>
+			</a>
 			<button
 				class=" flex h-10 w-10 items-center justify-center rounded-md bg-mainPurple text-white transition active:scale-95"
 				><User /></button
@@ -56,9 +65,14 @@
 				<Search size="25px" />
 				<p class=" mt-1 text-xs text-black">Søk</p>
 			</a>
-			<a class=" flex flex-col items-center" href="/handlelapp">
+			<a class=" relative flex flex-col items-center" href="/handlelapp">
 				<img class=" h-[25px]" src="/handlelapp.png" alt="" />
 				<p class=" mt-1 text-xs text-black">Handlelapp</p>
+				<p
+					class=" absolute right-[-5px] top-[-5px] grid h-5 w-5 place-items-center rounded-full text-sm font-bold text-red-600"
+				>
+					{$handlelapp.length}
+				</p>
 			</a>
 			<a class=" flex flex-col items-center" href="/">
 				<User size="25px" />
