@@ -35,13 +35,3 @@ func Bunnpris(apiProducts *model.ApiProducts) {
 
 	products.FetchProductPages(ctx, token, apiProducts)
 }
-
-func productPageTest(ctx context.Context, token, link string, apiProducts *model.ApiProducts) {
-	res := bunnpris.POST(ctx, token, link, nil, "text/html; charset=us-ascii")
-	if res.IsError() {
-		// Om det er en error, print den og gå videre til neste produkt
-		fmt.Println(res.Error())
-	}
-
-	res.GetProductData(apiProducts, link)
-}

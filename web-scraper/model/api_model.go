@@ -29,6 +29,7 @@ type ApiProduct struct {
 	BaseUrl string         `json:"base_url"`
 	Type    string         `json:"_type"`
 	ApiId   string         `json:"_id"`
+	Notes   string         `json:"notes"`
 	Data    ApiProductData `json:"_source"`
 }
 
@@ -112,9 +113,11 @@ func (apiProduct *ApiProduct) FormatData(productData []ApiProduct, products *Pro
 	product.ImageLink = fmt.Sprintf("%s%s",
 		"https://bilder.ngdata.no/", apiProduct.Data.ImageLink)
 
-	// fikser kategori navn
+	// Fikser kategori navn om kategori ikke er en empty string
 	// (bruker hard-coda kategori navn for å gjøre ting til samme kategori)
-	product.Category = getCorrectCategoryName(apiProduct.Data.Category)
+	if product.Category != "" {
+		product.Category = getCorrectCategoryName(apiProduct.Data.Category)
+	}
 
 	// lager et array av priser, å gjøre det på denne måten gjør det lettere
 	// når dataen skal sendes til database

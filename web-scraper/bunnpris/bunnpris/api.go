@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"unicode/utf8"
 
 	"github.com/korneliushen/handlel.app/scraper/model"
 	"golang.org/x/net/html"
@@ -145,7 +146,19 @@ func (products BunnprisProducts) FetchProductPages(ctx context.Context, token st
 
 func (data Response) GetProductData(apiProducts *model.ApiProducts, link string) {
 	// Lager en instanse av ApiProduct som data legges til i når det blir funnet
-	product := model.ApiProduct{Store: "bunnpris", BaseUrl: "https://nettbutikk.bunnpris.no"}
+	// Legger også til et notat som sier at produktet er fra bunnpris og ikke 
+	// har kategori. Dette hjelper om noen skal inn i databasen og for queries.
+	product := model.ApiProduct{
+		Store:   "bunnpris",
+		BaseUrl: "https://nettbutikk.bunnpris.no",
+		Notes:   "ingen_kategori_bunnpris",
+	}
+
+	// Setter kategory og underkategori til empty string. De ble automatisk til
+	// personlige artikler før av en eller annen grunn.
+	product.Data.Category = ""
+	product.Data.SubCategory = ""
+
 	// Definerer en funksjon som går gjennom base noden
 	var crawler func(*html.Node)
 	crawler = func(node *html.Node) {
@@ -162,14 +175,43 @@ func (data Response) GetProductData(apiProducts *model.ApiProducts, link string)
 				case "form1":
 					for _, attr := range node.Attr {
 						if attr.Key == "action" {
-							product.Data.Ean = strings.Split(strings.Split(attr.Val, "itemno=")[1], "&")[0]
+							product.Data.Ean = sanitizeData(strings.Split(strings.Split(attr.Val, "itemno=")[1], "&")[0])
 						}
 					}
+
 				case "titleName":
 					for _, attr := range node.Attr {
 						if attr.Key == "title" {
-							product.Data.Title = attr.Val
+							product.Data.Title = sanitizeData(attr.Val)
 							fmt.Println("Getting data for", product.Data.Title)
+						}
+					}
+
+				// Til nå har jeg funnet to ulike måter bilder kan vises på
+				case "zoomLens":
+					for _, attr := range node.FirstChild.Attr {
+						if attr.Key == "src" {
+							product.Data.ImageLink = sanitizeData(attr.Val)
+						}
+					}
+				case "itemDetailImg":
+					for _, attr := range node.Attr {
+						if attr.Key == "src" {
+							product.Data.ImageLink = sanitizeData(attr.Val)
+						}
+					}
+
+				case "item-cotext7":
+					if node.FirstChild != nil {
+						if node.FirstChild.FirstChild != nil {
+							product.Data.Subtitle = sanitizeData(node.FirstChild.FirstChild.Data)
+						}
+					}
+
+				case "lblItemDesc":
+					if node.FirstChild != nil {
+						if node.NextSibling != nil {
+							product.Data.Description = sanitizeData(node.FirstChild.NextSibling.Data)
 						}
 					}
 
@@ -215,6 +257,7 @@ func (data Response) GetProductData(apiProducts *model.ApiProducts, link string)
 							product.Data.ComparePricePerUnit = priceFloat
 						}
 					}
+					product.Data.UnitType = sanitizeData(unitPrice.NextSibling.Data)
 				}
 			}
 		}
@@ -235,9 +278,23 @@ func (data Response) GetProductData(apiProducts *model.ApiProducts, link string)
 		product.Data.ComparePricePerUnit = product.Data.OriginalPrice
 	}
 
-  // Legger til link som slug
-  product.Data.Slug = link
+	// Om originalPrice og price ikke er like er det salg så
+	// onSale settes til true
+	if product.Data.Price != product.Data.OriginalPrice {
+		product.Data.OnSale = true
+	}
+
+	// Legger til link som slug
+	product.Data.Slug = sanitizeData(link)
 
 	// Gjør noen ekstra checks for å populate fields i databasen
 	*apiProducts = append(*apiProducts, product)
+}
+
+// Function to clean non-UTF-8 data
+func sanitizeData(str string) string {
+	if utf8.ValidString(str) {
+		return str
+	}
+	return strings.ToValidUTF8(str, "")
 }

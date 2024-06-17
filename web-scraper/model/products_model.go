@@ -29,6 +29,7 @@ type Product struct {
 	Allergens          string              `json:"allergens"`
 	MayContainTracesOf string              `json:"maycontaintracesof"`
 	Weight             string              `json:"weight"`
+  Notes              string              `json:"notes"`
 	NutritionalContent *NutritionalContent `json:"nutritionalcontent"`
 }
 
@@ -66,13 +67,6 @@ func (products *Products) Format(apiProducts ApiProducts) {
 	// mapper over alle produkter vi har fått fra databasen og formatterer
 	// dataen i egne structs
 	for _, firstProduct := range apiProducts {
-		// TODO: fikse problemet vi har med kategorier
-		// Legger ikke til nye produkter fra bunnpris ennå pga. vet ikke hvordan
-		// vi skal sammenligne og samle ting med samme kategori ennå
-		if firstProduct.Store == "bunnpris" {
-			continue
-		}
-
 		gtin := firstProduct.Data.Ean
 
 		// om produktet allerede er sjekket, skip dette produktet

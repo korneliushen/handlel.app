@@ -84,11 +84,11 @@ func query(product model.Product, db *sql.DB) error {
 			id, title, subtitle, imagelink, category, 
 			subcategory, onsale, description, weight, origincountry, ingredients, 
 			vendor, brand, size, unit, unittype, allergens, mayContainTracesOf, 
-			nutritionalcontent, prices
+			nutritionalcontent, prices, notes
 		)
 		VALUES (
 			$1, $2, $3, $4, $5, $6 , $7, $8, $9, $10,
-			$11, $12, $13, $14, $15, $16, $17, $18, $19, $20
+			$11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21
 		)
 		ON CONFLICT (id)
 		DO UPDATE SET
@@ -110,7 +110,8 @@ func query(product model.Product, db *sql.DB) error {
 			allergens = EXCLUDED.allergens,
 			mayContainTracesOf = EXCLUDED.mayContainTracesOf,
 			nutritionalcontent = EXCLUDED.nutritionalcontent,
-			prices = EXCLUDED.prices
+			prices = EXCLUDED.prices,
+      notes = EXCLUDED.notes
 		`)
 	if err != nil {
 		return err
@@ -123,7 +124,8 @@ func query(product model.Product, db *sql.DB) error {
 		product.Description, product.Weight, product.OriginCountry,
 		product.Ingredients, product.Vendor, product.Brand, product.Size,
 		product.Unit, product.UnitType, product.Allergens,
-		product.MayContainTracesOf, nutritionalContentJson, pricesJson)
+		product.MayContainTracesOf, nutritionalContentJson, pricesJson,
+		product.Notes)
 	if err != nil {
 		return err
 	}
