@@ -24,7 +24,7 @@ type Data struct {
 
 // TODO: Trenger ikke å gjøre en ekstra request for den første siden (gidder ikke fikse nå)
 
-func (products *BunnprisProducts) GetProducts(apiProducts *model.ApiProducts, ctx context.Context, token, id string) error {
+func (products *BunnprisProducts) Get(apiProducts *model.ApiProducts, ctx context.Context, token, id string) error {
 	// Gjør en først request for å få mengden produkter i kategorien i tillegg
 	// til å få data fra første page
 	body := genBody(1, id)
@@ -78,11 +78,11 @@ func (products *BunnprisProducts) GetProducts(apiProducts *model.ApiProducts, ct
 }
 
 func genBody(page int, id string) []byte {
-  if id == "0" {
-    fmt.Println("XDDDD")
-    // Frukt og grønt prise pr stk har lyst til å være annerledes
-    return []byte(fmt.Sprintf("%s%d%s", `{dnItemParams: '{"PageName":"itemgrouplist","PageNo":"`, page, `","PageSize":"18","CatType":"","LogicalItemId":"0","Sorting":"","DepartmentNo":"16","DepartmentName":"FRUKT/GRØNT (Pris pr. stk) ","ItemGroupNo":"0","ItemGroupName":"FRUKT/GRØNT (Pris pr. stk) "}'}`))
-  }
+	if id == "0" {
+		fmt.Println("XDDDD")
+		// Frukt og grønt prise pr stk har lyst til å være annerledes
+		return []byte(fmt.Sprintf("%s%d%s", `{dnItemParams: '{"PageName":"itemgrouplist","PageNo":"`, page, `","PageSize":"18","CatType":"","LogicalItemId":"0","Sorting":"","DepartmentNo":"16","DepartmentName":"FRUKT/GRØNT (Pris pr. stk) ","ItemGroupNo":"0","ItemGroupName":"FRUKT/GRØNT (Pris pr. stk) "}'}`))
+	}
 	return []byte(fmt.Sprintf("%s%d%s%s%s", `{dnItemParams: '{"PageName":"itemgrouplist","PageNo":"`, page, `", "ItemGroupNo":"`, id, `"}'}`))
 }
 
@@ -109,7 +109,10 @@ func (products *BunnprisProducts) GetProductLinks(data *html.Node) {
 			// til i et BunnprisProducts arrayet (array med strings)
 			for _, attr := range node.Attr {
 				if attr.Val == "lblName" {
-					*products = append(*products, strings.Split(strings.Split(node.Parent.Attr[1].Val, ".no")[1], "&grpnm")[0])
+					*products = append(
+						*products,
+						strings.Split(strings.Split(node.Parent.Attr[1].Val, ".no")[1], "&grpnm")[0],
+					)
 				}
 			}
 		}

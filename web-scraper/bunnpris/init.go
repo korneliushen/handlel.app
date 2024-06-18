@@ -11,7 +11,7 @@ import (
 func Bunnpris(apiProducts *model.ApiProducts) {
 	ctx := context.Background()
 
-	token := "by3vb2wp5ezsorsynxfp4qg5"
+	token := "wl1irk2zaqbnbafvvufncju5"
 
 	fmt.Println("Getting categories")
 
@@ -25,7 +25,7 @@ func Bunnpris(apiProducts *model.ApiProducts) {
 
 	var products bunnpris.BunnprisProducts
 	for _, category := range categories {
-		err := products.GetProducts(apiProducts, ctx, token, category.Id)
+		err := products.Get(apiProducts, ctx, token, category.Id)
 		if err != nil {
 			fmt.Printf("Error getting products from %s, %s: %s", category.Name, category.Link, err.Error())
 		}

@@ -19,11 +19,12 @@ var storeInfo = map[string]struct {
 	targetClass   string
 	firstCategory string
 	url           string
+	imageUrl      string
 	id            string
 }{
-	"meny":  {targetClass: "li.cw-categories__item", firstCategory: "Frukt & grønt", url: "https://meny.no/varer/", id: "/1300/7080001150488"},
-	"joker": {targetClass: "li.product-categories__item", firstCategory: "Bakerivarer", url: "https://joker.no/nettbutikk/varer/", id: "/1220/7080001395933"},
-	"spar":  {targetClass: "li.product-categories__item", firstCategory: "Bakeartikler og kjeks", url: "https://spar.no/nettbutikk/varer/", id: "/1210/7080001097950"},
+	"meny":  {targetClass: "li.cw-categories__item", firstCategory: "Frukt & grønt", url: "https://meny.no/varer/", imageUrl: "https://bilder.ngdata.no", id: "/1300/7080001150488"},
+	"joker": {targetClass: "li.product-categories__item", firstCategory: "Bakerivarer", url: "https://joker.no/nettbutikk/varer/", imageUrl: "https://bilder.ngdata.no", id: "/1220/7080001395933"},
+	"spar":  {targetClass: "li.product-categories__item", firstCategory: "Bakeartikler og kjeks", url: "https://spar.no/nettbutikk/varer/", imageUrl: "https://bilder.ngdata.no", id: "/1210/7080001097950"},
 }
 
 func GetCategories() model.Categories {
@@ -139,6 +140,16 @@ func GetProducts(products *model.ApiProducts, categories model.Categories) {
 						category.SubCategories, product.Data.SubCategory,
 					)
 				}
+
+				baseImgUrl := "https://bilder.ngdata.no/"
+				// Lager small, medium og large versjoner av image
+				product.Data.ImageLinkSmall = fmt.Sprintf("%s%s%s",
+					baseImgUrl, product.Data.ImageLink, "/small.jpg")
+				product.Data.ImageLinkMedium = fmt.Sprintf("%s%s%s",
+					baseImgUrl, product.Data.ImageLink, "/medium.jpg")
+				product.Data.ImageLinkLarge = fmt.Sprintf("%s%s%s",
+					baseImgUrl, product.Data.ImageLink, "/large.jpg")
+
 				*products = append(*products, product.Extend(store, storeInfo[store].url))
 			}
 		}

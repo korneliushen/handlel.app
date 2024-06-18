@@ -287,6 +287,11 @@ func (data Response) GetProductData(apiProducts *model.ApiProducts, link string)
 	// Legger til link som slug
 	product.Data.Slug = sanitizeData(link)
 
+	baseImageLink := strings.Split(product.Data.ImageLink, "_f")[0]
+	product.Data.ImageLinkSmall = baseImageLink + "_s"
+	product.Data.ImageLinkMedium = baseImageLink + "_m"
+	product.Data.ImageLinkLarge = baseImageLink + "_f"
+
 	// Gjør noen ekstra checks for å populate fields i databasen
 	*apiProducts = append(*apiProducts, product)
 }

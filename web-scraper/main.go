@@ -25,6 +25,12 @@ func run() {
 	// henter data fra bunnpris
 	bunnpris.Bunnpris(apiProducts)
 
+	// LEGG TIL NYE BUTIKKER UNDER HER:
+	//
+	//
+	//
+	//
+
 	// Mapper over alle produkter vi har fått fra databasen og formatterer
 	// dataen i egne structs
 	products := model.Products{}

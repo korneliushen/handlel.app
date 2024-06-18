@@ -25,12 +25,13 @@ type Hits struct {
 type ApiProducts []ApiProduct
 
 type ApiProduct struct {
-	Store   string         `json:"store"`
-	BaseUrl string         `json:"base_url"`
-	Type    string         `json:"_type"`
-	ApiId   string         `json:"_id"`
-	Notes   string         `json:"notes"`
-	Data    ApiProductData `json:"_source"`
+	Store        string         `json:"store"`
+	BaseUrl      string         `json:"base_url"`
+	BaseImageUrl string         `json:"base_img_url"`
+	Type         string         `json:"_type"`
+	ApiId        string         `json:"_id"`
+	Notes        string         `json:"notes"`
+	Data         ApiProductData `json:"_source"`
 }
 
 type ApiProductData struct {
@@ -46,6 +47,9 @@ type ApiProductData struct {
 	ComparePricePerUnit   float64                 `json:"comparePricePerUnit"`
 	UnitType              string                  `json:"compareUnit"`
 	ImageLink             string                  `json:"imagePath"`
+	ImageLinkSmall        string                  `json:"imagePathSmall"`
+	ImageLinkMedium       string                  `json:"imagePathMedium"`
+	ImageLinkLarge        string                  `json:"imagePathLarge"`
 	WeightMeasurementType string                  `json:"measurementType"`
 	Weight                float64                 `json:"measurementValue"`
 	Unit                  string                  `json:"unit"`
@@ -110,8 +114,9 @@ func (apiProduct *ApiProduct) FormatData(productData []ApiProduct, products *Pro
 		apiProduct.Data.Weight, apiProduct.Data.WeightMeasurementType)
 
 	// lager hele url-en for bildelinker for ulike størrelser
-	product.ImageLink = fmt.Sprintf("%s%s",
-		"https://bilder.ngdata.no/", apiProduct.Data.ImageLink)
+	product.Images.Small = apiProduct.Data.ImageLinkSmall
+	product.Images.Medium = apiProduct.Data.ImageLinkMedium
+	product.Images.Large = apiProduct.Data.ImageLinkLarge
 
 	// Fikser kategori navn om kategori ikke er en empty string
 	// (bruker hard-coda kategori navn for å gjøre ting til samme kategori)

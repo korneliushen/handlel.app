@@ -13,8 +13,8 @@ type Product struct {
 	Category           string              `json:"category"`
 	SubCategory        string              `json:"subcategory"`
 	Prices             []Price             `json:"prices"`
+	Images             Images              `json:"images"`
 	OnSale             bool                `json:"onsale"`
-	ImageLink          string              `json:"imagelink"`
 	Description        string              `json:"description"`
 	Duration           string              `json:"duration"`
 	Unit               string              `json:"unit"`
@@ -29,7 +29,7 @@ type Product struct {
 	Allergens          string              `json:"allergens"`
 	MayContainTracesOf string              `json:"maycontaintracesof"`
 	Weight             string              `json:"weight"`
-  Notes              string              `json:"notes"`
+	Notes              string              `json:"notes"`
 	NutritionalContent *NutritionalContent `json:"nutritionalcontent"`
 }
 
@@ -39,6 +39,12 @@ type Price struct {
 	OriginalPrice float64 `json:"originalprice"`
 	UnitPrice     float64 `json:"unitprice"`
 	Url           string  `json:"url"`
+}
+
+type Images struct {
+	Small  string `json:"small"`
+	Medium string `json:"medium"`
+	Large  string `json:"large"`
 }
 
 // fields er på norsk her for å kunne matche de med det som kommer fra databasen med reflect
