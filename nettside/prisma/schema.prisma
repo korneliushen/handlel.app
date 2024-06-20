@@ -29,4 +29,5 @@ model products {
   maycontaintracesof String?
   nutritionalcontent Json?
   prices             Json?
+  notes              String?  @db.VarChar(255)
 }
