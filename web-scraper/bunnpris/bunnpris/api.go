@@ -170,6 +170,7 @@ func (data Response) GetProductData(apiProducts *model.ApiProducts, link string)
 			// Om attr sin value er products-container, kjøres en ny funksjon
 			// på alle child elements
 			for _, attr := range node.Attr {
+        // TODO: flytt switch statement til egen funksjon
 				// Switch statement som sjekker verdien til attributten
 				// Om den har values som passer til elementer med data vi vil
 				// ha, lagres dataen i product (instansen av Product)
@@ -177,7 +178,12 @@ func (data Response) GetProductData(apiProducts *model.ApiProducts, link string)
 				case "form1":
 					for _, attr := range node.Attr {
 						if attr.Key == "action" {
-							product.Data.Ean = sanitizeData(strings.Split(strings.Split(attr.Val, "itemno=")[1], "&")[0])
+              action := strings.Split(attr.Val, "itemno=")
+              if len(action) == 0 {
+                fmt.Println("NO DATA EAN FOUND FOR PRODUCT")
+                return
+              }
+              product.Data.Ean = sanitizeData(strings.Split(strings.Split(attr.Val, "itemno=")[1], "&")[0])
 						}
 					}
 
@@ -290,11 +296,11 @@ func (data Response) GetProductData(apiProducts *model.ApiProducts, link string)
 	product.Data.Slug = sanitizeData(link)
 
 	baseImageLink := BASE_URL + product.Data.ImageLink
-	product.Data.ImageLinkSmall = strings.Replace(baseImageLink, "_f", "_s", 1)
-	product.Data.ImageLinkMedium = strings.Replace(baseImageLink, "_f", "_m", 1)
-  // BaseImageLink er large versjon av bildet, så bare assigner ImageLinkLarge
+	product.Data.ImageLinkSmall = strings.Replace(baseImageLink, "_m", "_s", 1)
+	product.Data.ImageLinkLarge = strings.Replace(baseImageLink, "_m", "_f", 1)
+  // BaseImageLink er medium (_m) versjon av bildet, så bare assigner ImageLinkLarge
   // til baseImageLink
-	product.Data.ImageLinkLarge = baseImageLink
+	product.Data.ImageLinkMedium = baseImageLink
 
 	// Gjør noen ekstra checks for å populate fields i databasen
 	*apiProducts = append(*apiProducts, product)

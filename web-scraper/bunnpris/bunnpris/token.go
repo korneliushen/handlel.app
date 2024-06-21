@@ -51,7 +51,7 @@ func NewToken() (Token, error) {
 	newToken := Token{
 		Created: time.Now().Unix(),
 		Expiry:  time.Now().Add(5 * time.Hour).Unix(),
-		Value:   "t4gkhgwhxosrgpcpv3dv2ki0",
+		Value:   "snrxo0dnsbdiaoaqjnrm5jyl",
 	}
 
 	byteToken, err := json.MarshalIndent(newToken, "", "  ")
