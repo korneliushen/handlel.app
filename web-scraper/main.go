@@ -10,7 +10,6 @@ import (
 	"github.com/korneliushen/handlel.app/scraper/bunnpris"
 	"github.com/korneliushen/handlel.app/scraper/model"
 	"github.com/korneliushen/handlel.app/scraper/neon"
-	"github.com/korneliushen/handlel.app/scraper/ngdata"
 )
 
 func run() {
@@ -18,9 +17,6 @@ func run() {
 	// Denne brukes til å sende data til databasen og algolia, så alle butikker
 	// legger bare til data i dette arrayet
 	apiProducts := &model.ApiProducts{}
-
-	// Henter data fra ngdata api-et (joker, spar og meny).
-	ngdata.Ngdata(apiProducts)
 
 	// henter data fra bunnpris
 	bunnpris.Bunnpris(apiProducts)
@@ -35,6 +31,11 @@ func run() {
 	// dataen i egne structs
 	products := model.Products{}
 	products.Format(*apiProducts)
+
+	if len(products) == 0 {
+		fmt.Println("No products")
+		return
+	}
 
 	// legger data inn i neon databasen
 	neon.InsertData(products)

@@ -134,7 +134,9 @@ func (products BunnprisProducts) FetchProductPages(ctx context.Context, token st
 				fmt.Printf("Error getting data from link %s: %v\n", link, res)
 			}
 
-			res.GetProductData(apiProducts, link)
+			if err := res.GetProductData(apiProducts, link); err != nil {
+				fmt.Printf("Error getting product data from link %s: %v\n", link, err)
+			}
 		}(link)
 	}
 
@@ -144,7 +146,7 @@ func (products BunnprisProducts) FetchProductPages(ctx context.Context, token st
 // TODO FOR MEG IMRGN: alt av logikken for at dette skal kjøre smooth er ferdig
 // så må bare legge til dataen fra produkt siden til ApiProduct instansen
 
-func (data Response) GetProductData(apiProducts *model.ApiProducts, link string) {
+func (data Response) GetProductData(apiProducts *model.ApiProducts, link string) error {
 	// Lager en instanse av ApiProduct som data legges til i når det blir funnet
 	// Legger også til et notat som sier at produktet er fra bunnpris og ikke 
 	// har kategori. Dette hjelper om noen skal inn i databasen og for queries.
@@ -294,6 +296,8 @@ func (data Response) GetProductData(apiProducts *model.ApiProducts, link string)
 
 	// Gjør noen ekstra checks for å populate fields i databasen
 	*apiProducts = append(*apiProducts, product)
+
+	return nil
 }
 
 // Function to clean non-UTF-8 data
