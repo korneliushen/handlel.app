@@ -37,5 +37,6 @@ func Bunnpris(apiProducts *model.ApiProducts) {
 
 	fmt.Println("Getting product data")
 
+  // Henter data fra sidene til produktene
 	products.FetchProductPages(ctx, token.Value, apiProducts)
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/korneliushen/handlel.app/scraper/bunnpris"
 	"github.com/korneliushen/handlel.app/scraper/model"
 	"github.com/korneliushen/handlel.app/scraper/neon"
+	"github.com/korneliushen/handlel.app/scraper/ngdata"
 )
 
 func run() {
@@ -18,7 +19,10 @@ func run() {
 	// legger bare til data i dette arrayet
 	apiProducts := &model.ApiProducts{}
 
-	// henter data fra bunnpris
+	// meny, joker, spar
+  ngdata.Ngdata(apiProducts)
+
+	// bunnpris
 	bunnpris.Bunnpris(apiProducts)
 
 	// LEGG TIL NYE BUTIKKER UNDER HER:
