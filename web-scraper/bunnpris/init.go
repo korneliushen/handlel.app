@@ -8,7 +8,7 @@ import (
 	"github.com/korneliushen/handlel.app/scraper/model"
 )
 
-func Bunnpris(apiProducts *model.ApiProducts) {
+func Bunnpris(products *model.BaseProducts) {
 	ctx := context.Background()
 
 	token, err := bunnpris.ReadToken()
@@ -27,9 +27,9 @@ func Bunnpris(apiProducts *model.ApiProducts) {
 
 	fmt.Println("Getting products")
 
-	var products bunnpris.BunnprisProducts
+	var productLinks bunnpris.BunnprisProducts
 	for _, category := range categories {
-		err := products.Get(apiProducts, ctx, token.Value, category.Id)
+		err := productLinks.Get(ctx, token.Value, category.Id)
 		if err != nil {
 			fmt.Printf("Error getting products from %s, %s: %s", category.Name, category.Link, err.Error())
 		}
@@ -37,6 +37,5 @@ func Bunnpris(apiProducts *model.ApiProducts) {
 
 	fmt.Println("Getting product data")
 
-  // Henter data fra sidene til produktene
-	products.FetchProductPages(ctx, token.Value, apiProducts)
+	productLinks.FetchProductPages(ctx, token.Value, products)
 }

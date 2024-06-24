@@ -45,13 +45,7 @@ func (data Response) IsError() bool {
 	return false
 }
 
-// et array med denne dataen returneres fra ParseHTML
-// senere skal det kunne være generic hva som returneres
-
-// TODO: kan bare kjøre om Data.HTML eksisterer?
-// TODO: gjøre det dynamic (generics kanskje) sånn at man kan velge
-// TODO: hva man vil returnere (element, type osv.) (nå er det bare href og title)
-// legger til en method til Response struct som parser html og returnerer
+// Legger til en method til Response struct som parser html og returnerer
 // alle instanser av et element
 func (data Response) GetCategories() Categories {
 	var categories Categories
@@ -115,7 +109,7 @@ func (data Response) GetCategories() Categories {
 
 type BunnprisProducts []string
 
-func (products BunnprisProducts) FetchProductPages(ctx context.Context, token string, apiProducts *model.ApiProducts) {
+func (products BunnprisProducts) FetchProductPages(ctx context.Context, token string, baseProducts *model.BaseProducts) {
 	// Flere threads ellers tar det sånn 1 time å kjøre
 	var wg sync.WaitGroup
 	sem := make(chan struct{}, 10)
@@ -134,7 +128,7 @@ func (products BunnprisProducts) FetchProductPages(ctx context.Context, token st
 				fmt.Printf("Error getting data from link %s: %v\n", link, res)
 			}
 
-			if err := res.GetProductData(apiProducts, link); err != nil {
+			if err := res.GetProductData(baseProducts, link); err != nil {
 				fmt.Printf("Error getting product data from link %s: %v\n", link, err)
 			}
 		}(link)
@@ -143,18 +137,16 @@ func (products BunnprisProducts) FetchProductPages(ctx context.Context, token st
 	wg.Wait()
 }
 
-// TODO FOR MEG IMRGN: alt av logikken for at dette skal kjøre smooth er ferdig
-// så må bare legge til dataen fra produkt siden til ApiProduct instansen
-
-func (data Response) GetProductData(apiProducts *model.ApiProducts, link string) error {
-	// Lager en instanse av ApiProduct som data legges til i når det blir funnet
-	// Legger også til et notat som sier at produktet er fra bunnpris og ikke 
-	// har kategori. Dette hjelper om noen skal inn i databasen og for queries.
-	product := model.ApiProduct{
+func (data Response) GetProductData(baseProducts *model.BaseProducts, link string) error {
+	// Lager en instanse av BaseProduct som data legges til i når det blir funnet
+	product := &model.BaseProduct{
 		Store:   "bunnpris",
-		BaseUrl: "https://nettbutikk.bunnpris.no",
-		Notes:   "ingen_kategori_bunnpris",
+		BaseUrl: "https://nettbutikk.bunnpris.no",	
 	}
+
+	// Legger til et notat som sier at produktet er fra bunnpris og ikke har 
+  // kategori. Dette hjelper om noen skal inn i databasen og for queries.
+  product.Data.Notes = "ingen_kategori_bunnpris"
 
 	// Setter kategory og underkategori til empty string. De ble automatisk til
 	// personlige artikler før av en eller annen grunn.
@@ -170,103 +162,10 @@ func (data Response) GetProductData(apiProducts *model.ApiProducts, link string)
 			// Om attr sin value er products-container, kjøres en ny funksjon
 			// på alle child elements
 			for _, attr := range node.Attr {
-        // TODO: flytt switch statement til egen funksjon
 				// Switch statement som sjekker verdien til attributten
 				// Om den har values som passer til elementer med data vi vil
 				// ha, lagres dataen i product (instansen av Product)
-				switch attr.Val {
-				case "form1":
-					for _, attr := range node.Attr {
-						if attr.Key == "action" {
-              action := strings.Split(attr.Val, "itemno=")
-              if len(action) == 0 {
-                fmt.Println("NO DATA EAN FOUND FOR PRODUCT")
-                return
-              }
-              product.Data.Ean = sanitizeData(strings.Split(strings.Split(attr.Val, "itemno=")[1], "&")[0])
-						}
-					}
-
-				case "titleName":
-					for _, attr := range node.Attr {
-						if attr.Key == "title" {
-							product.Data.Title = sanitizeData(attr.Val)
-							fmt.Println("Getting data for", product.Data.Title)
-						}
-					}
-
-				// Til nå har jeg funnet to ulike måter bilder kan vises på
-				case "zoomLens":
-					for _, attr := range node.FirstChild.Attr {
-						if attr.Key == "src" {
-							product.Data.ImageLink = sanitizeData(attr.Val)
-						}
-					}
-				case "itemDetailImg":
-					for _, attr := range node.Attr {
-						if attr.Key == "src" {
-							product.Data.ImageLink = sanitizeData(attr.Val)
-						}
-					}
-
-				case "item-cotext7":
-					if node.FirstChild != nil {
-						if node.FirstChild.FirstChild != nil {
-							product.Data.Subtitle = sanitizeData(node.FirstChild.FirstChild.Data)
-						}
-					}
-
-				case "lblItemDesc":
-					if node.FirstChild != nil {
-						if node.NextSibling != nil {
-							product.Data.Description = sanitizeData(node.FirstChild.NextSibling.Data)
-						}
-					}
-
-				// Henter prisen. Henter først originalPrice. Etter det sjekkes
-				// price (campaign price). Om det ikke eksisterer, blir price satt til
-				// originalPrice
-				case "lblSalesPrice":
-					for _, attr := range node.Attr {
-						if attr.Key == "data-dnprice" || attr.Key == "data-dnprice-decimal" {
-							price := attr.Val
-							priceFloat, err := strconv.ParseFloat(strings.TrimSpace(price), 64)
-							if err != nil {
-								fmt.Printf("Couldnt convert string to float: %s", err.Error())
-								continue
-							}
-							product.Data.OriginalPrice = priceFloat
-						}
-					}
-				case "lblCampaignPrice":
-					for _, attr := range node.Attr {
-						if attr.Key == "data-dnprice" || attr.Key == "data-dnprice-decimal" {
-							price := attr.Val
-							priceFloat, err := strconv.ParseFloat(strings.TrimSpace(price), 64)
-							if err != nil {
-								fmt.Printf("Couldnt convert string to float: %s", err.Error())
-								continue
-							}
-							product.Data.Price = priceFloat
-						}
-					}
-
-				// Henter unittype og unitprice
-				case "clearfix div-Weightitem":
-					unitPrice := node.FirstChild.NextSibling
-					for _, attr := range unitPrice.Attr {
-						if attr.Key == "data-dnprice" || attr.Key == "data-dnprice-decimal" {
-							price := attr.Val
-							priceFloat, err := strconv.ParseFloat(strings.TrimSpace(price), 64)
-							if err != nil {
-								fmt.Printf("Couldnt convert string to float: %s", err.Error())
-								continue
-							}
-							product.Data.ComparePricePerUnit = priceFloat
-						}
-					}
-					product.Data.UnitType = sanitizeData(unitPrice.NextSibling.Data)
-				}
+        findData(node, attr, product)
 			}
 		}
 
@@ -303,9 +202,105 @@ func (data Response) GetProductData(apiProducts *model.ApiProducts, link string)
 	product.Data.ImageLinkMedium = baseImageLink
 
 	// Gjør noen ekstra checks for å populate fields i databasen
-	*apiProducts = append(*apiProducts, product)
+	*baseProducts = append(*baseProducts, *product)
 
 	return nil
+}
+
+func findData(node *html.Node, attr html.Attribute, product *model.BaseProduct) {
+  switch attr.Val {
+  case "form1":
+    for _, attr := range node.Attr {
+      if attr.Key == "action" {
+        action := strings.Split(attr.Val, "itemno=")
+        if len(action) == 0 {
+          fmt.Println("NO DATA EAN FOUND FOR PRODUCT")
+          return
+        }
+        product.Data.Ean = sanitizeData(strings.Split(strings.Split(attr.Val, "itemno=")[1], "&")[0])
+      }
+    }
+
+  case "titleName":
+    for _, attr := range node.Attr {
+      if attr.Key == "title" {
+        product.Data.Title = sanitizeData(attr.Val)
+        fmt.Println("Getting data for", product.Data.Title)
+      }
+    }
+
+  // Til nå har jeg funnet to ulike måter bilder kan vises på
+  case "zoomLens":
+    for _, attr := range node.FirstChild.Attr {
+      if attr.Key == "src" {
+        product.Data.ImageLink = sanitizeData(attr.Val)
+      }
+    }
+  case "itemDetailImg":
+    for _, attr := range node.Attr {
+      if attr.Key == "src" {
+        product.Data.ImageLink = sanitizeData(attr.Val)
+      }
+    }
+
+  case "item-cotext7":
+    if node.FirstChild != nil {
+      if node.FirstChild.FirstChild != nil {
+        product.Data.Subtitle = sanitizeData(node.FirstChild.FirstChild.Data)
+      }
+    }
+
+  case "lblItemDesc":
+    if node.FirstChild != nil {
+      if node.NextSibling != nil {
+        product.Data.Description = sanitizeData(node.FirstChild.NextSibling.Data)
+      }
+    }
+
+  // Henter prisen. Henter først originalPrice. Etter det sjekkes
+  // price (campaign price). Om det ikke eksisterer, blir price satt til
+  // originalPrice
+  case "lblSalesPrice":
+    for _, attr := range node.Attr {
+      if attr.Key == "data-dnprice" || attr.Key == "data-dnprice-decimal" {
+        price := attr.Val
+        priceFloat, err := strconv.ParseFloat(strings.TrimSpace(price), 64)
+        if err != nil {
+          fmt.Printf("Couldnt convert string to float: %s", err.Error())
+          continue
+        }
+        product.Data.OriginalPrice = priceFloat
+      }
+    }
+  case "lblCampaignPrice":
+    for _, attr := range node.Attr {
+      if attr.Key == "data-dnprice" || attr.Key == "data-dnprice-decimal" {
+        price := attr.Val
+        priceFloat, err := strconv.ParseFloat(strings.TrimSpace(price), 64)
+        if err != nil {
+          fmt.Printf("Couldnt convert string to float: %s", err.Error())
+          continue
+        }
+        product.Data.Price = priceFloat
+      }
+    }
+
+  // Henter unittype og unitprice
+  case "clearfix div-Weightitem":
+    unitPrice := node.FirstChild.NextSibling
+    for _, attr := range unitPrice.Attr {
+      if attr.Key == "data-dnprice" || attr.Key == "data-dnprice-decimal" {
+        price := attr.Val
+        priceFloat, err := strconv.ParseFloat(strings.TrimSpace(price), 64)
+        if err != nil {
+          fmt.Printf("Couldnt convert string to float: %s", err.Error())
+          continue
+        }
+        product.Data.ComparePricePerUnit = priceFloat
+      }
+    }
+    product.Data.UnitType = sanitizeData(unitPrice.NextSibling.Data)
+  }
 }
 
 // Function to clean non-UTF-8 data

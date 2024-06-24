@@ -10,9 +10,9 @@ Den trenger en NEON_URL (neon connection string, må være pooled connection) og
 
 ### hvordan koden fungerer
 
-main.go har en variabel som heter apiProducts som er et array med typen ApiProducts.
+main.go har en variabel som heter baseProducts som er et array med typen BaseProducts.
 
-I main.go hentes data fra butikkene (for nå ngdata og bunnpris), hvor produkter appendes til apiProducts arrayet.
+I main.go hentes data fra butikkene (for nå ngdata og bunnpris), hvor produkter appendes til baseProducts arrayet.
 
 Når alle produkter er hentet, kjøres en formatering til et format databasen vil ha, og så sendes dataen til databasen og til algolia indexen.
 
@@ -23,11 +23,11 @@ Lag et nytt directory her og gi det navnet på butikken du scraper.
 
 Sett opp scraperen hvordan du vil, men lag en funksjon som kan importes og kjøres av main.go
 
-Denne funksjonen må ta inn et argument med type *model.ApiProducts. Produktene du får fra scraperen din skal appendes til dette arrayet.
+Denne funksjonen må ta inn et argument med type *model.BaseProducts. Produktene du får fra scraperen din skal appendes til dette arrayet.
 
-Kjør funksjonen i main.go og gi apiProducts som argument.
+Kjør funksjonen i main.go og gi baseProducts som argument.
 
-Om dataen du henter er formatert som model.ApiProducts, skal det funke av seg selv og dataen skal legges til.
+Om dataen du henter er formatert som model.baseProducts, skal det funke av seg selv og dataen skal legges til.
 
 
 #### Fil struktur

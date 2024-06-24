@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/korneliushen/handlel.app/scraper/model"
 	"golang.org/x/net/html"
 )
 
@@ -24,7 +23,7 @@ type Data struct {
 
 // TODO: Trenger ikke å gjøre en ekstra request for den første siden (gidder ikke fikse nå)
 
-func (products *BunnprisProducts) Get(apiProducts *model.ApiProducts, ctx context.Context, token, id string) error {
+func (products *BunnprisProducts) Get(ctx context.Context, token, id string) error {
 	// Gjør en først request for å få mengden produkter i kategorien i tillegg
 	// til å få data fra første page
 	body := genBody(1, id)

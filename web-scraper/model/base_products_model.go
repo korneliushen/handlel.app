@@ -8,8 +8,6 @@ import (
 	"strings"
 )
 
-// TODO: Rename alt her til noe annet enn bare Api... (kanskje shared eller no)
-
 // Bare no extra som trengs til ngdata (har ikke giddet å flytte ennå)
 type ApiResponse struct {
 	TimedOut bool `json:"timed_out"`
@@ -18,23 +16,23 @@ type ApiResponse struct {
 
 type Hits struct {
 	AmountOfProducts int          `json:"total"`
-	Products         []ApiProduct `json:"hits"`
+	Products         []BaseProduct `json:"hits"`
 }
 
-// type alias for an array of ApiProduct
-type ApiProducts []ApiProduct
+// type alias for an array of BaseProduct
+type BaseProducts []BaseProduct
 
-type ApiProduct struct {
+type BaseProduct struct {
 	Store        string         `json:"store"`
 	BaseUrl      string         `json:"base_url"`
 	BaseImageUrl string         `json:"base_img_url"`
 	Type         string         `json:"_type"`
 	ApiId        string         `json:"_id"`
-	Notes        string         `json:"notes"`
-	Data         ApiProductData `json:"_source"`
+	Data         BaseProductData `json:"_source"`
 }
 
-type ApiProductData struct {
+type BaseProductData struct {
+	Notes                 string                  `json:"notes"`
 	Ean                   string                  `json:"ean"`
 	Title                 string                  `json:"title"`
 	Subtitle              string                  `json:"subtitle"`
@@ -60,46 +58,45 @@ type ApiProductData struct {
 	Brand                 string                  `json:"brand"`
 	OnSale                bool                    `json:"isOffer"`
 	OriginCountry         string                  `json:"countryOfOrigin"`
-	Allergens             []ApiAllergens          `json:"allergens"`
-	NutritionalContent    []ApiNutritionalContent `json:"nutritionalContent"`
-	Associated            ApiAssociated           `json:"associated"`
+	Allergens             []BaseAllergens          `json:"allergens"`
+	NutritionalContent    []BaseNutritionalContent `json:"nutritionalContent"`
+	Associated            BaseAssociated           `json:"associated"`
 }
 
-type ApiAllergens struct {
+type BaseAllergens struct {
 	Name string `json:"displayName"`
 	Code string `json:"code"`
 }
 
-type ApiNutritionalContent struct {
-	Id     string  `json:"name"`
+type BaseNutritionalContent struct {
 	Name   string  `json:"displayName"`
 	Amount float32 `json:"amount"`
 	Unit   string  `json:"unit"`
 }
 
-type ApiAssociated struct {
+type BaseAssociated struct {
 	Products []string `json:"slg"`
 }
 
-// oppdaterer data i ApiProduct
-func (product ApiProduct) Extend(store, baseUrl string) ApiProduct {
+// oppdaterer data i BaseProduct
+func (product BaseProduct) Extend(store, baseUrl string) BaseProduct {
 	product.Store = store
 	product.BaseUrl = baseUrl
 	return product
 }
 
-// legger en method til i ApiProduct struct så vi kan accesse apiProduct
-func (apiProduct *ApiProduct) FormatData(productData []ApiProduct, products *Products) {
+// legger en method til i BaseProduct struct så vi kan accesse baseProduct
+func (baseProduct *BaseProduct) FormatData(productData []BaseProduct, products *Products) {
 	product := Product{}
 
 	// for algolia
-	product.ObjectID = apiProduct.Data.Ean
+	product.ObjectID = baseProduct.Data.Ean
 
-	product.Id = apiProduct.Data.Ean
+	product.Id = baseProduct.Data.Ean
 
-	// legger til alle fields fra ApiProduct som har samme navn som Product
+	// legger til alle fields fra BaseProduct som har samme navn som Product
 	vDest := reflect.ValueOf(&product).Elem()
-	vSrc := reflect.ValueOf(&apiProduct.Data).Elem()
+	vSrc := reflect.ValueOf(&baseProduct.Data).Elem()
 	for i := range vDest.NumField() {
 		fieldDest := vDest.Field(i)
 		fieldSrc := vSrc.FieldByName(vDest.Type().Field(i).Name)
@@ -111,40 +108,47 @@ func (apiProduct *ApiProduct) FormatData(productData []ApiProduct, products *Pro
 
 	// lager en string for vekt, med value og unit
 	product.Weight = fmt.Sprintf("%v%s",
-		apiProduct.Data.Weight, apiProduct.Data.WeightMeasurementType)
+		baseProduct.Data.Weight, baseProduct.Data.WeightMeasurementType)
 
 	// lager hele url-en for bildelinker for ulike størrelser
-	product.Images.Small = apiProduct.Data.ImageLinkSmall
-	product.Images.Medium = apiProduct.Data.ImageLinkMedium
-	product.Images.Large = apiProduct.Data.ImageLinkLarge
+	product.Images.Small = baseProduct.Data.ImageLinkSmall
+	product.Images.Medium = baseProduct.Data.ImageLinkMedium
+	product.Images.Large = baseProduct.Data.ImageLinkLarge
 
 	// Fikser kategori navn om kategori ikke er en empty string
 	// (bruker hard-coda kategori navn for å gjøre ting til samme kategori)
 	if product.Category != "" {
-		product.Category = getCorrectCategoryName(apiProduct.Data.Category)
+		product.Category = getCorrectCategoryName(baseProduct.Data.Category)
 	}
 
-	// lager et array av priser, å gjøre det på denne måten gjør det lettere
+	// Lager et array av priser, å gjøre det på denne måten gjør det lettere
 	// når dataen skal sendes til database
 	var prices []Price
 	storeMap := map[string]bool{}
-	// sjekker at prisen ikke er 0, om den er det er det ikke vits å sende til
+	// Sjekker at prisen ikke er 0, om den er det er det ikke vits å sende til
 	// databasen
-	for _, product := range productData {
-		if _, exists := storeMap[product.Store]; exists {
+	for _, item := range productData {
+    // Gjør også en sjekk for å sjekke om produktet er på salg fra en av
+    // butikkene, så selv om ikke det første produktet er på salg, kan vi
+    // den fortsatt markeres som onSale om andre produkter er det
+    if item.Data.OnSale {
+      product.OnSale = true
+    }
+
+		if _, exists := storeMap[item.Store]; exists {
 			continue
 		}
-		storeMap[product.Store] = true
+		storeMap[item.Store] = true
 		prices = append(prices, Price{
-			Store:         product.Store,
-			Price:         product.Data.Price,
-			OriginalPrice: product.Data.OriginalPrice,
-			UnitPrice:     product.Data.ComparePricePerUnit,
-			Url:           fmt.Sprintf("%s%s", product.BaseUrl, product.Data.Slug),
+			Store:         item.Store,
+			Price:         item.Data.Price,
+			OriginalPrice: item.Data.OriginalPrice,
+			UnitPrice:     item.Data.ComparePricePerUnit,
+			Url:           fmt.Sprintf("%s%s", item.BaseUrl, item.Data.Slug),
 		})
 	}
 
-	// sorterer basert på pris, så det første elementet i arrayet vil være det
+	// Sorterer basert på pris, så det første elementet i arrayet vil være det
 	// billigste
 	priceCmp := func(a, b Price) int {
 		return cmp.Compare(a.Price, b.Price)
@@ -158,7 +162,7 @@ func (apiProduct *ApiProduct) FormatData(productData []ApiProduct, products *Pro
 	// lagt til i mayContainTracesOf
 	var allergens []string
 	var mayContainTracesOf []string
-	for _, allergen := range apiProduct.Data.Allergens {
+	for _, allergen := range baseProduct.Data.Allergens {
 		if allergen.Code == "JA" {
 			allergens = append(allergens, allergen.Name)
 		} else if allergen.Code == "KAN" {
@@ -169,7 +173,7 @@ func (apiProduct *ApiProduct) FormatData(productData []ApiProduct, products *Pro
 	product.MayContainTracesOf = strings.Join(mayContainTracesOf, ", ")
 
 	// næringsinnhold
-	nutritionalContentData := apiProduct.Data.NutritionalContent
+	nutritionalContentData := baseProduct.Data.NutritionalContent
 
 	// om det ikke er noe næringsinnhold
 	if len(nutritionalContentData) == 0 {

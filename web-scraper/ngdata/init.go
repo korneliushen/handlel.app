@@ -4,10 +4,10 @@ import (
 	"github.com/korneliushen/handlel.app/scraper/model"
 )
 
-func Ngdata(apiProducts *model.ApiProducts) {
+func Ngdata(products *model.BaseProducts) {
 	// henter alle kategorier
 	categories := GetCategories()
 
-	// henter alle produkter og appender til apiProducts arrayet
-	GetProducts(apiProducts, categories)
+	// henter alle produkter og appender til baseProducts arrayet
+	GetProducts(products, categories)
 }

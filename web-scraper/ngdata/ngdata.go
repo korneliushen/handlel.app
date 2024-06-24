@@ -55,14 +55,14 @@ func GetCategories() model.Categories {
 	return categories
 }
 
-func GetProductsFromApi(category model.Category, store string) ([]model.ApiProduct, error) {
+func GetProductsFromApi(category model.Category, store string) ([]model.BaseProduct, error) {
 	// bare meny funker helt for nå
 	url := getUrl(store, category.Name)
 
 	// får data om produkter fra api-en
 	data, err := fetchProducts(url)
 	if err != nil {
-		return []model.ApiProduct{}, err
+		return []model.BaseProduct{}, err
 	}
 
 	return data.Hits.Products, nil
@@ -110,7 +110,7 @@ func fetchProducts(url string) (model.ApiResponse, error) {
 	return produkter, nil
 }
 
-func GetProducts(products *model.ApiProducts, categories model.Categories) {
+func GetProducts(products *model.BaseProducts, categories model.Categories) {
 	for _, category := range categories.Categories {
 		for _, store := range stores {
 			// om kategorien sin butikk og butikken ikke er den samme, er det ikke
@@ -128,7 +128,7 @@ func GetProducts(products *model.ApiProducts, categories model.Categories) {
 				continue
 			}
 
-			// legger til produktet i apiProducts array som mappes over senere,
+			// legger til produktet i baseProduct array som mappes over senere,
 			// legger også til Store (for senere bruk)
 			for _, product := range res {
 				// legger til underkategorier, om underkategorien ikke er lagt til

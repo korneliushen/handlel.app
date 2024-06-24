@@ -64,7 +64,7 @@ type NutritionalContent struct {
 	Salt            string `json:"salt"`
 }
 
-func (products *Products) Format(apiProducts ApiProducts) {
+func (products *Products) Format(baseProducts BaseProducts) {
 	// lagrer alle produkter som allerede har blitt sjekket i et array
 	// da blir det ikke duplicates og vi kan returnere tidlig om produktet
 	// allerede er ferdig
@@ -72,7 +72,7 @@ func (products *Products) Format(apiProducts ApiProducts) {
 
 	// mapper over alle produkter vi har fått fra databasen og formatterer
 	// dataen i egne structs
-	for _, firstProduct := range apiProducts {
+	for _, firstProduct := range baseProducts {
 		gtin := firstProduct.Data.Ean
 
 		// om produktet allerede er sjekket, skip dette produktet
@@ -82,9 +82,9 @@ func (products *Products) Format(apiProducts ApiProducts) {
 		checkedGtins = append(checkedGtins, gtin)
 
 		// finner andre produkter med samme gtin og legger til i et array
-		sameProduct := []ApiProduct{firstProduct}
+		sameProduct := []BaseProduct{firstProduct}
 
-		for _, secondProduct := range apiProducts {
+		for _, secondProduct := range baseProducts {
 			if gtin == secondProduct.Data.Ean &&
 				firstProduct.Store != secondProduct.Store {
 				// legger til produktet i sameProduct array, alle produkter i dette
