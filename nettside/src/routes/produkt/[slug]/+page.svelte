@@ -3,7 +3,6 @@
 	import autoAnimate from '@formkit/auto-animate';
 	import { onMount } from 'svelte';
 	import { handlelapp } from '$lib/stores/handlelapp';
-	import type { Price } from '$lib/types/extendedPrisma';
 
 	let antallProdukter = 0;
 	let dropdown = false;
@@ -26,19 +25,20 @@
 		}
 	}
 	export let data: import('./$types').PageData;
-
 </script>
 
 <main
-	class=" relative grid w-screen max-w-[600px] grid-cols-1 gap-x-8 gap-y-4 overflow-hidden rounded-lg px-5 lg:max-w-[1200px] lg:grid-cols-2 lg:px-20 pb-16 sm:pb-0"
+	class=" relative grid w-screen max-w-[600px] grid-cols-1 gap-x-8 gap-y-4 overflow-hidden rounded-lg px-5 pb-16 sm:pb-0 lg:max-w-[1200px] lg:grid-cols-2 lg:px-20"
 >
 	<div class=" relative flex aspect-square min-h-80 items-center justify-center py-1 lg:w-full">
 		{#if imageError}
-			<p class=" text-xl text-gray-500 text-center">
-				Det finnes ikke bilde for dette produktet
-			</p>
+			<p class=" text-center text-xl text-gray-500">Det finnes ikke bilde for dette produktet</p>
 		{:else}
-			<img src={data.product.imagelink+"/medium.png"} alt="Produktbilde" on:error={() => imageError = true}/>
+			<img
+				src={data.product.images.medium}
+				alt="Produktbilde"
+				on:error={() => (imageError = true)}
+			/>
 		{/if}
 	</div>
 	<div class=" flex flex-col lg:relative">
@@ -48,7 +48,7 @@
 			>
 			<div class=" mt-2 flex justify-between">
 				<p class=" text-lg text-gray-500/60">{data.product?.vendor}</p>
-				<div class=" w-1/2 flex items-center justify-end">
+				<div class=" flex w-1/2 items-center justify-end">
 					<a target="_blank" href={data.product?.prices[0].url}
 						><img
 							class=" mr-4 h-12 rounded-md"
@@ -57,10 +57,12 @@
 						/></a
 					>
 					<div class=" text-end">
-						<p class=" text-2xl font-bold text-mainPurple">{data.product?.prices[0].price.toFixed(2)} kr</p>
+						<p class=" text-2xl font-bold text-mainPurple">
+							{data.product?.prices[0].price.toFixed(2)} kr
+						</p>
 						<p class=" text-lg text-gray-500/60">
-							{data.product?.prices[0].unitprice.toFixed(2) || data.product?.prices[0].price.toFixed(2)} kr/{data.product
-								?.unittype || 'stk'}
+							{data.product?.prices[0].unitprice.toFixed(2) ||
+								data.product?.prices[0].price.toFixed(2)} kr/{data.product?.unittype || 'stk'}
 						</p>
 					</div>
 				</div>
@@ -81,7 +83,8 @@
 					<div class=" text-end">
 						<p class=" text-lg font-bold">{price.price.toFixed(2)} kr</p>
 						<p class=" text-sm text-gray-500/60">
-							{price.unitprice.toFixed(2) || price.price.toFixed(2)} kr/{data.product.unittype || 'stk'}
+							{price.unitprice.toFixed(2) || price.price.toFixed(2)} kr/{data.product.unittype ||
+								'stk'}
 						</p>
 					</div>
 				</a>
@@ -126,7 +129,10 @@
 	</div>
 	<div
 		use:autoAnimate
-		class=" relative overflow-hidden border-t border-borderColor lg:w-full {data.product.nutritionalcontent ? "mb-0" : "mb-24"}"
+		class=" relative overflow-hidden border-t border-borderColor lg:w-full {data.product
+			.nutritionalcontent
+			? 'mb-0'
+			: 'mb-24'}"
 		style="max-height: {lesmer};"
 	>
 		{#if !lesmerBool}

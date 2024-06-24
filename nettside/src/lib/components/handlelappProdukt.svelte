@@ -22,18 +22,21 @@
 		<div class=" ml-4 flex h-full items-center gap-4">
 			<div class="flex w-16 items-center justify-center">
 				{#if imageError}
-					<p class=" text-xs text-gray-500">
-						Det finnes ikke bilde for dette produktet
-					</p>
+					<p class=" text-xs text-gray-500">Det finnes ikke bilde for dette produktet</p>
 				{:else}
-					<img class=" max-h-16 max-w-16" src={product.imagelink+"/small.png"} on:error={() => imageError = true} alt="produktbilde" />
+					<img
+						class=" max-h-16 max-w-16"
+						src={product.images.small}
+						on:error={() => (imageError = true)}
+						alt="produktbilde"
+					/>
 				{/if}
 			</div>
 			<div>
-				<p class=" text-xs md:text-sm font-medium">{product.title}</p>
+				<p class=" text-xs font-medium md:text-sm">{product.title}</p>
 				<p class=" text-xs text-gray-400">{product.brand || product.vendor}</p>
 				{#if !desktopView}
-					<p class=" text-xs md:text-sm font-medium">{product.prices[0].price.toFixed(2)} kr</p>
+					<p class=" text-xs font-medium md:text-sm">{product.prices[0].price.toFixed(2)} kr</p>
 				{/if}
 			</div>
 		</div>
@@ -42,7 +45,8 @@
 				<div class=" mr-3 text-end">
 					<p class=" font-medium">{product.prices[0].price.toFixed(2)} kr</p>
 					<p class=" text-xs font-medium text-gray-400">
-						{product.prices[0].unitprice.toFixed(2) || product.prices[0].price.toFixed(2)} kr/{product.unittype || 'stk'}
+						{product.prices[0].unitprice.toFixed(2) || product.prices[0].price.toFixed(2)} kr/{product.unittype ||
+							'stk'}
 					</p>
 				</div>
 			{/if}
