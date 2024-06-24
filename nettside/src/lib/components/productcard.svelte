@@ -16,7 +16,7 @@
 				productIHandlelappId = i;
 			}
 		}
-	})
+	});
 
 	function leggTilIHandlelapp() {
 		for (let i = 0; i < $handlelapp.length; i++) {
@@ -26,10 +26,13 @@
 			}
 		}
 		if (productIHandlelapp) {
-			$handlelapp = [...$handlelapp.slice(0, productIHandlelappId), ...$handlelapp.slice(productIHandlelappId + 1)]
+			$handlelapp = [
+				...$handlelapp.slice(0, productIHandlelappId),
+				...$handlelapp.slice(productIHandlelappId + 1)
+			];
 			productIHandlelapp = false;
 		} else {
-			$handlelapp = [...$handlelapp, product]
+			$handlelapp = [...$handlelapp, product];
 			productIHandlelapp = true;
 		}
 	}
@@ -43,17 +46,15 @@
 		class="relative flex aspect-square max-h-40 items-center justify-center py-1 lg:w-full"
 	>
 		{#if imageError}
-			<p class=" text-xl text-gray-500 text-center">
-				Det finnes ikke bilde for dette produktet
-			</p>
+			<p class=" text-center text-xl text-gray-500">Det finnes ikke bilde for dette produktet</p>
 		{:else}
 			<img
 				loading="lazy"
 				class="max-h-40"
-				src={product.imagelink+"/small.png"}
-				on:error={() => imageError = true}
+				src={product.images.small}
+				on:error={() => (imageError = true)}
 				alt="produktbilde"
-			/>	
+			/>
 		{/if}
 		<img
 			loading="lazy"
@@ -71,7 +72,8 @@
 			<div class="w-fit space-y-0">
 				<p class="font-semibold">{product.prices[0].price.toFixed(2)} kr</p>
 				<p class="border-t border-gray-500/60 text-sm text-gray-500/60">
-					{product.prices[0].unitprice.toFixed(2) || product.prices[0].price.toFixed(2)} kr/{product.unittype || 'stk'}
+					{product.prices[0].unitprice.toFixed(2) || product.prices[0].price.toFixed(2)} kr/{product.unittype ||
+						'stk'}
 				</p>
 			</div>
 			{#if productIHandlelapp}

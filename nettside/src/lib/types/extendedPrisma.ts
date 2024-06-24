@@ -3,6 +3,7 @@ import type { products } from '@prisma/client';
 export type ExtendedProduct = products & {
 	prices: Price[];
 	nutritionalcontent: NutritionalContent;
+	images: Image;
 };
 
 export type Price = {
@@ -27,4 +28,10 @@ type NutritionalContent = {
 	carbohydrates: string;
 	monounsaturatedfat: string;
 	polyunsaturatedfat: string;
+};
+
+type Image = {
+	large: string;
+	medium: string;
+	small: string;
 };
