@@ -109,12 +109,12 @@ func (data Response) GetCategories() Categories {
 
 type BunnprisProducts []string
 
-func (products BunnprisProducts) FetchProductPages(ctx context.Context, token string, baseProducts *model.BaseProducts) {
+func (productLinks BunnprisProducts) FetchProductPages(ctx context.Context, token string, products *model.Products) {
 	// Flere threads ellers tar det sånn 1 time å kjøre
 	var wg sync.WaitGroup
 	sem := make(chan struct{}, 10)
 
-	for _, link := range products {
+	for _, link := range productLinks {
 		wg.Add(1)
 		sem <- struct{}{}
 
@@ -128,7 +128,7 @@ func (products BunnprisProducts) FetchProductPages(ctx context.Context, token st
 				fmt.Printf("Error getting data from link %s: %v\n", link, res)
 			}
 
-			if err := res.GetProductData(baseProducts, link); err != nil {
+			if err := res.GetProductData(products, link); err != nil {
 				fmt.Printf("Error getting product data from link %s: %v\n", link, err)
 			}
 		}(link)
@@ -137,21 +137,26 @@ func (products BunnprisProducts) FetchProductPages(ctx context.Context, token st
 	wg.Wait()
 }
 
-func (data Response) GetProductData(baseProducts *model.BaseProducts, link string) error {
+func (data Response) GetProductData(products *model.Products, link string) error {
 	// Lager en instanse av BaseProduct som data legges til i når det blir funnet
-	product := &model.BaseProduct{
+	product := &model.Product{
 		Store:   "bunnpris",
-		BaseUrl: "https://nettbutikk.bunnpris.no",	
+		BaseUrl: BASE_URL,	
+    // Legger til et notat som sier at produktet er fra bunnpris og ikke har 
+    // kategori. Dette hjelper om noen skal inn i databasen og for queries.
+    Notes: "ingen_kategori_bunnpris",
+    // Setter kategory og underkategori til empty string. De ble automatisk til
+    // personlige artikler før av en eller annen grunn.
+    Category: "",
+    SubCategory: "",
 	}
 
-	// Legger til et notat som sier at produktet er fra bunnpris og ikke har 
-  // kategori. Dette hjelper om noen skal inn i databasen og for queries.
-  product.Data.Notes = "ingen_kategori_bunnpris"
-
-	// Setter kategory og underkategori til empty string. De ble automatisk til
-	// personlige artikler før av en eller annen grunn.
-	product.Data.Category = ""
-	product.Data.SubCategory = ""
+  // Initializer variabler for pris, så de ikke blir reassigna inni findData
+  // hele tiden. Prisene som blir funnet blir lagt til i en instans av
+  // model.Price og appenda til product.Prices
+  var price float64
+  var originalPrice float64
+  var unitPrice float64
 
 	// Definerer en funksjon som går gjennom base noden
 	var crawler func(*html.Node)
@@ -165,7 +170,7 @@ func (data Response) GetProductData(baseProducts *model.BaseProducts, link strin
 				// Switch statement som sjekker verdien til attributten
 				// Om den har values som passer til elementer med data vi vil
 				// ha, lagres dataen i product (instansen av Product)
-        findData(node, attr, product)
+        findData(node, attr, product, &price, &originalPrice, &unitPrice)
 			}
 		}
 
@@ -178,36 +183,40 @@ func (data Response) GetProductData(baseProducts *model.BaseProducts, link strin
 	// kjører crawler på base-noden
 	crawler(data.Data.HTML)
 
-	if product.Data.Price == 0 {
-		product.Data.Price = product.Data.OriginalPrice
+  product.Prices = append(product.Prices, model.Price{
+    Price: price, 
+    OriginalPrice: originalPrice, 
+    UnitPrice: unitPrice, 
+    Store: "bunnpris",
+    Url: BASE_URL + link,
+  })
+
+
+	if product.Prices[0].Price == 0 {
+		product.Prices[0].Price = product.Prices[0].OriginalPrice
 	}
-	if product.Data.ComparePricePerUnit == 0 {
-		product.Data.ComparePricePerUnit = product.Data.OriginalPrice
+	if product.Prices[0].UnitPrice == 0 {
+		product.Prices[0].UnitPrice = product.Prices[0].OriginalPrice
 	}
 
 	// Om originalPrice og price ikke er like er det salg så
 	// onSale settes til true
-	if product.Data.Price != product.Data.OriginalPrice {
-		product.Data.OnSale = true
+	if product.Prices[0].Price != product.Prices[0].Price {
+		product.OnSale = true
 	}
 
 	// Legger til link som slug
-	product.Data.Slug = sanitizeData(link)
-
-	baseImageLink := BASE_URL + product.Data.ImageLink
-	product.Data.ImageLinkSmall = strings.Replace(baseImageLink, "_m", "_s", 1)
-	product.Data.ImageLinkLarge = strings.Replace(baseImageLink, "_m", "_f", 1)
-  // BaseImageLink er medium (_m) versjon av bildet, så bare assigner ImageLinkLarge
-  // til baseImageLink
-	product.Data.ImageLinkMedium = baseImageLink
+	product.Slug = sanitizeData(link)
 
 	// Gjør noen ekstra checks for å populate fields i databasen
-	*baseProducts = append(*baseProducts, *product)
+	*products = append(*products, *product)
 
 	return nil
 }
 
-func findData(node *html.Node, attr html.Attribute, product *model.BaseProduct) {
+func findData(node *html.Node, attr html.Attribute, product *model.Product, price, originalPrice, unitPrice *float64) {
+  // Instanse av Price
+
   switch attr.Val {
   case "form1":
     for _, attr := range node.Attr {
@@ -217,15 +226,15 @@ func findData(node *html.Node, attr html.Attribute, product *model.BaseProduct) 
           fmt.Println("NO DATA EAN FOUND FOR PRODUCT")
           return
         }
-        product.Data.Ean = sanitizeData(strings.Split(strings.Split(attr.Val, "itemno=")[1], "&")[0])
+        product.Id = sanitizeData(strings.Split(action[1], "&")[0])
       }
     }
 
   case "titleName":
     for _, attr := range node.Attr {
       if attr.Key == "title" {
-        product.Data.Title = sanitizeData(attr.Val)
-        fmt.Println("Getting data for", product.Data.Title)
+        product.Title = sanitizeData(attr.Val)
+        fmt.Println("Getting data for", product.Title)
       }
     }
 
@@ -233,27 +242,27 @@ func findData(node *html.Node, attr html.Attribute, product *model.BaseProduct) 
   case "zoomLens":
     for _, attr := range node.FirstChild.Attr {
       if attr.Key == "src" {
-        product.Data.ImageLink = sanitizeData(attr.Val)
+        product.Images.Medium = sanitizeData(attr.Val)
       }
     }
   case "itemDetailImg":
     for _, attr := range node.Attr {
       if attr.Key == "src" {
-        product.Data.ImageLink = sanitizeData(attr.Val)
+        product.Images.Medium = sanitizeData(attr.Val)
       }
     }
 
   case "item-cotext7":
     if node.FirstChild != nil {
       if node.FirstChild.FirstChild != nil {
-        product.Data.Subtitle = sanitizeData(node.FirstChild.FirstChild.Data)
+        product.SubTitle = sanitizeData(node.FirstChild.FirstChild.Data)
       }
     }
 
   case "lblItemDesc":
     if node.FirstChild != nil {
       if node.NextSibling != nil {
-        product.Data.Description = sanitizeData(node.FirstChild.NextSibling.Data)
+        product.Description = sanitizeData(node.FirstChild.NextSibling.Data)
       }
     }
 
@@ -263,44 +272,51 @@ func findData(node *html.Node, attr html.Attribute, product *model.BaseProduct) 
   case "lblSalesPrice":
     for _, attr := range node.Attr {
       if attr.Key == "data-dnprice" || attr.Key == "data-dnprice-decimal" {
-        price := attr.Val
-        priceFloat, err := strconv.ParseFloat(strings.TrimSpace(price), 64)
+        priceString := attr.Val
+        priceFloat, err := strconv.ParseFloat(strings.TrimSpace(priceString), 64)
         if err != nil {
           fmt.Printf("Couldnt convert string to float: %s", err.Error())
           continue
         }
-        product.Data.OriginalPrice = priceFloat
+        *originalPrice = priceFloat
       }
     }
   case "lblCampaignPrice":
     for _, attr := range node.Attr {
       if attr.Key == "data-dnprice" || attr.Key == "data-dnprice-decimal" {
-        price := attr.Val
-        priceFloat, err := strconv.ParseFloat(strings.TrimSpace(price), 64)
+        priceString := attr.Val
+        priceFloat, err := strconv.ParseFloat(strings.TrimSpace(priceString), 64)
         if err != nil {
           fmt.Printf("Couldnt convert string to float: %s", err.Error())
           continue
         }
-        product.Data.Price = priceFloat
+        *price = priceFloat
       }
     }
 
   // Henter unittype og unitprice
   case "clearfix div-Weightitem":
-    unitPrice := node.FirstChild.NextSibling
-    for _, attr := range unitPrice.Attr {
+    unitPriceNode := node.FirstChild.NextSibling
+    for _, attr := range unitPriceNode.Attr {
       if attr.Key == "data-dnprice" || attr.Key == "data-dnprice-decimal" {
-        price := attr.Val
-        priceFloat, err := strconv.ParseFloat(strings.TrimSpace(price), 64)
+        priceString := attr.Val
+        priceFloat, err := strconv.ParseFloat(strings.TrimSpace(priceString), 64)
         if err != nil {
           fmt.Printf("Couldnt convert string to float: %s", err.Error())
           continue
         }
-        product.Data.ComparePricePerUnit = priceFloat
+        *unitPrice = priceFloat
       }
     }
-    product.Data.UnitType = sanitizeData(unitPrice.NextSibling.Data)
+    product.UnitType = sanitizeData(unitPriceNode.NextSibling.Data)
   }
+
+	baseImageLink := BASE_URL + product.Images.Medium
+	product.Images.Small = strings.Replace(baseImageLink, "_m", "_s", 1)
+	product.Images.Large = strings.Replace(baseImageLink, "_m", "_f", 1)
+  // BaseImageLink er medium (_m) versjon av bildet, så bare assigner ImageLinkLarge
+  // til baseImageLink
+	product.Images.Medium = baseImageLink
 }
 
 // Function to clean non-UTF-8 data

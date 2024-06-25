@@ -55,14 +55,14 @@ func GetCategories() model.Categories {
 	return categories
 }
 
-func GetProductsFromApi(category model.Category, store string) ([]model.BaseProduct, error) {
+func GetProductsFromApi(category model.Category, store string) ([]ApiProduct, error) {
 	// bare meny funker helt for nå
 	url := getUrl(store, category.Name)
 
 	// får data om produkter fra api-en
 	data, err := fetchProducts(url)
 	if err != nil {
-		return []model.BaseProduct{}, err
+		return []ApiProduct{}, err
 	}
 
 	return data.Hits.Products, nil
@@ -89,31 +89,32 @@ func getUrl(store, category string) string {
 }
 
 // henter data for produkter med url-en som blir generert over
-func fetchProducts(url string) (model.ApiResponse, error) {
+func fetchProducts(url string) (ApiResponse, error) {
 	// gjør request til url-en
 	res, err := http.Get(url)
 	if err != nil {
-		return model.ApiResponse{}, err
+		return ApiResponse{}, err
 	}
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return model.ApiResponse{}, err
+		return ApiResponse{}, err
 	}
 
-	var produkter model.ApiResponse
+	var produkter ApiResponse
 	err = json.Unmarshal(body, &produkter)
 	if err != nil {
-		return model.ApiResponse{}, err
+		return ApiResponse{}, err
 	}
 
 	return produkter, nil
 }
 
-func GetProducts(products *model.BaseProducts, categories model.Categories) {
+func GetProducts(categories model.Categories) model.Products {
+  products := model.Products{}
 	for _, category := range categories.Categories {
 		for _, store := range stores {
-			// om kategorien sin butikk og butikken ikke er den samme, er det ikke
+			// Om kategorien sin butikk og butikken ikke er den samme, er det ikke
 			// vits å kjøre request fordi den vil ikke få noe data
 			// (og om den får det vil det være duplicate)
 			if category.Store != store {
@@ -150,8 +151,11 @@ func GetProducts(products *model.BaseProducts, categories model.Categories) {
 				product.Data.ImageLinkLarge = fmt.Sprintf("%s%s%s",
 					baseImgUrl, product.Data.ImageLink, "/large.jpg")
 
-				*products = append(*products, product.Extend(store, storeInfo[store].url))
+        product = product.Extend(store, storeInfo[store].url)
+        products = append(products, product.Format())
 			}
 		}
 	}
+
+  return products
 }

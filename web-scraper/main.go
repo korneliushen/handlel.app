@@ -17,13 +17,13 @@ func run() {
 	// Instansierer en variabel med type BaseProduct
 	// Denne brukes til å sende data til databasen og algolia, så alle butikker
 	// legger bare til data i dette arrayet
-	baseProducts := &model.BaseProducts{}
+  products := &model.Products{}
 
 	// meny, joker, spar
-  ngdata.Ngdata(baseProducts)
+  ngdata.Ngdata(products)
 
-	// bunnpris
-	bunnpris.Bunnpris(baseProducts)
+  // bunnpris
+  bunnpris.Bunnpris(products)
 
 	// LEGG TIL NYE BUTIKKER UNDER HER:
 	//
@@ -33,19 +33,19 @@ func run() {
 
 	// Mapper over alle produkter vi har fått fra databasen og formatterer
 	// dataen i egne structs
-	products := model.Products{}
-	products.Format(*baseProducts)
+  formattedProducts := products.Format()
 
-	if len(products) == 0 {
+	if len(*products) == 0 {
 		fmt.Println("No products")
 		return
 	}
+  fmt.Println("Formated: ", len(formattedProducts))
 
 	// legger data inn i neon databasen
-	neon.InsertData(products)
+	neon.InsertData(formattedProducts)
 
 	// legger data inn i algolia indexen
-	if err := algolia.InsertRecords(products); err != nil {
+	if err := algolia.InsertRecords(formattedProducts); err != nil {
 		fmt.Printf("Error: %v\n", err)
 	}
 }

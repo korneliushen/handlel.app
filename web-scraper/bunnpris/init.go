@@ -8,7 +8,9 @@ import (
 	"github.com/korneliushen/handlel.app/scraper/model"
 )
 
-func Bunnpris(products *model.BaseProducts) {
+func Bunnpris(products *model.Products) {
+  originalLength := len(*products)
+
 	ctx := context.Background()
 
 	token, err := bunnpris.ReadToken()
@@ -38,4 +40,8 @@ func Bunnpris(products *model.BaseProducts) {
 	fmt.Println("Getting product data")
 
 	productLinks.FetchProductPages(ctx, token.Value, products)
+
+  if originalLength == len(*products) {
+    fmt.Println("Got no products from bunnpris")
+  }
 }

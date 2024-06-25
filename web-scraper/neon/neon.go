@@ -44,7 +44,7 @@ func InsertData(products model.Products) {
 		sem <- struct{}{}
 
 		go func(product model.Product) {
-			fmt.Println("Legger inn data for:", product.Title)
+			fmt.Println("Legger inn data for:", product.Title, product.Id)
 			// når funksjonen er ferdig, blir waitgroup instansen ferdig + sem
 			// (hvor mange ting som kan kjøre om gangen) blir oppdatert
 			defer wg.Done()

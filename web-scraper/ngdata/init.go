@@ -1,13 +1,18 @@
 package ngdata
 
-import (
-	"github.com/korneliushen/handlel.app/scraper/model"
-)
+import "github.com/korneliushen/handlel.app/scraper/model"
 
-func Ngdata(products *model.BaseProducts) {
-	// henter alle kategorier
+func Ngdata(products *model.Products) {
+	// Henter alle kategorier
 	categories := GetCategories()
 
-	// henter alle produkter og appender til baseProducts arrayet
-	GetProducts(products, categories)
+	// Henter alle produkter fra ngdata api og returnere et array med formaterte
+  // produkter
+  ngdataProducts := GetProducts(categories)
+
+  // Appender alle formaterte produkter vi får fra ngdata api-et til products
+  // arrayet
+  for _, product := range ngdataProducts {
+    *products = append(*products, product)
+  }
 }
