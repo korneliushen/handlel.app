@@ -110,6 +110,14 @@ func (baseProduct ApiProduct) Format() model.Product {
   price.Price = baseProduct.Data.Price
   price.OriginalPrice = baseProduct.Data.OriginalPrice
   price.UnitPrice = baseProduct.Data.ComparePricePerUnit
+
+  // ComparePricePerUnit er noen ganger null av en eller annen grunn.
+  // Har bare sett dette skje på produkter som selger et stk, så dette vil
+  // være accurate for de tilfellene
+  if baseProduct.Data.ComparePricePerUnit == 0 {
+    price.UnitPrice = price.Price
+  }
+
   price.Url = fmt.Sprintf("%s%s", baseProduct.BaseUrl, baseProduct.Data.Slug)
   product.Prices = append(product.Prices, price)
 
@@ -117,12 +125,14 @@ func (baseProduct ApiProduct) Format() model.Product {
 	product.Weight = fmt.Sprintf("%v%s",
 		baseProduct.Data.Weight, baseProduct.Data.WeightMeasurementType)
 
-	// lager hele url-en for bildelinker for ulike størrelser
-	product.Images.Small = baseProduct.Data.ImageLinkSmall
-	product.Images.Medium = baseProduct.Data.ImageLinkMedium
-	product.Images.Large = baseProduct.Data.ImageLinkLarge
+  // Base url for bilder
+  baseImgUrl := "https://bilder.ngdata.no/"
+  // Lager small, medium og large versjoner av image. Lager hele url-en
+	product.Images.Small = fmt.Sprintf("%s%s%s", baseImgUrl, baseProduct.Data.ImageLink, "/small.jpg")
+  product.Images.Medium = fmt.Sprintf("%s%s%s", baseImgUrl, baseProduct.Data.ImageLink, "/medium.jpg")
+  product.Images.Large = fmt.Sprintf("%s%s%s", baseImgUrl, baseProduct.Data.ImageLink, "/large.jpg")
 
-	// mapper over allergener array som vi fikk fra databasen
+	// Mapper over allergener array som vi fikk fra databasen
 	// i databasen så bestemmer koden hva itemet i arrayen betyr for produktet
 	// om koden er JA, blir det lagt til i allergens, om det er kan blir det
 	// lagt til i mayContainTracesOf

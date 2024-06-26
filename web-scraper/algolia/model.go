@@ -2,6 +2,9 @@ package algolia
 
 import "github.com/korneliushen/handlel.app/scraper/model"
 
+// Currently ikke i bruk, bare om vi må kutte ned på størrelsen til records
+// Dette er minumun records trenger for å fungere
+
 type Products []Product
 
 type Product struct {

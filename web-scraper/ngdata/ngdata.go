@@ -142,15 +142,6 @@ func GetProducts(categories model.Categories) model.Products {
 					)
 				}
 
-				baseImgUrl := "https://bilder.ngdata.no/"
-				// Lager small, medium og large versjoner av image
-				product.Data.ImageLinkSmall = fmt.Sprintf("%s%s%s",
-					baseImgUrl, product.Data.ImageLink, "/small.jpg")
-				product.Data.ImageLinkMedium = fmt.Sprintf("%s%s%s",
-					baseImgUrl, product.Data.ImageLink, "/medium.jpg")
-				product.Data.ImageLinkLarge = fmt.Sprintf("%s%s%s",
-					baseImgUrl, product.Data.ImageLink, "/large.jpg")
-
         product = product.Extend(store, storeInfo[store].url)
         products = append(products, product.Format())
 			}

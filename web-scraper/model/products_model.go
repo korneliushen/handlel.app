@@ -15,6 +15,7 @@ type Product struct {
   BaseUrl            string              `json:"baseurl"`
   Slug               string              `json:"slug"`
 	Id                 string              `json:"id"`
+  ObjectID           string              `json:"objectID"`
 	Title              string              `json:"title"`
 	SubTitle           string              `json:"subtitle"`
 	Category           string              `json:"category"`
@@ -113,6 +114,9 @@ func (products Products) Format() Products {
 }
 
 func (product *Product) AggregateProductData(productData Products, products *Products) {
+  // For algolia
+  product.ObjectID = product.Id
+
 	// Lager et array av priser, å gjøre det på denne måten gjør det lettere
 	// når dataen skal sendes til database
 	var prices []Price

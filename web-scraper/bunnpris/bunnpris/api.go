@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"reflect"
 	"strconv"
 	"strings"
 	"sync"
@@ -154,9 +155,8 @@ func (data Response) GetProductData(products *model.Products, link string) error
   // Initializer variabler for pris, så de ikke blir reassigna inni findData
   // hele tiden. Prisene som blir funnet blir lagt til i en instans av
   // model.Price og appenda til product.Prices
-  var price float64
-  var originalPrice float64
-  var unitPrice float64
+  price := model.Price{Url: BASE_URL + link, Store: "bunnpris"}
+  nutritionalContent := model.NutritionalContent{}
 
 	// Definerer en funksjon som går gjennom base noden
 	var crawler func(*html.Node)
@@ -170,7 +170,7 @@ func (data Response) GetProductData(products *model.Products, link string) error
 				// Switch statement som sjekker verdien til attributten
 				// Om den har values som passer til elementer med data vi vil
 				// ha, lagres dataen i product (instansen av Product)
-        findData(node, attr, product, &price, &originalPrice, &unitPrice)
+        findData(node, attr, product, &price, &nutritionalContent)
 			}
 		}
 
@@ -183,14 +183,8 @@ func (data Response) GetProductData(products *model.Products, link string) error
 	// kjører crawler på base-noden
 	crawler(data.Data.HTML)
 
-  product.Prices = append(product.Prices, model.Price{
-    Price: price, 
-    OriginalPrice: originalPrice, 
-    UnitPrice: unitPrice, 
-    Store: "bunnpris",
-    Url: BASE_URL + link,
-  })
-
+  product.Prices = append(product.Prices, price)
+  product.NutritionalContent = &nutritionalContent
 
 	if product.Prices[0].Price == 0 {
 		product.Prices[0].Price = product.Prices[0].OriginalPrice
@@ -214,7 +208,7 @@ func (data Response) GetProductData(products *model.Products, link string) error
 	return nil
 }
 
-func findData(node *html.Node, attr html.Attribute, product *model.Product, price, originalPrice, unitPrice *float64) {
+func findData(node *html.Node, attr html.Attribute, product *model.Product, price *model.Price, nutritionalContent *model.NutritionalContent) {
   // Instanse av Price
 
   switch attr.Val {
@@ -278,7 +272,7 @@ func findData(node *html.Node, attr html.Attribute, product *model.Product, pric
           fmt.Printf("Couldnt convert string to float: %s", err.Error())
           continue
         }
-        *originalPrice = priceFloat
+        price.OriginalPrice = priceFloat
       }
     }
   case "lblCampaignPrice":
@@ -290,7 +284,7 @@ func findData(node *html.Node, attr html.Attribute, product *model.Product, pric
           fmt.Printf("Couldnt convert string to float: %s", err.Error())
           continue
         }
-        *price = priceFloat
+        price.Price = priceFloat
       }
     }
 
@@ -305,11 +299,37 @@ func findData(node *html.Node, attr html.Attribute, product *model.Product, pric
           fmt.Printf("Couldnt convert string to float: %s", err.Error())
           continue
         }
-        *unitPrice = priceFloat
+        price.UnitPrice = priceFloat
       }
     }
     product.UnitType = sanitizeData(unitPriceNode.NextSibling.Data)
+
+  // Næringsinnhold
+  case "Nutrition":
+    // jeg beklager denne koden eksisterer
+    tableBody := node.FirstChild.NextSibling.NextSibling.FirstChild
+
+    // Mapper over alle children til tablebody, og legger til verdier i 
+    // nutritionalContent basert op key valuen i html-elementet
+    for child := tableBody.FirstChild; child != nil; child = child.NextSibling {
+	    v := reflect.ValueOf(nutritionalContent).Elem()
+
+      key := strings.TrimSpace(child.FirstChild.FirstChild.Data)
+      // På bunnpris heter det karbohydrat, så må gjøre det til Karbohydrater
+      if key == "Karbohydrat" {
+        key = "Karbohydrater"
+      }
+      field := v.FieldByName(key)
+
+      if field.IsValid() {
+        value := strings.TrimSpace(child.FirstChild.NextSibling.FirstChild.Data)
+        field.SetString(value)
+      }
+		}
+
+    fmt.Println(nutritionalContent.Energi)
   }
+
 
 	baseImageLink := BASE_URL + product.Images.Medium
 	product.Images.Small = strings.Replace(baseImageLink, "_m", "_s", 1)
