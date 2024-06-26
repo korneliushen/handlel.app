@@ -24,9 +24,7 @@ type Response struct {
 
 // typene til ApiRes.data
 type ResponseData struct {
-	// TODO: lage method til ResponseData som parser html
 	HTML *html.Node
-	// TODO: gjøre dette til en generic med json responses som kan komme
 	JSON []byte
 }
 
@@ -186,6 +184,14 @@ func (data Response) GetProductData(products *model.Products, link string) error
   product.Prices = append(product.Prices, price)
   product.NutritionalContent = &nutritionalContent
 
+  baseImageLink := BASE_URL + product.Images.Medium
+	product.Images.Small = strings.Replace(baseImageLink, "_m", "_s", 1)
+	product.Images.Large = strings.Replace(baseImageLink, "_m", "_f", 1)
+  // BaseImageLink er medium (_m) versjon av bildet, så bare assigner ImageLinkLarge
+  // til baseImageLink
+	product.Images.Medium = baseImageLink
+
+
 	if product.Prices[0].Price == 0 {
 		product.Prices[0].Price = product.Prices[0].OriginalPrice
 	}
@@ -326,17 +332,7 @@ func findData(node *html.Node, attr html.Attribute, product *model.Product, pric
         field.SetString(value)
       }
 		}
-
-    fmt.Println(nutritionalContent.Energi)
   }
-
-
-	baseImageLink := BASE_URL + product.Images.Medium
-	product.Images.Small = strings.Replace(baseImageLink, "_m", "_s", 1)
-	product.Images.Large = strings.Replace(baseImageLink, "_m", "_f", 1)
-  // BaseImageLink er medium (_m) versjon av bildet, så bare assigner ImageLinkLarge
-  // til baseImageLink
-	product.Images.Medium = baseImageLink
 }
 
 // Function to clean non-UTF-8 data

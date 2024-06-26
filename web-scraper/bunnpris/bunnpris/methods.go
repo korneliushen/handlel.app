@@ -11,12 +11,8 @@ import (
 	"golang.org/x/net/html"
 )
 
-// TODO: bruke riktige status codes
-// TODO: flytte til egen api/methods/req folder (må fikse import cycle problemer først)
-
 const BASE_URL = "https://nettbutikk.bunnpris.no"
 
-// TODO: bytte ut body io.Reader med generics?
 // TODO: trenger bare noen ting her og ikke alt (conditional det var den ene videoen jeg husker det)
 
 func POST(ctx context.Context, token, endpoint string, reqBody io.Reader, contentType string) Response {
