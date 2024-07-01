@@ -6,7 +6,8 @@ NOTE: om nye produkter blir lagt til blir det litt goofy med kategorier, så må
 
 Du trenger en .env fil i root directory for å kjøre programmet
 
-Den trenger en NEON_URL (neon connection string, må være pooled connection) og en ALGOLIA_SECRET (algolia read og write api key)
+Den trenger en NEON_URL (neon connection string, må være pooled connection), en ALGOLIA_SECRET (algolia read og write api key)
+og en BUNNPRIS_TOKEN (ASP.NET_SessionId som trengs for å få data fra bunnpris (skal prøve å automatisere i fremtiden), du kan få en token ved å gå til nettbutikk.bunnpris.no, velge butikk og så hente fra cookies)
 
 ### hvordan koden fungerer
 
