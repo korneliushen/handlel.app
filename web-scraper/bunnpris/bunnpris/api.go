@@ -195,9 +195,6 @@ func (data Response) GetProductData(products *model.Products, link string) error
 	if product.Prices[0].Price == 0 {
 		product.Prices[0].Price = product.Prices[0].OriginalPrice
 	}
-	if product.Prices[0].UnitPrice == 0 {
-		product.Prices[0].UnitPrice = product.Prices[0].OriginalPrice
-	}
 
 	// Om originalPrice og price ikke er like er det salg så
 	// onSale settes til true

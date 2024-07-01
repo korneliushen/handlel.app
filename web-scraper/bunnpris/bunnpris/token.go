@@ -7,6 +7,7 @@ import (
 )
 
 type Token struct {
+  Store   string `json:"store"`
 	Created int64  `json:"created"`
 	Expiry  int64  `json:"expiry"`
 	Value   string `json:"value"`
@@ -36,6 +37,7 @@ func ReadToken() (Token, error) {
 	}
 
 	// Sjekker om tokenen er valid
+  // Om den er invalid, lages en ny token
 	if !newToken.Valid() {
 		if newToken, err = NewToken(); err != nil {
 			return newToken, err
@@ -49,9 +51,10 @@ func ReadToken() (Token, error) {
 func NewToken() (Token, error) {
 	// Setter expiry til å være 5 timer fra da tokenen ble laget
 	newToken := Token{
+    Store:   "bunnpris",
 		Created: time.Now().Unix(),
 		Expiry:  time.Now().Add(5 * time.Hour).Unix(),
-		Value:   "snrxo0dnsbdiaoaqjnrm5jyl",
+		Value:   os.Getenv("BUNNPRIS_TOKEN"),
 	}
 
 	byteToken, err := json.MarshalIndent(newToken, "", "  ")
@@ -78,7 +81,7 @@ func (token *Token) Valid() bool {
 	}
 
 	// En if condition for å sjekke og returnere tidlig om tokenen er invalid
-	if token.Expiry > time.Now().Unix() {
+	if token.Expiry < time.Now().Unix() {
 		return false
 	}
 
