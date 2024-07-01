@@ -146,7 +146,7 @@ func (data Response) GetProductData(products *model.Products, link string) error
     Notes: "ingen_kategori_bunnpris",
     // Setter kategory og underkategori til empty string. De ble automatisk til
     // personlige artikler før av en eller annen grunn.
-    Category: "",
+    Category: "Bunnpris",
     SubCategory: "",
 	}
 
