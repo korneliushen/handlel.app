@@ -22,9 +22,9 @@ var storeInfo = map[string]struct {
 	imageUrl      string
 	id            string
 }{
-	"meny":  {targetClass: "li.cw-categories__item", firstCategory: "Frukt & grønt", url: "https://meny.no/varer/", imageUrl: "https://bilder.ngdata.no", id: "/1300/7080001150488"},
-	"joker": {targetClass: "li.product-categories__item", firstCategory: "Bakerivarer", url: "https://joker.no/nettbutikk/varer/", imageUrl: "https://bilder.ngdata.no", id: "/1220/7080001395933"},
-	"spar":  {targetClass: "li.product-categories__item", firstCategory: "Bakeartikler og kjeks", url: "https://spar.no/nettbutikk/varer/", imageUrl: "https://bilder.ngdata.no", id: "/1210/7080001097950"},
+	"meny":  {targetClass: "li.cw-categories__item", firstCategory: "Frukt & grønt", url: "https://meny.no/varer/", id: "/1300/7080001150488"},
+	"joker": {targetClass: "li.product-categories__item", firstCategory: "Bakerivarer", url: "https://joker.no/nettbutikk/varer/", id: "/1220/7080001395933"},
+	"spar":  {targetClass: "li.product-categories__item", firstCategory: "Bakeartikler og kjeks", url: "https://spar.no/nettbutikk/varer/", id: "/1210/7080001097950"},
 }
 
 func GetCategories() model.Categories {
