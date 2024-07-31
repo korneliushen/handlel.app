@@ -7,7 +7,6 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/korneliushen/handlel.app/scraper/algolia"
-	"github.com/korneliushen/handlel.app/scraper/bunnpris"
 	"github.com/korneliushen/handlel.app/scraper/model"
 	"github.com/korneliushen/handlel.app/scraper/neon"
 	"github.com/korneliushen/handlel.app/scraper/ngdata"
@@ -21,9 +20,6 @@ func run() {
 
 	// meny, joker, spar
   ngdata.Ngdata(products)
-
-  // bunnpris
-  bunnpris.Bunnpris(products)
 
 	// LEGG TIL NYE BUTIKKER UNDER HER:
 	//

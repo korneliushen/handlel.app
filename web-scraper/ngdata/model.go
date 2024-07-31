@@ -105,7 +105,7 @@ func (baseProduct ApiProduct) Format() model.Product {
 
   product.Store = baseProduct.Store
 
-  price := model.Price{}
+  price := model.PriceToday{}
   price.Store = baseProduct.Store
   price.Price = baseProduct.Data.Price
   price.OriginalPrice = baseProduct.Data.OriginalPrice
@@ -119,7 +119,7 @@ func (baseProduct ApiProduct) Format() model.Product {
   }
 
   price.Url = fmt.Sprintf("%s%s", baseProduct.BaseUrl, baseProduct.Data.Slug)
-  product.Prices = append(product.Prices, price)
+  product.Prices.Today = append(product.Prices.Today, price)
 
 	// lager en string for vekt, med value og unit
 	product.Weight = fmt.Sprintf("%v%s",

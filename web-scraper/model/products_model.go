@@ -20,7 +20,7 @@ type Product struct {
 	SubTitle           string              `json:"subtitle"`
 	Category           string              `json:"category"`
 	SubCategory        string              `json:"subcategory"`
-	Prices             []Price             `json:"prices"`
+	Prices             Price               `json:"prices"`
 	Images             Images              `json:"images"`
 	OnSale             bool                `json:"onsale"`
 	Description        string              `json:"description"`
@@ -42,11 +42,22 @@ type Product struct {
 }
 
 type Price struct {
+  Today   []PriceToday `json:"today"`
+  History []PriceHistory `json:"history"`
+}
+
+type PriceToday struct {
 	Store         string  `json:"store"`
 	Price         float64 `json:"price"`
 	OriginalPrice float64 `json:"originalprice"`
 	UnitPrice     float64 `json:"unitprice"`
 	Url           string  `json:"url"`
+}
+
+type PriceHistory struct {
+  Date string `json:"date"`
+  Price float64 `json:"price"`
+  Store string `json:"store"`
 }
 
 type Images struct {
@@ -119,7 +130,7 @@ func (product *Product) AggregateProductData(productData Products, products *Pro
 
 	// Lager et array av priser, å gjøre det på denne måten gjør det lettere
 	// når dataen skal sendes til database
-	var prices []Price
+	var prices Price
 	storeMap := map[string]bool{}
 	// Sjekker at prisen ikke er 0, om den er det er det ikke vits å sende til
 	// databasen
@@ -135,22 +146,26 @@ func (product *Product) AggregateProductData(productData Products, products *Pro
 			continue
 		}
 		storeMap[item.Store] = true
-		prices = append(prices, Price{
+		prices.Today = append(prices.Today, PriceToday{
 			Store:         item.Store,
-			Price:         item.Prices[0].Price,
-			OriginalPrice: item.Prices[0].OriginalPrice,
-			UnitPrice:     item.Prices[0].UnitPrice,
-			Url:           item.Prices[0].Url,
+			Price:         item.Prices.Today[0].Price,
+			OriginalPrice: item.Prices.Today[0].OriginalPrice,
+			UnitPrice:     item.Prices.Today[0].UnitPrice,
+			Url:           item.Prices.Today[0].Url,
 		})
+
+    // TODO: pris historikk
+    //
+    //
 	}
 
 	// Sorterer basert på pris, så det første elementet i arrayet vil være det
 	// billigste
-	priceCmp := func(a, b Price) int {
+	priceCmp := func(a, b PriceToday) int {
 		return cmp.Compare(a.Price, b.Price)
 	}
-	slices.SortFunc(prices, priceCmp)
-	product.Prices = prices
+	slices.SortFunc(prices.Today, priceCmp)
+	product.Prices.Today = prices.Today
 
   if product.Category != "" {
 		product.Category = getCorrectCategoryName(product.Category)

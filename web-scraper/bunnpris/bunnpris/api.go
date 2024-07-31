@@ -153,7 +153,7 @@ func (data Response) GetProductData(products *model.Products, link string) error
   // Initializer variabler for pris, så de ikke blir reassigna inni findData
   // hele tiden. Prisene som blir funnet blir lagt til i en instans av
   // model.Price og appenda til product.Prices
-  price := model.Price{Url: BASE_URL + link, Store: "bunnpris"}
+  price := model.PriceToday{Url: BASE_URL + link, Store: "bunnpris"}
   nutritionalContent := model.NutritionalContent{}
 
 	// Definerer en funksjon som går gjennom base noden
@@ -181,7 +181,7 @@ func (data Response) GetProductData(products *model.Products, link string) error
 	// kjører crawler på base-noden
 	crawler(data.Data.HTML)
 
-  product.Prices = append(product.Prices, price)
+  product.Prices.Today = append(product.Prices.Today, price)
   product.NutritionalContent = &nutritionalContent
 
   baseImageLink := BASE_URL + product.Images.Medium
@@ -192,13 +192,13 @@ func (data Response) GetProductData(products *model.Products, link string) error
 	product.Images.Medium = baseImageLink
 
 
-	if product.Prices[0].Price == 0 {
-		product.Prices[0].Price = product.Prices[0].OriginalPrice
+	if product.Prices.Today[0].Price == 0 {
+		product.Prices.Today[0].Price = product.Prices.Today[0].OriginalPrice
 	}
 
 	// Om originalPrice og price ikke er like er det salg så
 	// onSale settes til true
-	if product.Prices[0].Price != product.Prices[0].Price {
+	if product.Prices.Today[0].Price != product.Prices.Today[0].Price {
 		product.OnSale = true
 	}
 
@@ -211,7 +211,7 @@ func (data Response) GetProductData(products *model.Products, link string) error
 	return nil
 }
 
-func findData(node *html.Node, attr html.Attribute, product *model.Product, price *model.Price, nutritionalContent *model.NutritionalContent) {
+func findData(node *html.Node, attr html.Attribute, product *model.Product, price *model.PriceToday, nutritionalContent *model.NutritionalContent) {
   // Instanse av Price
 
   switch attr.Val {
