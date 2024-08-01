@@ -138,3 +138,35 @@ func query(product model.Product, db *sql.DB) error {
 	// ingen error så returnerer nil
 	return nil
 }
+
+type GetPriceHistoryFormat struct {
+  Gtin string `json:"id"`
+  Prices model.Price `json:"prices"`
+}
+
+func GetPriceHistory() ([]GetPriceHistoryFormat, error) {
+  db := db()
+  defer db.Close()
+
+  var prices []GetPriceHistoryFormat
+
+  rows, err := db.Query("SELECT id, prices FROM products")
+  if err != nil {
+    return nil, err
+  }
+  defer rows.Close()
+
+  for rows.Next() {
+    var price GetPriceHistoryFormat
+    if err := rows.Scan(&price.Gtin, &price.Prices); err != nil {
+      return nil, err
+    }
+    prices = append(prices, price)
+  }
+
+  if err := rows.Err(); err != nil {
+    return nil, err
+  }
+
+  return prices, nil
+}

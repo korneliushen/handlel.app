@@ -42,7 +42,7 @@ type Product struct {
 }
 
 type Price struct {
-  Today   []PriceToday `json:"today"`
+  Today   []PriceToday   `json:"today"`
   History []PriceHistory `json:"history"`
 }
 
@@ -153,6 +153,10 @@ func (product *Product) AggregateProductData(productData Products, products *Pro
 			UnitPrice:     item.Prices.Today[0].UnitPrice,
 			Url:           item.Prices.Today[0].Url,
 		})
+
+    var priceHistory []PriceHistory
+    priceHistory = append(priceHistory, PriceHistory{Date: "31.07.2024", Price: 10.0, Store: "meny"})
+    prices.History = priceHistory
 
     // TODO: pris historikk
     //
