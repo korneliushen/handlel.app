@@ -8,7 +8,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/korneliushen/handlel.app/meny/ngdata"
+	"github.com/korneliushen/handlel.app/scraper/model"
 	_ "github.com/lib/pq"
 )
 
@@ -27,7 +27,7 @@ func db() *sql.DB {
 }
 
 // legger til data i neon databasen
-func InsertData(products ngdata.Products) {
+func InsertData(products model.Products) {
 	// neon
 	db := db()
 	defer db.Close()
@@ -43,8 +43,8 @@ func InsertData(products ngdata.Products) {
 		wg.Add(1)
 		sem <- struct{}{}
 
-		go func(product ngdata.Product) {
-			fmt.Println("Legger inn data for:", product.Title)
+		go func(product model.Product) {
+			fmt.Println("Legger inn data for:", product.Title, product.Id)
 			// når funksjonen er ferdig, blir waitgroup instansen ferdig + sem
 			// (hvor mange ting som kan kjøre om gangen) blir oppdatert
 			defer wg.Done()
@@ -61,16 +61,22 @@ func InsertData(products ngdata.Products) {
 	wg.Wait()
 }
 
-func query(product ngdata.Product, db *sql.DB) error {
-	// gjør om næringsinnhold (type Næringsinnhold struct) til
-	// nutritionalContentJson (basically bare gjør om til json)
-	nutritionalContentJson, err := json.Marshal(product.NutritionalContent)
+func query(product model.Product, db *sql.DB) error {
+	// gjør om priser til json
+	pricesJson, err := json.Marshal(product.Prices)
 	if err != nil {
 		return err
 	}
 
-	// gjør om priser til json
-	pricesJson, err := json.Marshal(product.Prices)
+	// gjør om bilder til json
+	imagesJson, err := json.Marshal(product.Images)
+	if err != nil {
+		return err
+	}
+
+	// gjør om næringsinnhold (type Næringsinnhold struct) til
+	// nutritionalContentJson (basically bare gjør om til json)
+	nutritionalContentJson, err := json.Marshal(product.NutritionalContent)
 	if err != nil {
 		return err
 	}
@@ -81,20 +87,18 @@ func query(product ngdata.Product, db *sql.DB) error {
 	// up og overlapper
 	productsStmt, err := db.Prepare(`
 		INSERT INTO products (
-			id, title, subtitle, imagelink, category, 
-			subcategory, onsale, description, weight, origincountry, ingredients, 
-			vendor, brand, size, unit, unittype, allergens, mayContainTracesOf, 
-			nutritionalcontent, prices
+			id, title, subtitle, images, category, subcategory, onsale, description,
+			weight, origincountry, ingredients, vendor, brand, size, unit, unittype,
+			allergens, mayContainTracesOf, nutritionalcontent, prices, notes
 		)
 		VALUES (
-			$1, $2, $3, $4, $5, $6 , $7, $8, $9, $10,
-			$11, $12, $13, $14, $15, $16, $17, $18, $19, $20
+			$1, $2, $3, $4, $5, $6 , $7, $8, $9, $10, $11, $12, $13, $14, $15, $16,
+			$17, $18, $19, $20, $21
 		)
 		ON CONFLICT (id)
 		DO UPDATE SET
 			title = EXCLUDED.title,
 			subtitle = EXCLUDED.subtitle,
-			imagelink = EXCLUDED.imagelink,
 			category = EXCLUDED.category,
 			subcategory = EXCLUDED.subcategory,
 			onsale = EXCLUDED.onsale,
@@ -110,7 +114,9 @@ func query(product ngdata.Product, db *sql.DB) error {
 			allergens = EXCLUDED.allergens,
 			mayContainTracesOf = EXCLUDED.mayContainTracesOf,
 			nutritionalcontent = EXCLUDED.nutritionalcontent,
-			prices = EXCLUDED.prices
+			prices = EXCLUDED.prices,
+			images = EXCLUDED.images,
+      notes = EXCLUDED.notes
 		`)
 	if err != nil {
 		return err
@@ -119,11 +125,12 @@ func query(product ngdata.Product, db *sql.DB) error {
 
 	// queryen executes med verdiene fra product
 	_, err = productsStmt.Exec(product.Id, product.Title, product.SubTitle,
-		product.ImageLink, product.Category, product.SubCategory, product.OnSale,
+		imagesJson, product.Category, product.SubCategory, product.OnSale,
 		product.Description, product.Weight, product.OriginCountry,
 		product.Ingredients, product.Vendor, product.Brand, product.Size,
 		product.Unit, product.UnitType, product.Allergens,
-		product.MayContainTracesOf, nutritionalContentJson, pricesJson)
+		product.MayContainTracesOf, nutritionalContentJson, pricesJson,
+		product.Notes)
 	if err != nil {
 		return err
 	}
