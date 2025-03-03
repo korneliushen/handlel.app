@@ -27,6 +27,13 @@
 	export let data: import('./$types').PageData;
 </script>
 
+<svelte:head>
+	<title>{data.product.title}</title>
+	<meta
+		name="description"
+		content={`Finn billigste pris på ${data.product.title} fra flere dagligvarebutikker i hele Norge.`}
+	/>
+</svelte:head>
 <main
 	class=" relative grid w-screen max-w-[600px] grid-cols-1 gap-x-8 gap-y-4 overflow-hidden rounded-lg px-5 pb-16 sm:pb-0 lg:max-w-[1200px] lg:grid-cols-2 lg:px-20"
 >
