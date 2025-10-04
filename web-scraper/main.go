@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
-	"github.com/korneliushen/handlel.app/scraper/algolia"
 	"github.com/korneliushen/handlel.app/scraper/bunnpris"
 	"github.com/korneliushen/handlel.app/scraper/model"
 	"github.com/korneliushen/handlel.app/scraper/neon"
@@ -43,11 +42,6 @@ func run() {
 
 	// legger data inn i neon databasen
 	neon.InsertData(formattedProducts)
-
-	// legger data inn i algolia indexen
-	if err := algolia.InsertRecords(formattedProducts); err != nil {
-		fmt.Printf("Error: %v\n", err)
-	}
 }
 
 func main() {
