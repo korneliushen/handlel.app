@@ -8,7 +8,7 @@ import (
 	"github.com/korneliushen/handlel.app/scraper/model"
 )
 
-func Bunnpris(products *model.Products) {
+func Fetch(products *model.Products) {
   originalLength := len(*products)
 
 	ctx := context.Background()

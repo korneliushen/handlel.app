@@ -2,7 +2,7 @@ package ngdata
 
 import "github.com/korneliushen/handlel.app/scraper/model"
 
-func Ngdata(products *model.Products) {
+func Fetch(products *model.Products) {
 	// Henter alle kategorier
 	categories := GetCategories()
 

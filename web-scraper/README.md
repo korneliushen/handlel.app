@@ -23,11 +23,11 @@ til et format databasen vil ha, og så sendes dataen til databasen og til algoli
 
 Lag et nytt directory her og gi det navnet på butikken du scraper.
 
-Sett opp scraperen hvordan du vil, men lag en funksjon som kan importes og kjøres av main.go
+Sett opp scraperen hvordan du vil, men lag en funksjon som kan importes og kjøres av main.go (kall funksjonen Fetch)
 
 Denne funksjonen må ta inn et argument med type *model.Products. Produktene du får fra scraperen din skal appendes til dette arrayet.
 
-Kjør funksjonen i main.go og gi products som argument.
+Legg til Fetch funksjonen (eks: bunnpris.Fetch) i 'modules' listen i main.go.
 
 Om dataen du henter er formatert som model.Products, skal det funke av seg selv og dataen skal legges til.
 

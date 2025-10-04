@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
-	"github.com/korneliushen/handlel.app/scraper/bunnpris"
+	"github.com/korneliushen/handlel.app/scraper/data/bunnpris"
+	"github.com/korneliushen/handlel.app/scraper/data/ngdata"
 	"github.com/korneliushen/handlel.app/scraper/model"
 	"github.com/korneliushen/handlel.app/scraper/neon"
-	"github.com/korneliushen/handlel.app/scraper/ngdata"
 )
 
 func run() {
@@ -18,17 +18,15 @@ func run() {
 	// legger bare til data i dette arrayet
   products := &model.Products{}
 
-	// meny, joker, spar
-  ngdata.Ngdata(products)
+	// for nye butikker, importer modul og legg til Fetch funksjon i listen (vil populere products arr):
+	modules := []func(*model.Products){
+		ngdata.Fetch,
+		bunnpris.Fetch,
+	}
 
-  // bunnpris
-  bunnpris.Bunnpris(products)
-
-	// LEGG TIL NYE BUTIKKER UNDER HER:
-	//
-	//
-	//
-	//
+	for _, f := range modules {
+		f(products)
+	}
 
 	// Mapper over alle produkter vi har fått fra databasen og formatterer
 	// dataen i egne structs
@@ -38,7 +36,7 @@ func run() {
 		fmt.Println("No products")
 		return
 	}
-  fmt.Println("Formated: ", len(formattedProducts))
+  fmt.Println("Formatted: ", len(formattedProducts))
 
 	// legger data inn i neon databasen
 	neon.InsertData(formattedProducts)
