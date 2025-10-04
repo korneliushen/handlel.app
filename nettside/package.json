@@ -12,16 +12,19 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
+		"@prisma/client": "^6.16.3",
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@tailwindcss/typography": "^0.5.10",
 		"autoprefixer": "^10.4.16",
+		"install": "^0.13.0",
+		"npm": "^11.6.1",
 		"postcss": "^8.4.33",
 		"prettier": "^3.1.1",
 		"prettier-plugin-svelte": "^3.1.2",
 		"prettier-plugin-tailwindcss": "^0.5.1",
-		"prisma": "^5.14.0",
+		"prisma": "^5.22.0",
 		"svelte": "^4.2.7",
 		"svelte-check": "^3.6.0",
 		"tailwindcss": "^3.4.1",
@@ -32,7 +35,6 @@
 	"type": "module",
 	"dependencies": {
 		"@formkit/auto-animate": "^0.8.2",
-		"@prisma/client": "^5.22.0",
 		"algoliasearch": "^4.23.3",
 		"lucide-svelte": "^0.378.0"
 	}
