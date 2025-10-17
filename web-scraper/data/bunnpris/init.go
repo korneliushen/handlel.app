@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/korneliushen/handlel.app/scraper/bunnpris/bunnpris"
 	"github.com/korneliushen/handlel.app/scraper/model"
 )
 
@@ -13,7 +12,7 @@ func Fetch(products *model.Products) {
 
 	ctx := context.Background()
 
-	token, err := bunnpris.ReadToken()
+	token, err := ReadToken()
 	if err != nil {
 		fmt.Printf("Error getting token: %v\n", err)
 		return
@@ -21,7 +20,7 @@ func Fetch(products *model.Products) {
 
 	fmt.Println("Getting categories")
 
-	var categories bunnpris.Categories
+	var categories Categories
 	if err := categories.Get(ctx, token.Value); err != nil {
 		fmt.Printf("Error getting categories: %v\n", err)
 		return
@@ -29,7 +28,7 @@ func Fetch(products *model.Products) {
 
 	fmt.Println("Getting products")
 
-	var productLinks bunnpris.BunnprisProducts
+	var productLinks BunnprisProducts
 	for _, category := range categories {
 		err := productLinks.Get(ctx, token.Value, category.Id)
 		if err != nil {

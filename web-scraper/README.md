@@ -35,11 +35,14 @@ Om dataen du henter er formatert som model.Products, skal det funke av seg selv 
 #### Fil struktur
 ```js
 ~/web-scraper/
-├── algolia // funksjoner som interacter med algolia
 ├── neon // funksjoner som interacter med neon
 ├── lib // dir for funksjoner som skal brukes flere steder og har ganske basic funksjonalitet ig
 ├── model // dir for felles structs (produkter og kategorier)
-├── ngdata/bunnpris/oda/osv. // scrapere av ulike butikker
+├── data // scrapere av ulike butikker
+    ├── bunnpris
+    ├── ngdata
+    ├── oda
+    └── osv
 ├── .gitignore // no leaking
 ├── Dockerfile // docker (funker)
 ├── README.md // det du leser rn

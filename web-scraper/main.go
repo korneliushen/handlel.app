@@ -8,6 +8,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/korneliushen/handlel.app/scraper/data/bunnpris"
 	"github.com/korneliushen/handlel.app/scraper/data/ngdata"
+	"github.com/korneliushen/handlel.app/scraper/data/oda"
 	"github.com/korneliushen/handlel.app/scraper/model"
 	"github.com/korneliushen/handlel.app/scraper/neon"
 )
@@ -17,6 +18,9 @@ func run() {
 	// Denne brukes til å sende data til databasen og algolia, så alle butikker
 	// legger bare til data i dette arrayet
   products := &model.Products{}
+
+	oda.Fetch(products)
+	return
 
 	// for nye butikker, importer modul og legg til Fetch funksjon i listen (vil populere products arr):
 	modules := []func(*model.Products){

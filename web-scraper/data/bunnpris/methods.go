@@ -14,7 +14,6 @@ import (
 const BASE_URL = "https://nettbutikk.bunnpris.no"
 
 // TODO: trenger bare noen ting her og ikke alt (conditional det var den ene videoen jeg husker det)
-
 func POST(ctx context.Context, token, endpoint string, reqBody io.Reader, contentType string) Response {
 	// lager en url som requests skal sendes til ved å kombinere base url og
 	// endpoint vi får som arg
