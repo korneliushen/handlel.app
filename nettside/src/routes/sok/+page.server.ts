@@ -14,9 +14,10 @@ export const load: PageServerLoad = async ({ url }) => {
 				where: {
 					title: {
 						contains: url.searchParams.get('search') as string,
-            mode: 'insensitive'
+            			mode: 'insensitive'
 					}
-				}
+				},
+				take: 30,
 			})
 		};
 	}
