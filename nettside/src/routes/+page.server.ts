@@ -1,7 +1,7 @@
-import prisma from "$lib/prisma";
+import { prisma } from "$lib/server/prisma";
 import type { PageServerLoad } from "./$types";
 import { error } from "@sveltejs/kit";
-import type { ExtendedProduct } from "$lib/types/extendedPrisma";
+import type { ExtendedProduct } from "$lib/server/types/extendedPrisma";
 
 export const load: PageServerLoad = ({setHeaders}) => {
   setHeaders({

@@ -1,7 +1,7 @@
-import prisma from '$lib/prisma';
+import { prisma } from '$lib/server/prisma';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import type { ExtendedProduct } from '$lib/types/extendedPrisma';
+import type { ExtendedProduct } from '$lib/server/types/extendedPrisma';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const product = (await prisma.products.findFirst({

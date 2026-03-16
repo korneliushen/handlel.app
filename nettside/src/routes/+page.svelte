@@ -4,12 +4,20 @@
 	import ProductCardSkeleton from '$lib/components/productCardSkeleton.svelte';
 
 	export let data: import('./$types').PageData;
+	let onSaleProducts;
+	$: (async () => {
+		let loadedProducts = await data.streamed.products;
+		onSaleProducts = loadedProducts[1].products.filter((product) => product.onsale == true)
+	})();
+	
 </script>
 
 <div class="my-6 flex w-full items-center justify-center p-4">
-	<div
-		class="flex h-[256px] w-full items-center justify-center rounded-md bg-gray-300 md:h-96 md:w-[1200px]"
-	/>
+	{#await data.streamed.products then loadedProducts }
+		{#each onSaleProducts as data}
+			<div>{data.products[0].title}</div>
+		{/each}
+	{/await}
 </div>
 <section class="flex max-w-[100vw] flex-col items-center gap-y-3">
 	{#await data.streamed.products}

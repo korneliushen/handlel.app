@@ -1,5 +1,5 @@
-import prisma from '$lib/prisma';
-import type { ExtendedProduct } from '$lib/types/extendedPrisma';
+import { prisma } from '$lib/server/prisma';
+import type { ExtendedProduct } from '$lib/server/types/extendedPrisma';
 import type { PageServerLoad } from './$types';
 import algoliasearch from 'algoliasearch';
 

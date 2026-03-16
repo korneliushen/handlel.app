@@ -1,0 +1,9 @@
+FROM node:current-alpine3.23
+
+COPY build package.json package-lock.json ./
+
+RUN npm ci --omit dev
+
+COPY build ./build
+
+CMD ["node", "build"]

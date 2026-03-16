@@ -1,6 +1,8 @@
-import type { products } from '@prisma/client';
+import type { products } from '../src/generated/prisma';
 
-export type ExtendedProduct = products & {
+export type local_products = products
+
+export type ExtendedProduct = local_products & {
 	prices: Price[];
 	nutritionalcontent: NutritionalContent;
 	images: Image;

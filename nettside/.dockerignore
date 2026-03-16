@@ -1,0 +1,162 @@
+# ============================================================================
+# Created by https://dockerignore.com/
+# FRAMEWORK TEMPLATE for Svelte Kit
+# Website: https://kit.svelte.dev/
+# Repository: https://github.com/sveltejs/kit
+# ============================================================================
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# TEMPLATE OVERVIEW & USAGE NOTES
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# • TEMPLATE TYPE: Framework Template
+# • PURPOSE: Svelte Kit framework specific ignore patterns
+# • DESIGN PHILOSOPHY: Self-contained with all necessary patterns including security
+# • COMBINATION GUIDANCE: Use standalone - no need to combine with other templates
+# • SECURITY CONSIDERATIONS: Includes security patterns for .env files and credentials
+# • BEST PRACTICES: Review before use, test with your specific Svelte Kit setup
+# • OFFICIAL SOURCES: Svelte Kit community patterns and best practices
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# SECURITY & SENSITIVE DATA PROTECTION (ALWAYS FIRST!)
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# CRITICAL: Prevent sensitive data from being included in Docker images
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# ENVIRONMENT VARIABLES & CONFIGURATION FILES
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# Environment files contain sensitive API keys, database credentials,
+# and other secrets that must not be included in Docker images
+
+.env
+.env.*
+.env.*.local
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# APPLICATION SECRETS & CREDENTIALS
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# Application secrets, credentials, and sensitive configuration files
+
+**/config/credentials.*
+**/config/secrets.*
+**/keys/
+**/passwords/
+**/private/
+**/secrets/
+*.auth
+*.authz
+*.password
+*.secret
+*.secrets
+*.token
+*_tokens
+*password*
+apikeys.*
+appsettings.Development.json
+appsettings.Local.json
+appsettings.Staging.json
+connectionstrings.config
+credentials
+database.ini
+database.yml
+dbconfig.xml
+secrets.json
+secrets.yaml
+secrets.yml
+tokens.*
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# DEPENDENCIES AND PACKAGE MANAGERS
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# Package manager caches and dependency directories
+
+**/.npm/
+**/.pnpm/
+**/.yarn/
+**/node_modules/
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# BUILD ARTIFACTS AND OUTPUT
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# Build output directories and generated files
+
+**/.out/
+**/.output/
+**/.svelte-kit/output/
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# CACHE AND TEMPORARY FILES
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# Build caches, temporary files, and development artifacts
+
+**/.cache/
+**/.esbuild/
+**/.swc/
+**/.turbo/
+**/temp/
+**/tmp/
+*.cache
+*.temp
+*.tmp
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# TESTING AND QUALITY ASSURANCE
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# Test directories, test runners, and testing configuration
+
+**/__mocks__/
+**/__tests__/
+**/test/
+**/tests/
+cypress.config.*
+jest.config.*
+playwright.config.*
+vitest.config.*
+vitest.config.*.js
+vitest.config.*.mjs
+vitest.config.*.ts
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# DOCUMENTATION AND EXAMPLES
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# Documentation, examples, and sample files
+
+**/docs/
+**/documentation/
+**/examples/
+**/samples/
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# DEVELOPMENT TOOLS AND PLATFORMS
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# Development platform directories and tool configurations
+
+**/.aws/
+**/.azure/
+**/.dev/
+**/.devcontainer/
+**/.fly/
+**/.gcp/
+**/.husky/
+**/.netlify/
+**/.railway/
+**/.render/
+**/.vercel/
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# SVELTE KIT SPECIFIC
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# Svelte Kit framework specific directories and files
+
+**/.svelte-kit/
+**/.svelte-kit/generated/
+**/.svelte-kit/types/
+.svelte-kit/ambient.d.ts
+.svelte-kit/types.d.ts
+
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# ARCHIVES AND COMPRESSED FILES
+# ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+# Archive files that shouldn't be included in Docker images
+
+*.7z
+*.rar
